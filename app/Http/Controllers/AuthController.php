@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\UnauthorizedException;
@@ -114,17 +115,47 @@ class AuthController extends Controller
    * Handle a registration request for the application.
    *
    * @param  \Illuminate\Http\Request  $request
-   * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+   * @return \Illuminate\Http\JsonResponse
    */
   public function register(Request $request)
   {
-    $request->validate([]);
+    $request->validate([
+      'name'                => "required|unique:users",
+      'email'               => "required|email|unique:users",
+      'password'            => 'required|min:6',
+      'avatar'              => '',
+    ], [
+      'password.confirmed'  => 'The password does not match.'
+    ]);
 
-    $user = $this->create($request->all());
+    $avatar = $request->avatar;
+
+    $user = User::create([
+      'password' => Hash::make($request->password),
+    ] + $request->only(
+      ['name', 'email']
+    ));
+
+    ($user && $avatar) && $user->saveImage($avatar, 'avatar');
+
+    try {
+      // $user->notify(new SignupActivate($user));
+    } catch (\Exception $e) {
+      // $user->active = 1;
+      // $user->save();
+    }
+
+    $token       = $user->grantMeToken();
 
     $this->guard()->login($user);
 
-    return new JsonResponse([], 201);
+    return response()->json([
+      'message'     => 'Successfully registered!',
+      'user'        => $user,
+      'token'       => $token['token'],
+      'token_type'  => $token['token_type'],
+      // 'expires_at'  => $token['expires_at'],
+    ], 201);
   }
 
   /**
