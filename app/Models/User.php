@@ -45,6 +45,16 @@ class User extends Authenticatable implements HasMedia
     'email_verified_at' => 'datetime',
   ];
 
+  public function grantMeToken()
+  {
+    $token          =  $this->createToken('default');
+
+    return [
+      'token'       => $token->plainTextToken,
+      'token_type'  => 'Bearer',
+    ];
+  }
+
   function registerMediaCollections(): void
   {
     $mimes = ['image/jpeg', 'image/png', 'image/gif'];

@@ -18,6 +18,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
   return $request->user();
 });
 
+Route::group(['middleware' => 'guest'], function () {
+  Route::post('login', 'AuthController@login');
+});
+
+Route::group(['middleware' => ['auth:api']], function () {
+  Route::get('logout', 'AuthController@logout');
+});
+
 Route::group([], function () {
   Route::get('version', fn () => config('app.api.version'));
 });

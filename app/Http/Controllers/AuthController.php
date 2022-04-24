@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
@@ -136,34 +137,65 @@ class AuthController extends Controller
    */
   public function login(Request $request)
   {
-    $request->validate([]);
+    $request->validate([
+      'email'       => 'required|email',
+      'password'    => 'required|string',
+      'remember_me' => 'boolean'
+    ]);
 
-    // If the class is using the ThrottlesLogins trait, we can automatically throttle
-    // the login attempts for this application. We'll key this by the username and
-    // the IP address of the client making these requests into this application.
-    if (
-      method_exists($this, 'hasTooManyLoginAttempts') &&
-      $this->hasTooManyLoginAttempts($request)
-    ) {
-      $this->fireLockoutEvent($request);
+    $user = User::whereEmail($request->email)->first();
 
-      return $this->sendLockoutResponse($request);
-    }
+    if ($user) {
+      // If the class is using the ThrottlesLogins trait, we can automatically throttle
+      // the login attempts for this application. We'll key this by the username and
+      // the IP address of the client making these requests into this application.
+      if (
+        method_exists($this, 'hasTooManyLoginAttempts') &&
+        $this->hasTooManyLoginAttempts($request)
+      ) {
+        $this->fireLockoutEvent($request);
 
-    if ($this->attemptLogin($request)) {
+        return $this->sendLockoutResponse($request);
+      }
+
+      if (!$this->guard()->attempt(
+        $request->only('email', 'password'),
+        $request->filled('remember')
+      )) {
+        // If the login attempt was unsuccessful we will increment the number of attempts
+        // to login and redirect the user back to the login form. Of course, when this
+        // user surpasses their maximum number of attempts they will get locked out.
+        $this->incrementLoginAttempts($request);
+
+        return response()->json(
+          [
+            $this->username() => [trans('auth.failed')],
+            'message' => 'credentials does not match our records',
+            'status'  => false,
+          ],
+          401
+        );
+      }
+
+      // $user->withUrls('avatar');
+
+      $token       = $user->grantMeToken();
+
       if ($request->hasSession()) {
         $request->session()->put('auth.password_confirmed_at', time());
       }
 
-      return $this->sendLoginResponse($request);
+      return response()->json([
+        'user'        => $user,
+        'token'       => $token['token'],
+        'token_type'  => $token['token_type'],
+        // 'expires_at'  => $token['expires_at'],
+      ]);
+    } else {
+      throw ValidationException::withMessages([
+        'password' => [trans('validation.password')],
+      ]);
     }
-
-    // If the login attempt was unsuccessful we will increment the number of attempts
-    // to login and redirect the user back to the login form. Of course, when this
-    // user surpasses their maximum number of attempts they will get locked out.
-    $this->incrementLoginAttempts($request);
-
-    return $this->sendFailedLoginResponse($request);
   }
 
   function verification()
@@ -179,13 +211,11 @@ class AuthController extends Controller
    */
   public function logout(Request $request)
   {
-    $this->guard()->logout();
+    $request->user()->currentAccessToken()->delete();
 
-    $request->session()->invalidate();
-
-    $request->session()->regenerateToken();
-
-    return new JsonResponse([], 204);
+    return response()->json([
+      'message' => 'Successfully logged out'
+    ]);
   }
 
   /**
@@ -195,6 +225,16 @@ class AuthController extends Controller
    */
   protected function guard()
   {
-    return auth()->guard();
+    return auth();
+  }
+
+  /**
+   * Get the login username to be used by the controller.
+   *
+   * @return string
+   */
+  public function username()
+  {
+    return 'email';
   }
 }
