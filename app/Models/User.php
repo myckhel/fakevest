@@ -21,9 +21,11 @@ class User extends Authenticatable implements HasMedia
    * @var array<int, string>
    */
   protected $fillable = [
-    'name',
+    'username',
     'email',
     'password',
+    'phone',
+    'fullname',
   ];
 
   /**
@@ -34,6 +36,7 @@ class User extends Authenticatable implements HasMedia
   protected $hidden = [
     'password',
     'remember_token',
+    'media'
   ];
 
   /**
