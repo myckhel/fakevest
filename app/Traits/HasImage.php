@@ -95,12 +95,11 @@ trait HasImage
   public function uploadImage($image, $collection)
   {
     $name           = $collection;
-    $type           = strpos($image, ';');
-    $type           = explode(':', substr($image, 0, $type))[1];
-    $ext            = explode('/', $type)[1];
+    $filename       = explode('.', $image->getClientOriginalName());
+    $ext            = strtolower(array_pop($filename));
     $file_name      = rand() . '.' . $ext;
 
-    return $this->addMediaFromBase64($image)
+    return $this->addMedia($image)
       ->usingName($name)->usingFileName($file_name)
       ->toMediaCollection($collection);
   }
