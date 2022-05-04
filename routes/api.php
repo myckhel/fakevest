@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +22,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::group(['middleware' => 'guest'], function () {
   Route::post('login', 'AuthController@login');
   Route::post('register', 'AuthController@register');
+  // social
+  Route::get('/login/{provider}', [AuthController::class, 'redirectToProvider']);
+  Route::get('/login/{provider}/callback', [AuthController::class, 'handleProviderCallback']);
 });
 
 Route::group(['middleware' => ['auth:api']], function () {

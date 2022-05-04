@@ -15,6 +15,11 @@ class User extends Authenticatable implements HasMedia
 {
   use HasApiTokens, HasFactory, Notifiable, HasImage, InteractsWithMedia;
 
+  public function providers()
+  {
+    return $this->hasMany(Provider::class);
+  }
+
   /**
    * The attributes that are mass assignable.
    *
@@ -46,6 +51,7 @@ class User extends Authenticatable implements HasMedia
    */
   protected $casts = [
     'email_verified_at' => 'datetime',
+    'phone' => 'int'
   ];
 
   public function grantMeToken()
