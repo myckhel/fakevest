@@ -11,6 +11,7 @@
         "php": "^8.1",
         "ext-pcntl": "*",
         "ext-swoole": "^4.8",
+        "bavix/laravel-wallet": "^9.0",
         "guzzlehttp/guzzle": "^7.2",
         "intervention/image": "^2.7",
         "laravel/framework": "^9.2",
@@ -20,7 +21,8 @@
         "laravel/telescope": "^4.8",
         "laravel/tinker": "^2.7",
         "predis/predis": "^1.1",
-        "spatie/laravel-medialibrary": "^10.3"
+        "spatie/laravel-medialibrary": "^10.3",
+        "unicodeveloper/laravel-paystack": "dev-master"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
@@ -29,6 +31,12 @@
         "phpunit/phpunit": "^9.5.10",
         "spatie/laravel-ignition": "^1.0"
     },
+    "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/stojankukrika/laravel-paystack"
+    }
+  ],
     "autoload": {
         "psr-4": {
             "App\\": "app/",
