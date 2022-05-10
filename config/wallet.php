@@ -175,7 +175,7 @@ return [
     'model' => Wallet::class,
     'creating' => [],
     'default' => [
-      'name' => 'Default Wallet',
+      'name' => 'naira',
       'slug' => 'default',
       'meta' => [],
     ],
