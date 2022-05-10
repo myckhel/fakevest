@@ -12,6 +12,7 @@
         "ext-pcntl": "*",
         "ext-swoole": "^4.8",
         "bavix/laravel-wallet": "^9.0",
+        "fakerphp/faker": "^1.9.1",
         "guzzlehttp/guzzle": "^7.2",
         "intervention/image": "^2.7",
         "laravel/framework": "^9.2",
@@ -25,7 +26,6 @@
         "unicodeveloper/laravel-paystack": "dev-master"
     },
     "require-dev": {
-        "fakerphp/faker": "^1.9.1",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^6.1",
         "phpunit/phpunit": "^9.5.10",
