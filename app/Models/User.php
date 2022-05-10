@@ -10,10 +10,39 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\HasMedia;
+use Bavix\Wallet\Traits\HasWallet;
+use Bavix\Wallet\Traits\HasWallets;
+use Bavix\Wallet\Interfaces\Wallet;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class User extends Authenticatable implements HasMedia
+class User extends Authenticatable implements HasMedia, Wallet
 {
-  use HasApiTokens, HasFactory, Notifiable, HasImage, InteractsWithMedia;
+  use HasApiTokens, HasFactory, Notifiable, HasImage, InteractsWithMedia, HasWallet, HasWallets;
+
+  /**
+   * Get all of the payment_options for the User
+   *
+   * @return \Illuminate\Database\Eloquent\Relations\HasMany
+   */
+  public function payment_options(): HasMany
+  {
+    return $this->hasMany(PaymentOption::class);
+  }
+
+  /**
+   * Get all of the payments for the User
+   *
+   * @return \Illuminate\Database\Eloquent\Relations\HasMany
+   */
+  public function payments(): HasMany
+  {
+    return $this->hasMany(Payment::class);
+  }
+
+  public function providers()
+  {
+    return $this->hasMany(Provider::class);
+  }
 
   /**
    * The attributes that are mass assignable.
@@ -21,9 +50,11 @@ class User extends Authenticatable implements HasMedia
    * @var array<int, string>
    */
   protected $fillable = [
-    'name',
+    'username',
     'email',
     'password',
+    'phone',
+    'fullname',
   ];
 
   /**
@@ -34,6 +65,7 @@ class User extends Authenticatable implements HasMedia
   protected $hidden = [
     'password',
     'remember_token',
+    'media'
   ];
 
   /**
@@ -43,6 +75,7 @@ class User extends Authenticatable implements HasMedia
    */
   protected $casts = [
     'email_verified_at' => 'datetime',
+    'phone' => 'int'
   ];
 
   public function grantMeToken()

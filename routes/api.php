@@ -1,5 +1,10 @@
 <?php
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PaymentOptionController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\WalletController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,9 +26,18 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::group(['middleware' => 'guest'], function () {
   Route::post('login', 'AuthController@login');
   Route::post('register', 'AuthController@register');
+  Route::get('users/random', [UserController::class, 'random']);
+  // social
+  Route::get('/login/{provider}', [AuthController::class, 'redirectToProvider']);
+  Route::get('/login/{provider}/callback', [AuthController::class, 'handleProviderCallback']);
 });
 
 Route::group(['middleware' => ['auth:api']], function () {
+  Route::apiResource('wallets',         WalletController::class);
+  Route::apiResource('payments',        PaymentController::class);
+  Route::apiResource('payment_options', PaymentOptionController::class);
+  Route::post('payments/verify',        [PaymentController::class, 'verify']);
+
   Route::get('logout', 'AuthController@logout');
 });
 

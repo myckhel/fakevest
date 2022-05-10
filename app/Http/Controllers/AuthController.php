@@ -4,16 +4,93 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\UnauthorizedException;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
   use ThrottlesLogins;
+
+  /**
+   * Redirect the user to the Provider authentication page.
+   *
+   * @param $provider
+   * @return JsonResponse
+   */
+  public function redirectToProvider($provider)
+  {
+    $validated = $this->validateProvider($provider);
+    if (!is_null($validated)) {
+      return $validated;
+    }
+
+    return ['url' => Socialite::driver($provider)->stateless()->redirect()->getTargetUrl()];
+  }
+
+  /**
+   * Obtain the user information from Provider.
+   *
+   * @param $provider
+   * @return JsonResponse
+   */
+  public function handleProviderCallback($provider)
+  {
+    $validated = $this->validateProvider($provider);
+    if (!is_null($validated)) {
+      return $validated;
+    }
+    try {
+      $user = Socialite::driver($provider)->stateless()->user();
+    } catch (ClientException $exception) {
+      return response()->json(['error' => 'Invalid credentials provided.'], 422);
+    }
+
+    $userCreated = User::firstOrCreate(
+      [
+        'email' => $user->getEmail()
+      ],
+      [
+        'email_verified_at' => now(),
+        'fullname' => $user->getName(),
+        'status' => true,
+      ]
+    );
+    $userCreated->providers()->updateOrCreate(
+      [
+        'provider' => $provider,
+        'provider_id' => $user->getId(),
+      ],
+      [
+        'avatar' => $user->getAvatar()
+      ]
+    );
+    $token = $userCreated->grantMeToken();
+
+    return response()->json([
+      'message'     => 'Successfully authenticated!',
+      'user'        => $userCreated,
+      'token'       => $token['token'],
+      'token_type'  => $token['token_type'],
+    ], 201);
+  }
+
+  /**
+   * @param $provider
+   * @return JsonResponse
+   */
+  protected function validateProvider($provider)
+  {
+    if (!in_array($provider, ['facebook', 'github', 'google'])) {
+      return response()->json(['error' => 'Please login using facebook, github or google'], 422);
+    }
+  }
 
   /**
    * Mark the authenticated user's email address as verified.
@@ -120,10 +197,12 @@ class AuthController extends Controller
   public function register(Request $request)
   {
     $request->validate([
-      'name'                => "required|unique:users",
-      'email'               => "required|email|unique:users",
+      'username'            => "unique:users",
+      'phone'               => [Rule::requiredIf(!$request->email), "digits_between:10,11"],
+      'email'               => [Rule::requiredIf(!$request->phone), "email", "unique:users,email"],
       'password'            => 'required|min:6',
-      'avatar'              => '',
+      'fullname'            => 'required|min:6',
+      'avatar'              => 'image',
     ], [
       'password.confirmed'  => 'The password does not match.'
     ]);
@@ -133,7 +212,7 @@ class AuthController extends Controller
     $user = User::create([
       'password' => Hash::make($request->password),
     ] + $request->only(
-      ['name', 'email']
+      ['username', 'email', 'phone', 'fullname']
     ));
 
     ($user && $avatar) && $user->saveImage($avatar, 'avatar');
@@ -146,8 +225,6 @@ class AuthController extends Controller
     }
 
     $token       = $user->grantMeToken();
-
-    $this->guard()->login($user);
 
     return response()->json([
       'message'     => 'Successfully registered!',
@@ -169,12 +246,26 @@ class AuthController extends Controller
   public function login(Request $request)
   {
     $request->validate([
-      'email'       => 'required|email',
+      'username'    => [Rule::requiredIf(!$request->phone && !$request->email)],
+      'phone'       => [Rule::requiredIf(!$request->email && !$request->username), "digits_between:10,11"],
+      'email'       => [Rule::requiredIf(!$request->phone && !$request->username), 'email'],
       'password'    => 'required|string',
-      'remember_me' => 'boolean'
     ]);
 
-    $user = User::whereEmail($request->email)->first();
+    $email    = $request->email;
+    $username = $request->username;
+    $phone    = $request->phone;
+    $password = $request->password;
+
+    $user = User::when(
+      $email,
+      fn ($q) => $q->whereEmail($request->email),
+      fn ($q) => $q->when(
+        $username,
+        fn ($q) => $q->whereUsername($username),
+        fn ($q) => $q->wherePhone($phone),
+      )
+    )->first();
 
     if ($user) {
       // If the class is using the ThrottlesLogins trait, we can automatically throttle
@@ -189,12 +280,7 @@ class AuthController extends Controller
         return $this->sendLockoutResponse($request);
       }
 
-      if (!$this->guard()->attempt(
-        $request->only('email', 'password'),
-        $request->filled('remember')
-      )) {
-        // If the login attempt was unsuccessful we will increment the number of attempts
-        // to login and redirect the user back to the login form. Of course, when this
+      if (!Hash::check($password, $user->password)) {
         // user surpasses their maximum number of attempts they will get locked out.
         $this->incrementLoginAttempts($request);
 
@@ -208,13 +294,9 @@ class AuthController extends Controller
         );
       }
 
-      // $user->withUrls('avatar');
+      $user->withUrls('avatar');
 
       $token       = $user->grantMeToken();
-
-      if ($request->hasSession()) {
-        $request->session()->put('auth.password_confirmed_at', time());
-      }
 
       return response()->json([
         'user'        => $user,
@@ -224,7 +306,7 @@ class AuthController extends Controller
       ]);
     } else {
       throw ValidationException::withMessages([
-        'password' => [trans('validation.password')],
+        'user' => [trans('passwords.user')],
       ]);
     }
   }
