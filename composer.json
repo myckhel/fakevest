@@ -64,7 +64,8 @@
             "@php artisan key:generate --ansi"
         ],
         "dev": "php artisan octane:start --workers=1 --task-workers=1 --watch",
-        "deploy:main": "git push heroku main"
+        "deploy:main": "git push heroku main",
+        "deploy:dev-main": "git push heroku dev:main"
     },
     "extra": {
         "laravel": {
