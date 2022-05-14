@@ -63,7 +63,8 @@
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
         ],
-        "dev": "php artisan octane:start --workers=1 --task-workers=1 --watch"
+        "dev": "php artisan octane:start --workers=1 --task-workers=1 --watch",
+        "deploy:main": "git push heroku main"
     },
     "extra": {
         "laravel": {
