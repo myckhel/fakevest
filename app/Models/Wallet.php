@@ -9,7 +9,10 @@ class Wallet extends BaseWallet
 {
   use HasFactory;
 
-  protected $casts = ['balance' => 'float'];
+  protected $casts = [
+    'balance' => 'float', 'decimal_places' => 'int',
+    'meta' => 'json',
+  ];
 
   static function fromKobo(int $figure)
   {
