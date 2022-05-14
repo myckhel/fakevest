@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PaymentOptionController;
+use App\Http\Controllers\PlanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WalletController;
 use Illuminate\Http\Request;
@@ -36,6 +37,7 @@ Route::group(['middleware' => ['auth:api']], function () {
   Route::apiResource('wallets',         WalletController::class);
   Route::apiResource('payments',        PaymentController::class);
   Route::apiResource('payment_options', PaymentOptionController::class);
+  Route::apiResource('plans', PlanController::class)->only(['index', 'show']);
   Route::post('payments/verify',        [PaymentController::class, 'verify']);
 
   Route::get('logout', 'AuthController@logout');

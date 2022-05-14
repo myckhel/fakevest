@@ -2,32 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\Plan;
 use Illuminate\Http\Request;
 
-class UserController extends Controller
+class PlanController extends Controller
 {
-  /**
-   * Display a listing of the resource.
-   *
-   * @return \Illuminate\Http\Response
-   */
-  public function random(Request $request)
-  {
-    $request->validate([
-      'orderBy'     => '',
-      'order'       => 'in:asc,desc',
-      'pageSize'    => 'int',
-    ]);
-
-    $pageSize = $request->pageSize;
-
-    return User
-      ::with('wallets')
-      ->inRandomOrder()
-      ->paginate($pageSize);
-  }
-
   /**
    * Display a listing of the resource.
    *
@@ -45,7 +24,7 @@ class UserController extends Controller
     $order    = $request->order;
     $orderBy  = $request->orderBy;
 
-    return User
+    return Plan
       ::orderBy($orderBy ?? 'id', $order ?? 'asc')
       ->paginate($pageSize);
   }
@@ -61,50 +40,50 @@ class UserController extends Controller
     $request->validate([]);
     $user     = $request->user();
 
-    return User::create($request->only([]));
+    return Plan::create($request->only([]));
   }
 
   /**
    * Display the specified resource.
    *
-   * @param  \App\Models\User  $user
+   * @param  \App\Models\Plan  $plan
    * @return \Illuminate\Http\Response
    */
-  public function show(User $user)
+  public function show(Plan $plan)
   {
-    $this->authorize('view', $user);
-    return $user;
+    $this->authorize('view', $plan);
+    return $plan;
   }
 
   /**
    * Update the specified resource in storage.
    *
    * @param  \Illuminate\Http\Request  $request
-   * @param  \App\Models\User  $user
+   * @param  \App\Models\Plan  $plan
    * @return \Illuminate\Http\Response
    */
-  public function update(Request $request, User $user)
+  public function update(Request $request, Plan $plan)
   {
-    $this->authorize('update', $user);
+    $this->authorize('update', $plan);
     $request->validate([]);
     $user     = $request->user();
 
-    $user->update(array_filter($request->only($user->getFillable())));
+    $plan->update(array_filter($request->only($plan->getFillable())));
 
-    return $user;
+    return $plan;
   }
 
   /**
    * Remove the specified resource from storage.
    *
-   * @param  \App\Models\User  $user
+   * @param  \App\Models\Plan  $plan
    * @return \Illuminate\Http\Response
    */
-  public function destroy(User $user)
+  public function destroy(Plan $plan)
   {
-    $this->authorize('delete', $user);
+    $this->authorize('delete', $plan);
 
-    $user->delete();
+    $plan->delete();
 
     return ['status' => true];
   }
