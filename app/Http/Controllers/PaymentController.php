@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Payment;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
-use Paystack;
+use Myckhel\Paystack\Support\Transaction;
 
 class PaymentController extends Controller
 {
@@ -13,9 +13,8 @@ class PaymentController extends Controller
   {
     $request->validate(['reference' => 'required']);
 
-    $request->instance()->query->set('trxref', $request->reference);
+    $paymentDetails   = (object) Transaction::verify($request->reference)['data'];
 
-    $paymentDetails   = (object) Paystack::getPaymentData()['data'];
     $payment          = Payment::where('reference', $paymentDetails->reference)->first();
 
     if ($payment && $payment->status == 'pending') {
@@ -111,7 +110,7 @@ class PaymentController extends Controller
 
     $amount           = $request->amount;
     $data             = ["amount" => $amount, "email" => $user->email, 'reference' => $reference];
-    $response         = Paystack::getAuthorizationResponse($data);
+    $response         = Transaction::initialize($data);
     $responseData     = (object) $response['data'];
 
     return $user->payments()->create([
