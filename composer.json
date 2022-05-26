@@ -21,9 +21,9 @@
         "laravel/socialite": "^5.5",
         "laravel/telescope": "^4.8",
         "laravel/tinker": "^2.7",
+        "myckhel/laravel-paystack": "v1.0.0-alpha.6",
         "predis/predis": "^1.1",
-        "spatie/laravel-medialibrary": "^10.3",
-        "unicodeveloper/laravel-paystack": "dev-master"
+        "spatie/laravel-medialibrary": "^10.3"
     },
     "require-dev": {
         "mockery/mockery": "^1.4.4",
@@ -31,12 +31,7 @@
         "phpunit/phpunit": "^9.5.10",
         "spatie/laravel-ignition": "^1.0"
     },
-    "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/stojankukrika/laravel-paystack"
-    }
-  ],
+    "repositories": [],
     "autoload": {
         "psr-4": {
             "App\\": "app/",
