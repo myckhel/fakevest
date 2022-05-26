@@ -2,12 +2,14 @@
 
 namespace App\Providers;
 
+use App\Listeners\PaystackWebHookListener;
 use App\Models\Saving;
 use App\Observers\SavingObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use Myckhel\Paystack\Events\Hook;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -28,6 +30,9 @@ class EventServiceProvider extends ServiceProvider
   protected $listen = [
     Registered::class => [
       SendEmailVerificationNotification::class,
+    ],
+    Hook::class => [
+      PaystackWebHookListener::class,
     ],
   ];
 
