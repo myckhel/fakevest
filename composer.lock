@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bef11cc0dff0a5e104dbb7a37b1bba9e",
+    "content-hash": "8f7020d6aeec6cddf036e12d0292be46",
     "packages": [
         {
             "name": "bavix/laravel-wallet",
@@ -2804,16 +2804,16 @@
         },
         {
             "name": "myckhel/laravel-paystack",
-            "version": "dev-main",
+            "version": "v1.0.0-beta.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myckhel/laravel-paystack.git",
-                "reference": "1a477f6ccff251a43e98b0b596a50fae38ab6259"
+                "reference": "25665afc0657fb83432d3dcec70f76212f99e13d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myckhel/laravel-paystack/zipball/1a477f6ccff251a43e98b0b596a50fae38ab6259",
-                "reference": "1a477f6ccff251a43e98b0b596a50fae38ab6259",
+                "url": "https://api.github.com/repos/myckhel/laravel-paystack/zipball/25665afc0657fb83432d3dcec70f76212f99e13d",
+                "reference": "25665afc0657fb83432d3dcec70f76212f99e13d",
                 "shasum": ""
             },
             "require": {
@@ -2822,7 +2822,6 @@
             "require-dev": {
                 "orchestra/testbench": "^6.0"
             },
-            "default-branch": true,
             "type": "package",
             "extra": {
                 "laravel": {
@@ -2855,9 +2854,9 @@
             ],
             "support": {
                 "issues": "https://github.com/myckhel/laravel-paystack/issues",
-                "source": "https://github.com/myckhel/laravel-paystack/tree/main"
+                "source": "https://github.com/myckhel/laravel-paystack/tree/v1.0.0-beta.0"
             },
-            "time": "2022-05-26T12:50:36+00:00"
+            "time": "2022-05-27T08:22:39+00:00"
         },
         {
             "name": "myclabs/php-enum",
@@ -9324,9 +9323,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "myckhel/laravel-paystack": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

@@ -2,10 +2,10 @@
 
 namespace App\Listeners;
 
+use App\Models\Payment;
 use Myckhel\Paystack\Events\Hook;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Facades\Log;
 
 class PaystackWebHookListener implements ShouldQueue
 {
@@ -29,6 +29,11 @@ class PaystackWebHookListener implements ShouldQueue
    */
   public function handle(Hook $event)
   {
-    Log::debug($event->event);
+    $eventData = (object) $event->event['data'];
+    $eventname = $event->event['event'];
+
+    match ($eventname) {
+      'charge.success', 'charge.failed' => Payment::process($eventData),
+    };
   }
 }

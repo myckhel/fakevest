@@ -10,6 +10,49 @@ class Payment extends Model
 {
   use HasFactory;
 
+  static function process(object $paymentDetails)
+  {
+    $payment          = static::where('reference', $paymentDetails->reference)->first();
+
+    if ($payment && $payment->status == 'pending') {
+      $user           = $payment->user;
+      if ($paymentDetails->status != 'success') {
+        $payment->update([
+          'status' => $paymentDetails->status,
+        ]);
+      }
+
+      if ($paymentDetails->status == 'success') {
+        $payment->update([
+          'status'              => $paymentDetails->status,
+          'message'             => $paymentDetails->message,
+          'reference'           => $paymentDetails->reference,
+          'authorization_code'  => $paymentDetails->authorization['authorization_code'],
+          'currency_code'       => $paymentDetails->currency,
+          'paid_at'            => now(), //$paymentDetails['data']['paidAt'],
+        ]);
+
+        $wallet = $payment->wallet;
+
+        if ($wallet) {
+          $wallet->deposit($wallet::fromKobo($paymentDetails->amount));
+        } else {
+          $user->deposit(Wallet::fromKobo($paymentDetails->amount));
+        }
+
+        if ($paymentDetails->status = "success" && $paymentDetails->authorization['reusable']) {
+          $user->payment_options()->firstOrCreate(
+            ['signature' => $paymentDetails->authorization['signature']],
+            $paymentDetails->authorization
+          );
+        }
+      }
+
+      return ['status' => true, 'payment' => $payment];
+    }
+    return ['status' => false, 'payment' => $payment];
+  }
+
   /**
    * Get the wallet that owns the Payment
    *

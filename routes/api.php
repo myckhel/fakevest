@@ -43,6 +43,8 @@ Route::group(['middleware' => ['auth:api']], function () {
   Route::post('payments/verify',        [PaymentController::class, 'verify']);
 
   Route::get('logout', 'AuthController@logout');
+
+  Route::post('hooks', 'PaymentController@hooks');
 });
 
 Route::group([], function () {
