@@ -5,56 +5,25 @@ namespace App\Http\Controllers;
 use App\Models\Payment;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
-use Paystack;
+use Myckhel\Paystack\Events\Hook;
+use Myckhel\Paystack\Support\Transaction;
 
 class PaymentController extends Controller
 {
+  function hooks(Request $request)
+  {
+    event(new Hook($request->all()));
+
+    return ['status' => true];
+  }
+
   public function verify(Request $request)
   {
     $request->validate(['reference' => 'required']);
 
-    $request->instance()->query->set('trxref', $request->reference);
+    $paymentDetails   = (object) Transaction::verify($request->reference)['data'];
 
-    $paymentDetails   = (object) Paystack::getPaymentData()['data'];
-    $payment          = Payment::where('reference', $paymentDetails->reference)->first();
-
-    if ($payment && $payment->status == 'pending') {
-      $user           = $payment->user;
-      if ($paymentDetails->status != 'success') {
-        $payment->update([
-          'status' => $paymentDetails->status,
-        ]);
-      }
-
-      if ($paymentDetails->status == 'success') {
-        $payment->update([
-          'status'              => $paymentDetails->status,
-          'message'             => $paymentDetails->message,
-          'reference'           => $paymentDetails->reference,
-          'authorization_code'  => $paymentDetails->authorization['authorization_code'],
-          'currency_code'       => $paymentDetails->currency,
-          'paid_at'            => now(), //$paymentDetails['data']['paidAt'],
-        ]);
-
-        $wallet = $payment->wallet;
-
-        if ($wallet) {
-          $wallet->deposit($wallet::fromKobo($paymentDetails->amount));
-        } else {
-          $user->deposit(Wallet::fromKobo($paymentDetails->amount));
-        }
-
-        if ($paymentDetails->status = "success" && $paymentDetails->authorization['reusable']) {
-          $user->payment_options()->firstOrCreate(
-            ['signature' => $paymentDetails->authorization['signature']],
-            $paymentDetails->authorization
-          );
-        }
-      }
-
-      return ['status' => true, 'payment' => $payment];
-    }
-    return ['status' => false, 'payment' => $payment];
+    return Payment::process($paymentDetails);
   }
 
   /**
@@ -111,7 +80,7 @@ class PaymentController extends Controller
 
     $amount           = $request->amount;
     $data             = ["amount" => $amount, "email" => $user->email, 'reference' => $reference];
-    $response         = Paystack::getAuthorizationResponse($data);
+    $response         = Transaction::initialize($data);
     $responseData     = (object) $response['data'];
 
     return $user->payments()->create([

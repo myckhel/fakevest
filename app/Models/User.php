@@ -20,6 +20,16 @@ class User extends Authenticatable implements HasMedia, Wallet
   use HasApiTokens, HasFactory, Notifiable, HasImage, InteractsWithMedia, HasWallet, HasWallets;
 
   /**
+   * Get all of the savings for the User
+   *
+   * @return \Illuminate\Database\Eloquent\Relations\HasMany
+   */
+  public function savings(): HasMany
+  {
+    return $this->hasMany(Saving::class);
+  }
+
+  /**
    * Get all of the payment_options for the User
    *
    * @return \Illuminate\Database\Eloquent\Relations\HasMany
