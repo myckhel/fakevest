@@ -21,6 +21,7 @@ return new class extends Migration
       $table->integer('minDays')->nullable();
       $table->boolean('breakable')->default(true);
       $table->string('icon')->nullable();
+      $table->json('colors')->default('[]');
       $table->timestamps();
     });
   }

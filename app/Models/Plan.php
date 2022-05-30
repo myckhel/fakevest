@@ -26,8 +26,9 @@ class Plan extends Model
     'interest',
     'minDays',
     'breakable',
-    'icon'
+    'icon',
+    'colors',
   ];
 
-  protected $casts = ['interest' => 'float', 'minDays' => 'int', 'breakable' => 'boolean'];
+  protected $casts = ['interest' => 'float', 'minDays' => 'int', 'breakable' => 'boolean', 'colors' => 'array'];
 }
