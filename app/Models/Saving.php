@@ -40,8 +40,17 @@ class Saving extends Model implements Wallet
     'until',
     'times',
     'interval',
-    'active'
+    'amount',
+    'target',
+    'active',
+    'payment_plan_id',
   ];
 
-  protected $casts = ['plan_id' => 'int', 'times' => 'int', 'active' => 'boolean'];
+  protected $casts = [
+    'plan_id' => 'int',
+    'times'   => 'int',
+    'active'  => 'boolean',
+    'amount'  => 'float',
+    'target'  => 'float'
+  ];
 }

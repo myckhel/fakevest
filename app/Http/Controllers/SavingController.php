@@ -46,8 +46,10 @@ class SavingController extends Controller
       'plan_id'   => 'required|int',
       'until'     => 'date',
       'times'     => 'int',
-      'interval'  => 'in:daily,weekly,monthly,yearly',
-      'active'    => 'bool'
+      'interval'  => 'in:daily,weekly,monthly,biannually,annually',
+      'amount'    => 'digits_between:3,15',
+      'target'    => 'digits_between:3,15',
+      'active'    => 'bool',
     ]);
 
     $user     = $request->user();
@@ -58,6 +60,8 @@ class SavingController extends Controller
       'until',
       'times',
       'interval',
+      'amount',
+      'target',
       'active'
     ]));
   }
@@ -87,12 +91,14 @@ class SavingController extends Controller
     $request->validate([
       'until'     => 'date',
       'times'     => 'int',
-      'interval'  => 'in:daily,weekly,monthly,yearly',
+      'interval'  => 'in:daily,weekly,monthly,biannually,annually',
+      'amount'    => 'digits_between:3,15',
+      'target'    => 'digits_between:3,15',
       'active'    => 'bool'
     ]);
 
     $saving->update(array_filter($request->only(
-      ['desc', 'until', 'times', 'interval', 'active']
+      ['desc', 'until', 'times', 'interval', 'amount', 'target', 'active']
     )));
 
     return $saving->load(['plan', 'wallet']);

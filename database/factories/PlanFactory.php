@@ -22,6 +22,7 @@ class PlanFactory extends Factory
       'interest' => $this->faker->numberBetween(10, 30),
       'minDays' => $this->faker->numberBetween(0, 30),
       'breakable' => $this->faker->randomElement([true, false]),
+      'colors' => [$this->faker->hexColor(), $this->faker->hexColor()],
     ];
   }
 }

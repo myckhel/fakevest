@@ -20,8 +20,11 @@ return new class extends Migration
       $table->string('desc')->nullable();
       $table->date('until')->nullable();
       $table->integer('times')->nullable();
-      $table->enum('interval', ['daily', 'weekly', 'monthly', 'yearly'])->nullable();
+      $table->enum('interval', ['daily', 'weekly', 'monthly', 'biannually', 'annually'])->nullable();
+      $table->decimal('amount', 15)->default(0);
+      $table->decimal('target', 15)->default(0);
       $table->boolean('active')->default(true);
+      $table->integer('payment_plan_id')->index()->nullable(true);
       $table->timestamps();
     });
   }

@@ -33,7 +33,7 @@ class PaystackWebHookListener implements ShouldQueue
     $eventname = $event->event['event'];
 
     match ($eventname) {
-      'charge.success', 'charge.failed' => Payment::process($eventData),
+      'charge.success' => Payment::process($eventData),
     };
   }
 }

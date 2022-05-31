@@ -2,6 +2,8 @@
 
 namespace App\Observers;
 
+use App\Jobs\Saving\SavingCreatedJob;
+use App\Jobs\Saving\SavingUpdatedJob;
 use App\Models\Saving;
 
 class SavingObserver
@@ -15,6 +17,9 @@ class SavingObserver
   public function created(Saving $saving)
   {
     $saving->balance;
+    if ($saving->interval) {
+      SavingCreatedJob::dispatch($saving);
+    }
   }
 
   /**
@@ -25,7 +30,9 @@ class SavingObserver
    */
   public function updated(Saving $saving)
   {
-    //
+    if ($saving->wasChanged(['interval', 'amount', 'desc'])) {
+      SavingUpdatedJob::dispatch($saving);
+    }
   }
 
   /**
