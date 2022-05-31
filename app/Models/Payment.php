@@ -32,12 +32,24 @@ class Payment extends Model
           'paid_at'            => now(), //$paymentDetails['data']['paidAt'],
         ]);
 
-        $wallet = $payment->wallet;
+        $user             = $payment->user;
 
-        if ($wallet) {
-          $wallet->deposit($wallet::fromKobo($paymentDetails->amount));
+        if ($paymentDetails->plan) {
+          $saving = Saving::wherePaymentPlanId($paymentDetails->plan['id'])->first();
+          $wallet = $saving->wallet;
+          if ($wallet) {
+            $wallet->deposit($wallet::fromKobo($paymentDetails->amount));
+          } else {
+            $user->deposit(Wallet::fromKobo($paymentDetails->amount));
+          }
         } else {
-          $user->deposit(Wallet::fromKobo($paymentDetails->amount));
+          $wallet = $payment->wallet;
+
+          if ($wallet) {
+            $wallet->deposit($wallet::fromKobo($paymentDetails->amount));
+          } else {
+            $user->deposit(Wallet::fromKobo($paymentDetails->amount));
+          }
         }
 
         if ($paymentDetails->status = "success" && $paymentDetails->authorization['reusable']) {
