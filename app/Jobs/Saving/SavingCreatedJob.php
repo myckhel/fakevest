@@ -43,10 +43,8 @@ class SavingCreatedJob implements ShouldQueue
       'interval'    => $saving->interval,
     ])['data'];
 
-    sleep(1);
-
     Subscription::create([
-      'plan_code'   => $plan->plan_code,
+      'plan'   => $plan->plan_code,
       'customer'    => $email,
       'start_date'  => Carbon::now()->addSeconds(10)->toIso8601String(),
     ]);
