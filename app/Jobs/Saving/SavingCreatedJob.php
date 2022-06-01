@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Myckhel\Paystack\Support\Plan;
+use Myckhel\Paystack\Support\Subscription;
 
 class SavingCreatedJob implements ShouldQueue
 {
@@ -31,7 +32,8 @@ class SavingCreatedJob implements ShouldQueue
    */
   public function handle()
   {
-    $saving = $this->saving;
+    $saving   = $this->saving;
+    $email    = $saving->user->email;
 
     $plan = (object) Plan::create([
       'name'        => $saving->desc,
@@ -39,6 +41,11 @@ class SavingCreatedJob implements ShouldQueue
       'amount'      => $saving->amount * 10,
       'interval'    => $saving->interval,
     ])['data'];
+
+    Subscription::create([
+      'plan_code' => $plan->plan_code,
+      'customer'  => $email,
+    ]);
 
     $saving->update(['payment_plan_id' => $plan->id]);
   }
