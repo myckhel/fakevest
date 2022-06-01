@@ -46,7 +46,7 @@ class SavingCreatedJob implements ShouldQueue
     Subscription::create([
       'plan'   => $plan->plan_code,
       'customer'    => $email,
-      'start_date'  => Carbon::now()->addSeconds(10)->toIso8601String(),
+      'start_date'  => Carbon::now()->addSeconds(40)->toIso8601String(),
     ]);
 
     $saving->update(['payment_plan_id' => $plan->id]);
