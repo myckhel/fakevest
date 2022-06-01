@@ -53,7 +53,7 @@ class Payment extends Model
         }
 
         if ($paymentDetails->status = "success" && $paymentDetails->authorization['reusable']) {
-          $user->payment_options()->firstOrCreate(
+          $user->paymentOptions()->firstOrCreate(
             ['signature' => $paymentDetails->authorization['signature']],
             $paymentDetails->authorization
           );

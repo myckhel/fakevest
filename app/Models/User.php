@@ -34,7 +34,7 @@ class User extends Authenticatable implements HasMedia, Wallet
    *
    * @return \Illuminate\Database\Eloquent\Relations\HasMany
    */
-  public function payment_options(): HasMany
+  public function paymentOptions(): HasMany
   {
     return $this->hasMany(PaymentOption::class);
   }
