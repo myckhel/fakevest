@@ -40,11 +40,23 @@ class PaymentOptionController extends Controller
   public function store(Request $request)
   {
     $request->validate([]);
-    $user     = $request->user();
+    $user       = $request->user();
+    $amount     = 100 * 100;
 
-    return Transaction::initialize([
+    $response   = Transaction::initialize([
       'email'   => $user->email,
-      'amount'  => 100 * 100,
+      'amount'  => $amount,
+    ]);
+
+    $responseData     = (object) $response['data'];
+
+    $wallet = $user->wallet;
+
+    return $user->payments()->create([
+      'amount'        => $amount,
+      'access_code'   => $responseData->access_code,
+      'reference'     => $responseData->reference,
+      'wallet_id'     => $wallet?->id,
     ]);
   }
 
