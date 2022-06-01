@@ -3,6 +3,7 @@
 namespace App\Jobs\Saving;
 
 use App\Models\Saving;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -42,9 +43,12 @@ class SavingCreatedJob implements ShouldQueue
       'interval'    => $saving->interval,
     ])['data'];
 
+    sleep(1);
+
     Subscription::create([
-      'plan_code' => $plan->plan_code,
-      'customer'  => $email,
+      'plan_code'   => $plan->plan_code,
+      'customer'    => $email,
+      'start_date'  => Carbon::now()->addSeconds(10)->toIso8601String(),
     ]);
 
     $saving->update(['payment_plan_id' => $plan->id]);
