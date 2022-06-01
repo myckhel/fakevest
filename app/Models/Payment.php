@@ -12,7 +12,14 @@ class Payment extends Model
 
   static function process(object $paymentDetails)
   {
-    $payment          = static::where('reference', $paymentDetails->reference)->first();
+    $payment          = static::firstOrCreate(
+      ['reference', $paymentDetails->reference],
+      [
+        'amount'        => $paymentDetails->amount,
+        'access_code'   => $paymentDetails->access_code || '',
+        'reference'     => $paymentDetails->reference,
+      ]
+    )->first();
 
     if ($payment && $payment->status == 'pending') {
       $user           = $payment->user;
