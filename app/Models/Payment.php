@@ -16,7 +16,7 @@ class Payment extends Model
       ['reference', $paymentDetails->reference],
       [
         'amount'        => $paymentDetails->amount,
-        'access_code'   => $paymentDetails->access_code || '',
+        'access_code'   => '',
         'reference'     => $paymentDetails->reference,
       ]
     )->first();
