@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,9 +13,18 @@ class Payment extends Model
 
   static function process(object $paymentDetails)
   {
-    $payment          = static::where('reference', $paymentDetails->reference)->first();
+    $payment          = static::firstOrCreate(
+      ['reference' => $paymentDetails->reference],
+      [
+        'amount'        => $paymentDetails->amount,
+        'access_code'   => Carbon::now()->timestamp,
+        'reference'     => $paymentDetails->reference,
+        'status'        => 'pending',
+        'user_id'       => User::whereEmail($paymentDetails->customer['email'])->first()->id,
+      ]
+    );
 
-    if ($payment && $payment->status == 'pending') {
+    if ($payment?->status == 'pending') {
       $user           = $payment->user;
       if ($paymentDetails->status != 'success') {
         $payment->update([
@@ -36,7 +46,7 @@ class Payment extends Model
 
         if ($paymentDetails->plan) {
           $saving = Saving::wherePaymentPlanId($paymentDetails->plan['id'])->first();
-          $wallet = $saving->wallet;
+          $wallet = $saving?->wallet;
           if ($wallet) {
             $wallet->deposit($wallet::fromKobo($paymentDetails->amount));
           } else {
@@ -53,7 +63,7 @@ class Payment extends Model
         }
 
         if ($paymentDetails->status = "success" && $paymentDetails->authorization['reusable']) {
-          $user->payment_options()->firstOrCreate(
+          $user->paymentOptions()->firstOrCreate(
             ['signature' => $paymentDetails->authorization['signature']],
             $paymentDetails->authorization
           );

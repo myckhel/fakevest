@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PaymentOption;
 use Illuminate\Http\Request;
+use Myckhel\Paystack\Support\Transaction;
 
 class PaymentOptionController extends Controller
 {
@@ -25,7 +26,7 @@ class PaymentOptionController extends Controller
     $order    = $request->order;
     $orderBy  = $request->orderBy;
 
-    return $user->payment_options()
+    return $user->paymentOptions()
       ->orderBy($orderBy ?? 'id', $order ?? 'asc')
       ->paginate($pageSize);
   }
@@ -39,9 +40,24 @@ class PaymentOptionController extends Controller
   public function store(Request $request)
   {
     $request->validate([]);
-    $user     = $request->user();
+    $user       = $request->user();
+    $amount     = 100 * 100;
 
-    return PaymentOption::create($request->only([]));
+    $response   = Transaction::initialize([
+      'email'   => $user->email,
+      'amount'  => $amount,
+    ]);
+
+    $responseData     = (object) $response['data'];
+
+    $wallet = $user->wallet;
+
+    return $user->payments()->create([
+      'amount'        => $amount,
+      'access_code'   => $responseData->access_code,
+      'reference'     => $responseData->reference,
+      'wallet_id'     => $wallet?->id,
+    ]);
   }
 
   /**

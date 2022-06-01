@@ -3,6 +3,7 @@
 namespace App\Jobs\Saving;
 
 use App\Models\Saving;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -10,6 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Myckhel\Paystack\Support\Plan;
+use Myckhel\Paystack\Support\Subscription;
 
 class SavingCreatedJob implements ShouldQueue
 {
@@ -31,7 +33,8 @@ class SavingCreatedJob implements ShouldQueue
    */
   public function handle()
   {
-    $saving = $this->saving;
+    $saving   = $this->saving;
+    $email    = $saving->user->email;
 
     $plan = (object) Plan::create([
       'name'        => $saving->desc,
@@ -39,6 +42,12 @@ class SavingCreatedJob implements ShouldQueue
       'amount'      => $saving->amount * 10,
       'interval'    => $saving->interval,
     ])['data'];
+
+    Subscription::create([
+      'plan'   => $plan->plan_code,
+      'customer'    => $email,
+      'start_date'  => Carbon::now()->addSeconds(40)->toIso8601String(),
+    ]);
 
     $saving->update(['payment_plan_id' => $plan->id]);
   }

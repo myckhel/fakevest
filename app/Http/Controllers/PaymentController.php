@@ -76,6 +76,8 @@ class PaymentController extends Controller
 
     if ($wallet_name) {
       $wallet = $user->wallets()->whereName($wallet_name)->firstOrFail();
+    } else {
+      $wallet = $user->wallet;
     }
 
     $amount           = $request->amount;
