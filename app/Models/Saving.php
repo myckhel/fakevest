@@ -44,6 +44,7 @@ class Saving extends Model implements Wallet
     'target',
     'active',
     'payment_plan_id',
+    'metas',
   ];
 
   protected $casts = [
@@ -51,6 +52,7 @@ class Saving extends Model implements Wallet
     'times'   => 'int',
     'active'  => 'boolean',
     'amount'  => 'float',
-    'target'  => 'float'
+    'target'  => 'float',
+    'metas'   => 'array',
   ];
 }

@@ -25,6 +25,7 @@ return new class extends Migration
       $table->decimal('target', 15)->default(0);
       $table->boolean('active')->default(true);
       $table->integer('payment_plan_id')->index()->nullable(true);
+      $table->json('metas');
       $table->timestamps();
     });
   }
