@@ -67,15 +67,22 @@ class PaymentController extends Controller
     $request->validate([
       'amount'        => 'required|numeric',
       'wallet_name'   => 'string',
+      'wallet_id'     => 'int',
     ]);
 
     $user             = $request->user();
     $wallet_name      = $request->wallet_name;
+    $wallet_id        = $request->wallet_id;
     $reference        = $request->reference;
     $wallet           = null;
 
-    if ($wallet_name) {
-      $wallet = $user->wallets()->whereName($wallet_name)->firstOrFail();
+    if ($wallet_name || $wallet_id) {
+      $wallet = $user->wallets()
+        ->when(
+          $wallet_id,
+          fn ($q) => $q->whereId($wallet_id),
+          fn ($q) => $q->whereName($wallet_name)
+        )->firstOrFail();
     } else {
       $wallet = $user->wallet;
     }

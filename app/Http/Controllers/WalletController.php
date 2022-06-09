@@ -24,9 +24,10 @@ class WalletController extends Controller
     $pageSize = $request->pageSize;
     $order    = $request->order;
     $orderBy  = $request->orderBy;
+    $user     = $request->user();
 
-    return Wallet
-      ::orderBy($orderBy ?? 'id', $order ?? 'asc')
+    return $user->wallet()
+      ->orderBy($orderBy ?? 'id', $order ?? 'asc')
       ->paginate($pageSize);
   }
 
