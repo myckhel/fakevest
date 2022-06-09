@@ -50,11 +50,12 @@ class SavingController extends Controller
       'amount'    => 'digits_between:3,15',
       'target'    => 'digits_between:3,15',
       'active'    => 'bool',
+      'payment_option_id'    => 'int',
     ]);
 
     $user     = $request->user();
 
-    return $user->savings()->create($request->only([
+    $saving = $user->savings()->create($request->only([
       'plan_id',
       'desc',
       'until',
@@ -62,8 +63,13 @@ class SavingController extends Controller
       'interval',
       'amount',
       'target',
-      'active'
-    ]));
+      'active',
+    ]) + ($request->payment_option_id
+      ? ['metas' => ['payment_option_id' => (int) $request->payment_option_id]]
+      : []
+    ));
+
+    return $saving;
   }
 
   /**

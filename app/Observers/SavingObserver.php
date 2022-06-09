@@ -17,9 +17,7 @@ class SavingObserver
   public function created(Saving $saving)
   {
     $saving->balance;
-    if ($saving->interval) {
-      SavingCreatedJob::dispatch($saving);
-    }
+    SavingCreatedJob::dispatch($saving);
   }
 
   /**

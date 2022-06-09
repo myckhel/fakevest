@@ -44,22 +44,22 @@ class Payment extends Model
 
         $user             = $payment->user;
 
+        $wallet = null;
+
         if ($paymentDetails->plan) {
           $saving = Saving::wherePaymentPlanId($paymentDetails->plan['id'])->first();
           $wallet = $saving?->wallet;
-          if ($wallet) {
-            $wallet->deposit($wallet::fromKobo($paymentDetails->amount));
-          } else {
-            $user->deposit(Wallet::fromKobo($paymentDetails->amount));
-          }
+        } elseif ($paymentDetails->metadata['saving_id']) {
+          $saving = Saving::find($paymentDetails->metadata['saving_id']);
+          $wallet = $saving?->wallet;
         } else {
           $wallet = $payment->wallet;
+        }
 
-          if ($wallet) {
-            $wallet->deposit($wallet::fromKobo($paymentDetails->amount));
-          } else {
-            $user->deposit(Wallet::fromKobo($paymentDetails->amount));
-          }
+        if ($wallet) {
+          $wallet->deposit($wallet::fromKobo($paymentDetails->amount));
+        } else {
+          $user->deposit(Wallet::fromKobo($paymentDetails->amount));
         }
 
         if ($paymentDetails->status = "success" && $paymentDetails->authorization['reusable']) {
