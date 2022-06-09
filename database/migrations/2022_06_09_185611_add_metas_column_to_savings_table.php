@@ -14,7 +14,7 @@ return new class extends Migration
   public function up()
   {
     Schema::table('savings', function (Blueprint $table) {
-      $table->json('metas');
+      $table->json('metas')->default("{}");
     });
   }
 
