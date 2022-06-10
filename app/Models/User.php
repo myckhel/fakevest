@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Traits\HasImage;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -18,6 +17,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class User extends Authenticatable implements HasMedia, Wallet
 {
   use HasApiTokens, HasFactory, Notifiable, HasImage, InteractsWithMedia, HasWallet, HasWallets;
+
+  /**
+   * Get all of the accounts for the User
+   *
+   * @return \Illuminate\Database\Eloquent\Relations\HasMany
+   */
+  public function bankAccounts(): HasMany
+  {
+    return $this->hasMany(UserAccount::class);
+  }
 
   /**
    * Get all of the savings for the User
