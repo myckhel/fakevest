@@ -92,12 +92,16 @@ class PaymentController extends Controller
     $response         = Transaction::initialize($data);
     $responseData     = (object) $response['data'];
 
-    return $user->payments()->create([
+    $payment = $user->payments()->create([
       'amount'        => $amount,
       'access_code'   => $responseData->access_code,
       'reference'     => $responseData->reference,
       'wallet_id'     => $wallet?->id,
     ]);
+
+    $payment->authorization_url = $responseData->authorization_url;
+
+    return $payment;
   }
 
   /**
