@@ -5,6 +5,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PaymentOptionController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\SavingController;
+use App\Http\Controllers\UserAccountController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WalletController;
 use Illuminate\Http\Request;
@@ -35,11 +36,14 @@ Route::group(['middleware' => 'guest'], function () {
 });
 
 Route::group(['middleware' => ['auth:api']], function () {
+  Route::post('wallets/withdraw',       [WalletController::class, 'withdraw']);
+
   Route::apiResource('wallets',         WalletController::class);
   Route::apiResource('payments',        PaymentController::class);
   Route::apiResource('payment_options', PaymentOptionController::class);
-  Route::apiResource('plans', PlanController::class)->only(['index', 'show']);
-  Route::apiResource('savings', SavingController::class);
+  Route::apiResource('plans',           PlanController::class)->only(['index', 'show']);
+  Route::apiResource('savings',         SavingController::class);
+  Route::apiResource('user_accounts',   UserAccountController::class);
   Route::post('payments/verify',        [PaymentController::class, 'verify']);
 
   Route::get('logout', 'AuthController@logout');

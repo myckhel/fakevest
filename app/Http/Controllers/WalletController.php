@@ -5,9 +5,53 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
+use Myckhel\Paystack\Support\Recipient;
+use Myckhel\Paystack\Support\Transfer;
 
 class WalletController extends Controller
 {
+  public function withdraw(Request $request)
+  {
+    $request->validate([
+      'from_wallet_id'  => 'required|int',
+      'to_user_account' => 'required|int',
+      'amount'          => 'required|numeric',
+    ]);
+
+    $user = $request->user();
+    $from_wallet_id   = $request->from_wallet_id;
+    $to_user_account  = $request->to_user_account;
+    $amount           = $request->amount;
+
+    $wallet       = $user->wallets()->findOrFail($from_wallet_id);
+    $bankAccount  = $user->bankAccounts()->findOrFail($to_user_account);
+
+    $recipient    = (object) Recipient::fetch($bankAccount->recipient_id);
+
+    $wallet->withdraw($amount);
+
+    $wallet->balance;
+
+    try {
+      $transfer = Transfer::initiate([
+        'recipient' => $recipient->data['recipient_code'],
+        'source'    => 'balance',
+        'amount'    => $amount * 100,
+        'reason'    => "Withdrawal from $wallet->name wallet",
+      ]);
+    } catch (\Throwable $th) {
+      $wallet->deposit($amount);
+      throw $th;
+    }
+
+    return [
+      'status'    => true,
+      'message'   => 'Withdrawal successful',
+      'transfer'  => $transfer,
+      'wallet'    => $wallet
+    ];
+  }
+
   /**
    * Display a listing of the resource.
    *
@@ -24,9 +68,10 @@ class WalletController extends Controller
     $pageSize = $request->pageSize;
     $order    = $request->order;
     $orderBy  = $request->orderBy;
+    $user     = $request->user();
 
-    return Wallet
-      ::orderBy($orderBy ?? 'id', $order ?? 'asc')
+    return $user->wallet()
+      ->orderBy($orderBy ?? 'id', $order ?? 'asc')
       ->paginate($pageSize);
   }
 
