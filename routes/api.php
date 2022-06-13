@@ -36,6 +36,8 @@ Route::group(['middleware' => 'guest'], function () {
 });
 
 Route::group(['middleware' => ['auth:api']], function () {
+  Route::post('wallets/withdraw',       [WalletController::class, 'withdraw']);
+
   Route::apiResource('wallets',         WalletController::class);
   Route::apiResource('payments',        PaymentController::class);
   Route::apiResource('payment_options', PaymentOptionController::class);
