@@ -95,6 +95,27 @@ class UserController extends Controller
   }
 
   /**
+   * Update the specified resource in storage.
+   *
+   * @param  \Illuminate\Http\Request  $request
+   * @param  \App\Models\User  $user
+   * @return \Illuminate\Http\Response
+   */
+  public function updateAvatar(Request $request, User $user)
+  {
+    $this->authorize('updateAvatar', $user);
+
+    $request->validate([
+      'avatar'              => 'image',
+    ]);
+    $avatar = $request->avatar;
+
+    $user->saveImage($avatar, 'avatar');
+
+    return $user;
+  }
+
+  /**
    * Remove the specified resource from storage.
    *
    * @param  \App\Models\User  $user

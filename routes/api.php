@@ -36,8 +36,16 @@ Route::group(['middleware' => 'guest'], function () {
 });
 
 Route::group(['middleware' => ['auth:api']], function () {
+  Route::get(
+    'whoami',
+    fn (Request $request) => $request->user()
+  );
+
+  Route::put('users/{user}/avatar',        [UserController::class, 'updateAvatar']);
+
   Route::post('wallets/withdraw',       [WalletController::class, 'withdraw']);
 
+  Route::apiResource('users',           UserController::class)->only(['update', 'show']);
   Route::apiResource('wallets',         WalletController::class);
   Route::apiResource('payments',        PaymentController::class);
   Route::apiResource('payment_options', PaymentOptionController::class);
