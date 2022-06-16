@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Plan;
 use App\Models\Saving;
 use Illuminate\Http\Request;
 
@@ -55,16 +56,23 @@ class SavingController extends Controller
 
     $user     = $request->user();
 
-    $saving = $user->savings()->create($request->only([
+    $data     = $request->only([
       'plan_id',
       'desc',
       'until',
       'times',
-      'interval',
       'amount',
       'target',
       'active',
-    ]) + ($request->payment_option_id
+    ]);
+
+    $plan = Plan::findOrFail($request->plan_id);
+
+    if (!$plan->minDays) {
+      $data['interval'] = $request->interval;
+    }
+
+    $saving = $user->savings()->create($data + ($request->payment_option_id
       ? ['metas' => ['payment_option_id' => (int) $request->payment_option_id]]
       : []
     ));

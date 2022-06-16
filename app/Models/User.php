@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Traits\HasImage;
+use Bavix\Wallet\Interfaces\Wallet;
+use App\Models\Wallet as ModelsWallet;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -11,8 +13,9 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\HasMedia;
 use Bavix\Wallet\Traits\HasWallet;
 use Bavix\Wallet\Traits\HasWallets;
-use Bavix\Wallet\Interfaces\Wallet;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class User extends Authenticatable implements HasMedia, Wallet
 {
@@ -36,6 +39,16 @@ class User extends Authenticatable implements HasMedia, Wallet
   public function savings(): HasMany
   {
     return $this->hasMany(Saving::class);
+  }
+
+  public function savingWallet(): HasOneThrough
+  {
+    return $this->hasOneThrough(ModelsWallet::class, Saving::class, 'user_id', 'holder_id')->whereHolderType(Saving::class);
+  }
+
+  public function savingWallets(): HasManyThrough
+  {
+    return $this->hasManyThrough(ModelsWallet::class, Saving::class, 'user_id', 'holder_id')->whereHolderType(Saving::class);
   }
 
   /**
