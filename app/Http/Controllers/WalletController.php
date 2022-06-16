@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Saving;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
+use Illuminate\Validation\UnauthorizedException;
 use Myckhel\Paystack\Support\Recipient;
 use Myckhel\Paystack\Support\Transfer;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class WalletController extends Controller
 {
@@ -23,10 +26,32 @@ class WalletController extends Controller
     $to_user_account  = $request->to_user_account;
     $amount           = $request->amount;
 
-    $wallet       = $user->wallets()->findOrFail($from_wallet_id);
+    $wallet           = Wallet::whereId($from_wallet_id)
+      ->where(
+        fn ($q) => $q->where(fn ($q) => $q->whereHolderType(User::class)->whereHolderId($user->id))
+          ->orWhere(
+            fn ($q) => $q
+              ->whereHolderType(Saving::class)
+              ->join(
+                'savings',
+                fn ($lj) => $lj->on('savings.id', '=', 'wallets.holder_id')->where('savings.user_id', $user->id)
+              )
+          )
+      )->firstOrFail();
+
     $bankAccount  = $user->bankAccounts()->findOrFail($to_user_account);
 
     $recipient    = (object) Recipient::fetch($bankAccount->recipient_id);
+
+    if ($wallet->holder::class == Saving::class) {
+      $plan = $wallet->holder->plan;
+
+      if (!$plan->breakable) {
+        return response()->json([
+          'message' => 'This plan is not breakable'
+        ], 403);
+      }
+    }
 
     $wallet->withdraw($amount);
 
