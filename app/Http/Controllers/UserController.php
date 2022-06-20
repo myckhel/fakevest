@@ -87,11 +87,11 @@ class UserController extends Controller
   {
     $this->authorize('update', $user);
     $request->validate([
-      'fullname'            => '',
-      'profile.dob'         => 'date',
-      'profile.gender'      => 'in:male,female',
-      'profile.next_of_kin' => '',
-      'profile.address'     => '',
+      'fullname'    => '',
+      'dob'         => 'date',
+      'gender'      => 'in:male,female',
+      'next_of_kin' => '',
+      'address'     => '',
     ]);
 
     $user     = $request->user();

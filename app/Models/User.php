@@ -89,6 +89,10 @@ class User extends Authenticatable implements HasMedia, Wallet
     'phone',
     'fullname',
     'profile',
+    'dob',
+    'gender',
+    'next_of_kin',
+    'address',
   ];
 
   /**
@@ -109,6 +113,7 @@ class User extends Authenticatable implements HasMedia, Wallet
    */
   protected $casts = [
     'email_verified_at' => 'datetime',
+    'dob' => 'date',
     'phone' => 'int', 'profile' => Jsonable::class
   ];
 
