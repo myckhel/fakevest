@@ -86,7 +86,14 @@ class UserController extends Controller
   public function update(Request $request, User $user)
   {
     $this->authorize('update', $user);
-    $request->validate([]);
+    $request->validate([
+      'fullname'            => '',
+      'profile.dob'         => 'date',
+      'profile.gender'      => 'in:male,female',
+      'profile.next_of_kin' => '',
+      'profile.address'     => '',
+    ]);
+
     $user     = $request->user();
 
     $user->update(array_filter($request->only($user->getFillable())));

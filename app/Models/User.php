@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\Jsonable;
 use App\Traits\HasImage;
 use Bavix\Wallet\Interfaces\Wallet;
 use App\Models\Wallet as ModelsWallet;
@@ -87,6 +88,7 @@ class User extends Authenticatable implements HasMedia, Wallet
     'password',
     'phone',
     'fullname',
+    'profile',
   ];
 
   /**
@@ -107,7 +109,7 @@ class User extends Authenticatable implements HasMedia, Wallet
    */
   protected $casts = [
     'email_verified_at' => 'datetime',
-    'phone' => 'int'
+    'phone' => 'int', 'profile' => Jsonable::class
   ];
 
   public function grantMeToken()
