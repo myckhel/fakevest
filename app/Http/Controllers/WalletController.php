@@ -94,6 +94,7 @@ class WalletController extends Controller
     $user     = $request->user();
 
     return $user->wallets()
+      ->withBalanceDiff()
       ->orderBy($orderBy ?? 'id', $order ?? 'asc')
       ->paginate($pageSize);
   }
