@@ -5,11 +5,17 @@ namespace App\Models;
 use App\Casts\FloatCast;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Bavix\Wallet\Models\Wallet as BaseWallet;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class Wallet extends BaseWallet
 {
   use HasFactory;
+
+  function scopeWhereWithinDay($q)
+  {
+    $q->where("created_at", ">", Carbon::now()->subDay())->where("created_at", "<", Carbon::now());
+  }
 
   function scopeWithBalanceDiff($q)
   {

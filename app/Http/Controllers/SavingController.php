@@ -26,11 +26,12 @@ class SavingController extends Controller
     $pageSize = $request->pageSize;
     $order    = $request->order;
     $orderBy  = $request->orderBy;
-    $active   = $request->active;
 
     return $user->savings()
-      ->whenSetWhere(['active' => $active])
       ->with(['plan', 'wallet'])
+      ->withTargetPercentage()
+      ->withBalanceChangePercentage()
+      ->whereActive()
       ->orderBy($orderBy ?? 'id', $order ?? 'asc')
       ->paginate($pageSize);
   }
