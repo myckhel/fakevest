@@ -6,10 +6,8 @@ use App\Models\Saving;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
-use Illuminate\Validation\UnauthorizedException;
 use Myckhel\Paystack\Support\Recipient;
 use Myckhel\Paystack\Support\Transfer;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class WalletController extends Controller
 {
@@ -95,7 +93,7 @@ class WalletController extends Controller
     $orderBy  = $request->orderBy;
     $user     = $request->user();
 
-    return $user->wallet()
+    return $user->wallets()
       ->orderBy($orderBy ?? 'id', $order ?? 'asc')
       ->paginate($pageSize);
   }
