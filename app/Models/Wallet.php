@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\FloatCast;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Bavix\Wallet\Models\Wallet as BaseWallet;
 use Illuminate\Support\Facades\DB;
@@ -9,16 +10,6 @@ use Illuminate\Support\Facades\DB;
 class Wallet extends BaseWallet
 {
   use HasFactory;
-
-  function getBalanceChangeAttribute($value)
-  {
-    return (float) $value ?: 0;
-  }
-
-  function getBalanceChangePercentageAttribute($value)
-  {
-    return (float) $value ?: 0;
-  }
 
   function scopeWithBalanceDiff($q)
   {
@@ -37,7 +28,8 @@ class Wallet extends BaseWallet
 
   protected $casts = [
     'balance' => 'float', 'decimal_places' => 'int',
-    'meta' => 'json',
+    'meta'    => 'json', 'balance_change' => FloatCast::class,
+    'balance_change_percentage' => FloatCast::class,
   ];
 
   static function fromKobo(int $figure)
