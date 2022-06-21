@@ -29,7 +29,7 @@ class Saving extends Model implements Wallet
         'plan as target_percentage' => fn ($q) => $q
           ->where('target', '!=', NULL)
           ->join('wallets', fn ($j) => $j->on('wallets.holder_id', 'savings.id')->whereHolderType(self::class)),
-      ], DB::raw('wallets.balance / target * 100'));
+      ], DB::raw('NULLIF(wallets.balance, 0) / target * 100'));
   }
 
   function scopeWithBalanceChangePercentage($q)
