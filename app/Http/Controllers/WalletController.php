@@ -11,6 +11,15 @@ use Myckhel\Paystack\Support\Transfer;
 
 class WalletController extends Controller
 {
+  function viewDollar(Request $request)
+  {
+    $request->validate([]);
+
+    $user = $request->user();
+
+    return $user->wallets()->whereName('dollar')->firstOrCreate(['name' => 'dollar']);
+  }
+
   public function withdraw(Request $request)
   {
     $request->validate([
