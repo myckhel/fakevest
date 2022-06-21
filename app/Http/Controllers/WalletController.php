@@ -6,13 +6,20 @@ use App\Models\Saving;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
-use Illuminate\Validation\UnauthorizedException;
 use Myckhel\Paystack\Support\Recipient;
 use Myckhel\Paystack\Support\Transfer;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class WalletController extends Controller
 {
+  function viewDollar(Request $request)
+  {
+    $request->validate([]);
+
+    $user = $request->user();
+
+    return $user->wallets()->whereName('dollar')->firstOrCreate(['name' => 'dollar']);
+  }
+
   public function withdraw(Request $request)
   {
     $request->validate([
@@ -95,7 +102,8 @@ class WalletController extends Controller
     $orderBy  = $request->orderBy;
     $user     = $request->user();
 
-    return $user->wallet()
+    return $user->wallets()
+      ->withBalanceDiff()
       ->orderBy($orderBy ?? 'id', $order ?? 'asc')
       ->paginate($pageSize);
   }
