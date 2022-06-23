@@ -15,4 +15,14 @@ class Transaction extends ModelsTransaction
     $column = $column ? "$column." : "";
     $q->where($column . "created_at", ">", Carbon::now()->subDay())->where($column . "created_at", "<", Carbon::now());
   }
+
+  /**
+   * @var array
+   */
+  protected $casts = [
+    'wallet_id' => 'int',
+    'confirmed' => 'bool',
+    'meta'      => 'json',
+    'amount'    => 'int',
+  ];
 }
