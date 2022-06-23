@@ -36,9 +36,22 @@ class Saving extends Model implements Wallet
   {
     $q
       ->withSum([
-        'wallet as balance_change_percentage' => fn ($q) => $q
-          ->whereWithinDay()
+        'trans as balance_change_percentage' => fn ($q) => $q
+          ->whereWithinDay('transactions')->join('wallets', 'transactions.wallet_id', 'wallets.id')
       ], DB::raw('amount / wallets.balance * 100'));
+  }
+
+  function loadBalanceChangePercentage()
+  {
+    return $this->loadSum([
+      'trans as balance_change_percentage' => fn ($q) => $q
+        ->whereWithinDay('transactions')->join('wallets', 'transactions.wallet_id', 'wallets.id'),
+    ], DB::raw('amount / wallets.balance * 100'));
+  }
+
+  function trans()
+  {
+    return $this->hasMany(Transaction::class, 'payable_id')->wherePayableType(self::class);
   }
 
   /**

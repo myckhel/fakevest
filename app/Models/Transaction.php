@@ -10,8 +10,9 @@ class Transaction extends ModelsTransaction
 {
   use HasFactory;
 
-  function scopeWhereWithinDay($q)
+  function scopeWhereWithinDay($q, $column)
   {
-    $q->where("created_at", ">", Carbon::now()->subDay())->where("created_at", "<", Carbon::now());
+    $column = $column ? "$column." : "";
+    $q->where($column . "created_at", ">", Carbon::now()->subDay())->where($column . "created_at", "<", Carbon::now());
   }
 }
