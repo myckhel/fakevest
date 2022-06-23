@@ -90,7 +90,9 @@ class SavingController extends Controller
   public function show(Saving $saving)
   {
     $this->authorize('view', $saving);
-    return $saving->load(['plan', 'wallet'])->loadBalanceChangePercentage();
+    return $saving->load(['plan', 'wallet'])
+      ->loadBalanceChangePercentage()
+      ->loadTargetPercentage();
   }
 
   /**
