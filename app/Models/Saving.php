@@ -8,37 +8,63 @@ use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Traits\HasWallet;
 use Bavix\Wallet\Traits\HasWallets;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
 class Saving extends Model implements Wallet
 {
   use HasFactory, HasWhenSetWhere, HasWallet, HasWallets;
 
-  function scopeWhereActive($q)
+  static $syntaxTargetPercent = "NULLIF(wallets.balance, 0) / target * 100";
+
+  function scopeWhereActive($q): Builder
   {
-    $q->where('until', '>=', Carbon::now());
+    return $q->where('until', '>=', Carbon::now());
   }
 
-  function scopeWithTargetPercentage($q)
+  function scopeWithTargetPercentage($q): Builder
   {
-    $q
+    return $q
       ->withSum([
         'plan as target_percentage' => fn ($q) => $q
           ->where('target', '!=', NULL)
           ->join('wallets', fn ($j) => $j->on('wallets.holder_id', 'savings.id')->whereHolderType(self::class)),
-      ], DB::raw('NULLIF(wallets.balance, 0) / target * 100'));
+      ], DB::raw(self::$syntaxTargetPercent));
   }
 
-  function scopeWithBalanceChangePercentage($q)
+  function scopeWithBalanceChangePercentage($q): Builder
   {
-    $q
+    return $q
       ->withSum([
-        'wallet as balance_change_percentage' => fn ($q) => $q
-          ->whereWithinDay()
+        'trans as balance_change_percentage' => fn ($q) => $q
+          ->whereWithinDay('transactions')->join('wallets', 'transactions.wallet_id', 'wallets.id')
       ], DB::raw('amount / wallets.balance * 100'));
+  }
+
+  function loadBalanceChangePercentage(): self
+  {
+    return $this->loadSum([
+      'trans as balance_change_percentage' => fn ($q) => $q
+        ->whereWithinDay('transactions')->join('wallets', 'transactions.wallet_id', 'wallets.id'),
+    ], DB::raw('amount / wallets.balance * 100'));
+  }
+
+  function loadTargetPercentage(): self
+  {
+    return $this->loadSum([
+      'plan as target_percentage' => fn ($q) => $q
+        ->where('target', '!=', NULL)
+        ->join('wallets', fn ($j) => $j->on('wallets.holder_id', 'savings.id')->whereHolderType(self::class)),
+    ], DB::raw(self::$syntaxTargetPercent));
+  }
+
+  function trans(): HasMany
+  {
+    return $this->hasMany(Transaction::class, 'payable_id')->wherePayableType(self::class);
   }
 
   /**

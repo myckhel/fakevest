@@ -5,6 +5,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PaymentOptionController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\SavingController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserAccountController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WalletController;
@@ -53,6 +54,7 @@ Route::group(['middleware' => ['auth:api']], function () {
   Route::apiResource('plans',           PlanController::class)->only(['index', 'show']);
   Route::apiResource('savings',         SavingController::class);
   Route::apiResource('user_accounts',   UserAccountController::class);
+  Route::apiResource('transactions',    TransactionController::class)->only(['index', 'show']);
   Route::post('payments/verify',        [PaymentController::class, 'verify']);
 
   Route::get('logout', 'AuthController@logout');
