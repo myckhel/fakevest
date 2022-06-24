@@ -23,7 +23,7 @@ return new class extends Migration
       $table->enum('interval', ['daily', 'weekly', 'monthly', 'biannually', 'annually'])->nullable();
       $table->decimal('amount', 15)->default(0);
       $table->decimal('target', 15)->default(0);
-      $table->boolean('active')->default(true);
+      $table->boolean('public')->default(true);
       $table->integer('payment_plan_id')->index()->nullable(true);
       $table->json('metas')->default("{}");
       $table->timestamps();
