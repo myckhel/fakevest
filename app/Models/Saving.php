@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\ActiveCast;
 use App\Casts\FloatCast;
 use App\Traits\HasWhenSetWhere;
 use Bavix\Wallet\Interfaces\Wallet;
@@ -21,19 +22,11 @@ class Saving extends Model implements Wallet
 
   static $syntaxTargetPercent = "NULLIF(wallets.balance, 0) / target * 100";
 
+  static $syntaxBalancePercent = "amount / wallets.balance * 100";
+
   function scopeWhereActive($q): Builder
   {
     return $q->where('until', '>=', Carbon::now());
-  }
-
-  function scopeWithTargetPercentage($q): Builder
-  {
-    return $q
-      ->withSum([
-        'plan as target_percentage' => fn ($q) => $q
-          ->where('target', '!=', NULL)
-          ->join('wallets', fn ($j) => $j->on('wallets.holder_id', 'savings.id')->whereHolderType(self::class)),
-      ], DB::raw(self::$syntaxTargetPercent));
   }
 
   function scopeWithBalanceChangePercentage($q): Builder
@@ -42,7 +35,16 @@ class Saving extends Model implements Wallet
       ->withSum([
         'trans as balance_change_percentage' => fn ($q) => $q
           ->whereWithinDay('transactions')->join('wallets', 'transactions.wallet_id', 'wallets.id')
-      ], DB::raw('amount / wallets.balance * 100'));
+      ], DB::raw(self::$syntaxBalancePercent));
+  }
+
+  function scopeWithTargetPercentage($q): Builder
+  {
+    return $q
+      ->withSum(
+        ['plan as target_percentage' => fn ($q) => $q->joinWallets()],
+        DB::raw(self::$syntaxTargetPercent)
+      );
   }
 
   function loadBalanceChangePercentage(): self
@@ -50,16 +52,15 @@ class Saving extends Model implements Wallet
     return $this->loadSum([
       'trans as balance_change_percentage' => fn ($q) => $q
         ->whereWithinDay('transactions')->join('wallets', 'transactions.wallet_id', 'wallets.id'),
-    ], DB::raw('amount / wallets.balance * 100'));
+    ], DB::raw(self::$syntaxBalancePercent));
   }
 
   function loadTargetPercentage(): self
   {
-    return $this->loadSum([
-      'plan as target_percentage' => fn ($q) => $q
-        ->where('target', '!=', NULL)
-        ->join('wallets', fn ($j) => $j->on('wallets.holder_id', 'savings.id')->whereHolderType(self::class)),
-    ], DB::raw(self::$syntaxTargetPercent));
+    return $this->loadSum(
+      ['plan as target_percentage' => fn ($q) => $q->joinWallets()],
+      DB::raw(self::$syntaxTargetPercent)
+    );
   }
 
   function trans(): HasMany
@@ -95,19 +96,22 @@ class Saving extends Model implements Wallet
     'interval',
     'amount',
     'target',
-    'active',
     'payment_plan_id',
     'metas',
+    'public',
   ];
 
   protected $casts = [
     'plan_id' => 'int',
     'times'   => 'int',
-    'active'  => 'boolean',
     'amount'  => 'float',
     'target'  => 'float',
     'metas'   => 'array',
     'target_percentage' => FloatCast::class,
     'balance_change_percentage' => FloatCast::class,
+    'active' => ActiveCast::class,
+    'public' => 'boolean',
   ];
+
+  protected $appends = ['active'];
 }
