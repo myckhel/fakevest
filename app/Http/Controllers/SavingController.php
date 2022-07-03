@@ -51,7 +51,7 @@ class SavingController extends Controller
       'interval'  => 'in:daily,weekly,monthly,biannually,annually',
       'amount'    => 'digits_between:3,15',
       'target'    => 'digits_between:3,15',
-      'active'    => 'bool',
+      'public'    => 'bool',
       'payment_option_id'    => 'int',
     ]);
 
@@ -64,7 +64,7 @@ class SavingController extends Controller
       'times',
       'amount',
       'target',
-      'active',
+      'public',
     ]);
 
     $plan = Plan::findOrFail($request->plan_id);
@@ -111,11 +111,11 @@ class SavingController extends Controller
       'interval'  => 'in:daily,weekly,monthly,biannually,annually',
       'amount'    => 'digits_between:3,15',
       'target'    => 'digits_between:3,15',
-      'active'    => 'bool'
+      'public'    => 'bool'
     ]);
 
     $saving->update(array_filter($request->only(
-      ['desc', 'until', 'times', 'interval', 'amount', 'target', 'active']
+      ['desc', 'until', 'times', 'interval', 'amount', 'target', 'public']
     )));
 
     return $saving->load(['plan', 'wallet']);

@@ -25,11 +25,11 @@ class PaymentFactory extends Factory
       'amount'              => $this->faker->randomNumber(5),
       'status'              => $this->faker->randomElement(['processing', 'on hold', 'pending', 'completed']),
       'message'             => $this->faker->randomElement(['processing', 'on hold', 'pending', 'completed']),
-      'reference'           => $this->faker->sha1,
-      'access_code'         => $this->faker->unique()->sha256,
-      'authorization_code'  => $this->faker->sha256,
+      'reference'           => $this->faker->sha1(),
+      'access_code'         => $this->faker->unique()->sha256(),
+      'authorization_code'  => $this->faker->sha256(),
       'currency_code'       => 'NGN',
-      'paid_at'             => $this->faker->dateTimeThisYear,
+      'paid_at'             => $this->faker->dateTimeThisYear(),
     ];
   }
 }
