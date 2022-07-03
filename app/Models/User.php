@@ -23,6 +23,16 @@ class User extends Authenticatable implements HasMedia, Wallet
   use HasApiTokens, HasFactory, Notifiable, HasImage, InteractsWithMedia, HasWallet, HasWallets;
 
   /**
+   * Get all of the challenges for the User
+   *
+   * @return \Illuminate\Database\Eloquent\Relations\HasMany
+   */
+  public function challenges(): HasMany
+  {
+    return $this->hasMany(UserChallenge::class);
+  }
+
+  /**
    * Get all of the accounts for the User
    *
    * @return \Illuminate\Database\Eloquent\Relations\HasMany
