@@ -22,10 +22,15 @@ class UserController extends Controller
 
     $pageSize = $request->pageSize;
 
-    return User
+    $users = User
       ::with('wallets')
       ->inRandomOrder()
+      ->withUrls(['avatar'])
       ->paginate($pageSize);
+
+    $users->each(fn ($user) => $user->withUrls(['avatar']));
+
+    return $users;
   }
 
   /**
@@ -45,9 +50,14 @@ class UserController extends Controller
     $order    = $request->order;
     $orderBy  = $request->orderBy;
 
-    return User
+    $users = User
       ::orderBy($orderBy ?? 'id', $order ?? 'asc')
+      ->withUrls(['avatar'])
       ->paginate($pageSize);
+
+    $users->each(fn ($user) => $user->withUrls(['avatar']));
+
+    return $users;
   }
 
   /**
@@ -73,7 +83,7 @@ class UserController extends Controller
   public function show(User $user)
   {
     $this->authorize('view', $user);
-    return $user;
+    return $user->withUrls(['avatar']);
   }
 
   /**
