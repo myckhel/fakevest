@@ -58,6 +58,13 @@ return [
       'visibility' => 'public',
     ],
 
+    'saving_avatars' => [
+      'driver'    => env('FILESYSTEM_DISK', 'local'),
+      'root'      => public_path("media/saving_avatars"),
+      'url'       => env('APP_URL') . "/media/saving_avatars",
+      'visibility' => 'public',
+    ],
+
     's3' => [
       'driver' => 's3',
       'key' => env('AWS_ACCESS_KEY_ID'),

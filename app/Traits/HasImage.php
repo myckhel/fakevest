@@ -2,6 +2,8 @@
 
 namespace App\Traits;
 
+use App\Models\User;
+
 /**
  *
  */
@@ -33,7 +35,7 @@ trait HasImage
   private function generateCollectionUrl(&$medias, $is_array, $collection)
   {
     if ($medias) {
-      $images;
+      $images = null;
       if ($is_array) {
         $images = [];
         $medias = $this->getMedia($collection);
@@ -43,6 +45,9 @@ trait HasImage
       } else {
         $images = $this->imageObj(is_array($medias) ? $medias[0] : $medias);
       }
+      if ($images) $this->$collection = $images;
+    } else if (self::class == User::class) {
+      $images = $this->imageObj(null, true);
       if ($images) $this->$collection = $images;
     }
   }
@@ -83,11 +88,11 @@ trait HasImage
   private function imageObj($media, $fallback = false)
   {
     $image = new \stdClass();
-    $fallbackUrl = 'https://www.pngitem.com/pimgs/m/30-307416_profile-icon-png-image-free-download-searchpng-employee.png';
+    $fallbackUrl    = config('app.url') . "/assets/img/user-profile.png";
     $image->thumb   = $fallback ? $fallbackUrl : $media->getUrl('thumb');
     $image->medium  = $fallback ? $fallbackUrl : $media->getUrl('medium');
     $image->url     = $fallback ? $fallbackUrl : $media->getUrl();
-    $image->id      = $media->id;
+    !$fallback && ($image->id      = $media->id);
     $image->metas   = $fallback ? ['fallback' => true] : ['fallback' => false] + $media->custom_properties;
     return $image;
   }
@@ -104,18 +109,26 @@ trait HasImage
       ->toMediaCollection($collection);
   }
 
-  private function convertionCallback($queued = false)
+  private function convertionCallback($queued = false, $medium = true, $thumb = true)
   {
-    return (function () use ($queued) {
-      if ($queued) {
-        $this->addMediaConversion('thumb')
+    return (function () use ($queued, $medium, $thumb) {
+      $thumbConvertion =
+        $thumb ? $this->addMediaConversion('thumb') : null;
+
+      $mediumConvertion =
+        $medium ? $this->addMediaConversion('medium') : null;
+
+      if (!$queued) {
+        $thumb && $thumbConvertion->nonQueued()
           ->width(368)->height(232);
-        $this->addMediaConversion('medium')
+
+        $medium && $mediumConvertion->nonQueued()
           ->width(400)->height(400);
       } else {
-        $this->addMediaConversion('thumb')->nonQueued()
+        $thumbConvertion->nonQueued()
           ->width(368)->height(232);
-        $this->addMediaConversion('medium')->nonQueued()
+
+        $mediumConvertion->nonQueued()
           ->width(400)->height(400);
       }
     });
