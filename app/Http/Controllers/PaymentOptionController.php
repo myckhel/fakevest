@@ -46,6 +46,7 @@ class PaymentOptionController extends Controller
     $response   = Transaction::initialize([
       'email'   => $user->email,
       'amount'  => $amount,
+      'callback_url' => config('app.url') . "/api/paystack/hooks"
     ]);
 
     $responseData     = (object) $response['data'];

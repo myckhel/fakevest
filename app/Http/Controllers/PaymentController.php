@@ -88,7 +88,7 @@ class PaymentController extends Controller
     }
 
     $amount           = $request->amount;
-    $data             = ["amount" => $amount, "email" => $user->email, 'reference' => $reference];
+    $data             = ["amount" => $amount, "email" => $user->email, 'reference' => $reference, 'callback_url' => config('app.url') . "/api/paystack/hooks"];
     $response         = Transaction::initialize($data);
     $responseData     = (object) $response['data'];
 
