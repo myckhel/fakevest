@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Payment;
+use App\Models\Saving;
+use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Myckhel\Paystack\Events\Hook;
@@ -77,11 +79,23 @@ class PaymentController extends Controller
     $wallet           = null;
 
     if ($wallet_name || $wallet_id) {
-      $wallet = $user->wallets()
+      Wallet::where(
+        fn ($q) => $q
+          ->where(
+            fn ($q) => $q
+              ->where('wallets.holder_type', Saving::class)
+              ->where('users.id', $user->id)
+          )->orWhere(fn ($q) => $q->where(
+            fn ($q) => $q->whereHolderId($user->id)
+              ->whereHolderType(User::class)
+          ))
+      )
+        ->join('savings', 'savings.id', 'wallets.holder_id')
+        ->join('users', 'savings.user_id', 'users.id')
         ->when(
           $wallet_id,
-          fn ($q) => $q->whereId($wallet_id),
-          fn ($q) => $q->whereName($wallet_name)
+          fn ($q) => $q->where('wallets.id', $wallet_id),
+          fn ($q) => $q->where('wallets.name', $wallet_name)
         )->firstOrFail();
     } else {
       $wallet = $user->wallet;
