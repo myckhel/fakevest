@@ -28,12 +28,13 @@ class TransactionController extends Controller
     $orderBy    = $request->orderBy;
     $saving_id  = $request->saving_id;
 
-    return $user->transactions()
-      ->when($saving_id, fn ($q) => $q->orWhere(
-        fn ($q) => $q
-          ->wherePayableType(Saving::class)
-          ->wherePayableId($saving_id)
-      ))
+    return Transaction::when(
+      $saving_id,
+      fn ($q) => $q->wherePayableType(Saving::class)
+        ->wherePayableId($saving_id),
+      fn ($q) => $q->wherePayableType(User::class)
+        ->wherePayableId($user->id)
+    )
       ->orderBy($orderBy ?? 'id', $order ?? 'asc')
       ->paginate($pageSize);
   }
