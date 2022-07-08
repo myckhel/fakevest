@@ -108,7 +108,7 @@ class PaymentController extends Controller
       'reference'     => $reference,
       'callback_url'  => config('app.url') . "/api/paystack/hooks",
       "metadata"      => [
-        $wallet_id    => $wallet->id,
+        'wallet_id'   => $wallet->id,
       ]
     ];
     $response         = Transaction::initialize($data);
