@@ -110,7 +110,7 @@ class PaymentController extends Controller
       "amount"        => $amount,
       "email"         => $user->email,
       'reference'     => $reference,
-      'callback_url'  => config('app.url') . "/api/paystack/hooks",
+      'callback_url'  => config('app.url') . "/api/v1/paystack/hooks",
       "metadata"      => [
         'wallet_id'   => $wallet->id,
       ]
