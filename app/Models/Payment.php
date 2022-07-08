@@ -49,10 +49,10 @@ class Payment extends Model
         if ($paymentDetails->plan) {
           $saving = Saving::wherePaymentPlanId($paymentDetails->plan['id'])->first();
           $wallet = $saving?->wallet;
-        } elseif ($paymentDetails->metadata && $paymentDetails->metadata['saving_id']) {
+        } elseif ($paymentDetails->metadata && isset($paymentDetails->metadata['saving_id'])) {
           $saving = Saving::find($paymentDetails->metadata['saving_id']);
           $wallet = $saving?->wallet;
-        } elseif ($paymentDetails->metadata && $paymentDetails->metadata['wallet_id']) {
+        } elseif ($paymentDetails->metadata && isset($paymentDetails->metadata['wallet_id'])) {
           $wallet = Wallet::find($paymentDetails->metadata['wallet_id']);
         } else {
           $wallet = $payment->wallet;
