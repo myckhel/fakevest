@@ -79,7 +79,7 @@ class PaymentController extends Controller
     $wallet           = null;
 
     if ($wallet_name || $wallet_id) {
-      Wallet::where(
+      $wallet = Wallet::where(
         fn ($q) => $q
           ->where(
             fn ($q) => $q
@@ -102,7 +102,15 @@ class PaymentController extends Controller
     }
 
     $amount           = $request->amount * 100;
-    $data             = ["amount" => $amount, "email" => $user->email, 'reference' => $reference, 'callback_url' => config('app.url') . "/api/paystack/hooks"];
+    $data             = [
+      "amount"        => $amount,
+      "email"         => $user->email,
+      'reference'     => $reference,
+      'callback_url'  => config('app.url') . "/api/paystack/hooks",
+      "metadata"      => [
+        $wallet_id    => $wallet->id,
+      ]
+    ];
     $response         = Transaction::initialize($data);
     $responseData     = (object) $response['data'];
 
