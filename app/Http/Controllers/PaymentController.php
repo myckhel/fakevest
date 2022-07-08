@@ -79,21 +79,22 @@ class PaymentController extends Controller
     $wallet           = null;
 
     if ($wallet_name || $wallet_id) {
-      $wallet = Wallet::where(
-        fn ($q) => $q
-          ->where(
-            fn ($q) => $q
-              ->where('wallets.holder_type', Saving::class)
-              ->where('users.id', $user->id)
-          )->orWhere(fn ($q) => $q->where(
-            fn ($q) => $q->whereHolderId($user->id)
-              ->whereHolderType(User::class)
-          ))
-      )->join(
-        'savings',
-        fn ($j) => $j->on('savings.id', 'wallets.holder_id')
-          ->where('wallets.holder_type', Saving::class)
-      )
+      $wallet = Wallet::select('wallets.*')
+        ->where(
+          fn ($q) => $q
+            ->where(
+              fn ($q) => $q
+                ->where('wallets.holder_type', Saving::class)
+                ->where('users.id', $user->id)
+            )->orWhere(fn ($q) => $q->where(
+              fn ($q) => $q->whereHolderId($user->id)
+                ->whereHolderType(User::class)
+            ))
+        )->join(
+          'savings',
+          fn ($j) => $j->on('savings.id', 'wallets.holder_id')
+            ->where('wallets.holder_type', Saving::class)
+        )
         ->join('users', 'savings.user_id', 'users.id')
         ->when(
           $wallet_id,
