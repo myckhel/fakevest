@@ -89,8 +89,11 @@ class PaymentController extends Controller
             fn ($q) => $q->whereHolderId($user->id)
               ->whereHolderType(User::class)
           ))
+      )->join(
+        'savings',
+        fn ($j) => $j->on('savings.id', 'wallets.holder_id')
+          ->where('wallets.holder_type', Saving::class)
       )
-        ->join('savings', 'savings.id', 'wallets.holder_id')
         ->join('users', 'savings.user_id', 'users.id')
         ->when(
           $wallet_id,
