@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Saving;
 use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
@@ -20,18 +21,54 @@ class TransactionController extends Controller
       'order'       => 'in:asc,desc',
       'pageSize'    => 'int',
       'saving_id'   => 'int',
+      'wallet_name' => '',
+      'wallet_id'   => 'int',
     ]);
 
-    $user       = $request->user();
-    $pageSize   = $request->pageSize;
-    $order      = $request->order;
-    $orderBy    = $request->orderBy;
-    $saving_id  = $request->saving_id;
+    $user         = $request->user();
+    $pageSize     = $request->pageSize;
+    $order        = $request->order;
+    $orderBy      = $request->orderBy;
+    $saving_id    = $request->saving_id;
+    $wallet_name  = $request->wallet_name;
+    $wallet_id    = $request->wallet_id;
 
     return Transaction::when(
-      $saving_id,
-      fn ($q) => $q->wherePayableType(Saving::class)
-        ->wherePayableId($saving_id),
+      $saving_id || $wallet_name || $wallet_id,
+      fn ($q) => $q->when(
+        $wallet_name
+          || $wallet_id,
+        fn ($q) => $q->whereHas(
+          'wallet',
+          fn ($q) => $q
+            ->when(
+              $wallet_name,
+              fn ($q) => $q->whereName($wallet_name),
+              fn ($q) => $q->whereId($wallet_id),
+            )
+            ->where(
+              fn ($q) => $q
+                ->whereHas(
+                  'holder',
+                  fn ($q) => $q
+                    ->where(fn ($q) => $q->whereHolderType(User::class)
+                      ->whereHolderId($user->id))
+                    ->orWhere(
+                      fn ($q) => $q->whereHolderType(Saving::class)
+                        ->where(
+                          'holder_id',
+                          fn ($q) => $q
+                            ->select('user_id')
+                            ->from('savings')
+                            ->whereColumn('wallets.holder_id', 'savings.id')
+                        )
+                    )
+                )
+            )
+        ),
+        fn ($q) => $q->wherePayableType(Saving::class)
+          ->wherePayableId($saving_id),
+      ),
       fn ($q) => $q->wherePayableType(User::class)
         ->wherePayableId($user->id)
     )
