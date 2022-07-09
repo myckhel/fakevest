@@ -19,7 +19,7 @@ return new class extends Migration
       $table->foreignId('wallet_id')->nullable()->constrained()->onDelete('cascade');
       $table->string('access_code')->unique();
       $table->string('reference');
-      $table->decimal('amount', 9, 3);
+      $table->decimal('amount', 15, 2);
       $table->string('status', 10)->default('pending');
       $table->string('message')->nullable();
       $table->string('authorization_code')->nullable();
