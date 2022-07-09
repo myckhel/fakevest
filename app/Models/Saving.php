@@ -40,11 +40,10 @@ class Saving extends Model implements Wallet
 
   function scopeWithTargetPercentage($q): Builder
   {
-    return $q
-      ->withSum(
-        ['plan as target_percentage' => fn ($q) => $q->joinWallets()],
-        DB::raw(self::$syntaxTargetPercent)
-      );
+    return $q->withSum(
+      ['wallet as target_percentage'],
+      DB::raw(self::$syntaxTargetPercent)
+    );
   }
 
   function loadBalanceChangePercentage(): self
@@ -58,7 +57,7 @@ class Saving extends Model implements Wallet
   function loadTargetPercentage(): self
   {
     return $this->loadSum(
-      ['plan as target_percentage' => fn ($q) => $q->joinWallets()],
+      ['wallet as target_percentage'],
       DB::raw(self::$syntaxTargetPercent)
     );
   }
