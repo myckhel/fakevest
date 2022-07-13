@@ -53,7 +53,9 @@ class Transaction extends ModelsTransaction
             ->whereUserId($user->id)
             ->whereColumn('transactions.payable_id', 'savings.id')
         )
-    );
+    )->when(!$saving_id, fn ($q) => $q->orWhere(
+      fn ($q) => $q->wherePayableType(User::class)->wherePayableId($user->id)
+    ));
   }
 
   function scopeWhereWithinDay($q, $column = false)
