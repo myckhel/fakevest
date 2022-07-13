@@ -53,6 +53,7 @@ class SavingController extends Controller
       'target'    => 'digits_between:3,15',
       'public'    => 'bool',
       'payment_option_id'    => 'int',
+      'avatar'    => 'image',
     ]);
 
     $user     = $request->user();
@@ -77,6 +78,8 @@ class SavingController extends Controller
       ? ['metas' => ['payment_option_id' => (int) $request->payment_option_id]]
       : []
     ));
+
+    $saving->saveImage($request->avatar, 'avatar');
 
     return $saving;
   }

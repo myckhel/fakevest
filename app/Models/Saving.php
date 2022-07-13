@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Casts\ActiveCast;
 use App\Casts\FloatCast;
+use App\Traits\HasImage;
 use App\Traits\HasWhenSetWhere;
 use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Traits\HasWallet;
@@ -15,10 +16,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Saving extends Model implements Wallet
+class Saving extends Model implements Wallet, HasMedia
 {
-  use HasFactory, HasWhenSetWhere, HasWallet, HasWallets;
+  use HasFactory, HasWhenSetWhere, HasWallet, HasWallets, InteractsWithMedia, HasImage;
 
   static $syntaxTargetPercent = "NULLIF(wallets.balance, 0) / target * 100";
 
@@ -118,4 +121,13 @@ class Saving extends Model implements Wallet
   ];
 
   protected $appends = ['active'];
+
+  function registerMediaCollections(): void
+  {
+    $mimes = ['image/jpeg', 'image/png', 'image/gif'];
+    $this->addMediaCollection('avatar')
+      ->acceptsMimeTypes($mimes)
+      ->singleFile()->useDisk('saving_avatars')
+      ->registerMediaConversions($this->convertionCallback(false, false));
+  }
 }
