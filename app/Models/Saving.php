@@ -24,6 +24,11 @@ class Saving extends Model implements Wallet
 
   static $syntaxBalancePercent = "amount / wallets.balance * 100";
 
+  function scopeWhereIsChallenge($q): Builder
+  {
+    return $q->whereHas('plan', fn ($q) => $q->whereName('Challenge'));
+  }
+
   function scopeWhereActive($q): Builder
   {
     return $q->where('until', '>=', Carbon::now());
