@@ -80,6 +80,12 @@ class PaymentController extends Controller
 
     if ($wallet_name || $wallet_id) {
       $wallet = Wallet::select('wallets.*')
+        ->leftJoin(
+          'savings',
+          fn ($j) => $j->on('savings.id', 'wallets.holder_id')
+            ->where('wallets.holder_type', Saving::class)
+        )
+        ->leftJoin('users', 'savings.user_id', 'users.id')
         ->where(
           fn ($q) => $q
             ->where(
@@ -87,15 +93,11 @@ class PaymentController extends Controller
                 ->where('wallets.holder_type', Saving::class)
                 ->where('users.id', $user->id)
             )->orWhere(fn ($q) => $q->where(
-              fn ($q) => $q->whereHolderId($user->id)
+              fn ($q) => $q
+                ->whereHolderId($user->id)
                 ->whereHolderType(User::class)
             ))
-        )->join(
-          'savings',
-          fn ($j) => $j->on('savings.id', 'wallets.holder_id')
-            ->where('wallets.holder_type', Saving::class)
         )
-        ->join('users', 'savings.user_id', 'users.id')
         ->when(
           $wallet_id,
           fn ($q) => $q->where('wallets.id', $wallet_id),
