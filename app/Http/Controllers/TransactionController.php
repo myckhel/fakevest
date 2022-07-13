@@ -23,6 +23,7 @@ class TransactionController extends Controller
       'saving_id'   => 'int',
       'wallet_name' => '',
       'wallet_id'   => 'int',
+      'wallet_names'  => 'array',
     ]);
 
     $user         = $request->user();
@@ -31,47 +32,15 @@ class TransactionController extends Controller
     $orderBy      = $request->orderBy;
     $saving_id    = $request->saving_id;
     $wallet_name  = $request->wallet_name;
+    $wallet_names = $request->wallet_names;
     $wallet_id    = $request->wallet_id;
 
-    return Transaction::when(
-      $saving_id || $wallet_name || $wallet_id,
-      fn ($q) => $q->when(
-        $wallet_name
-          || $wallet_id,
-        fn ($q) => $q->whereHas(
-          'wallet',
-          fn ($q) => $q
-            ->when(
-              $wallet_name,
-              fn ($q) => $q->whereName($wallet_name),
-              fn ($q) => $q->whereId($wallet_id),
-            )
-            ->where(
-              fn ($q) => $q
-                ->whereHas(
-                  'holder',
-                  fn ($q) => $q
-                    ->where(fn ($q) => $q->whereHolderType(User::class)
-                      ->whereHolderId($user->id))
-                    ->orWhere(
-                      fn ($q) => $q->whereHolderType(Saving::class)
-                        ->where(
-                          'holder_id',
-                          fn ($q) => $q
-                            ->select('user_id')
-                            ->from('savings')
-                            ->whereColumn('wallets.holder_id', 'savings.id')
-                        )
-                    )
-                )
-            )
-        ),
-        fn ($q) => $q->wherePayableType(Saving::class)
-          ->wherePayableId($saving_id),
-      ),
-      fn ($q) => $q->wherePayableType(User::class)
-        ->wherePayableId($user->id)
-    )
+    return Transaction::user($user, [
+      'wallet_name'   => $wallet_name,
+      'wallet_names'  => $wallet_names,
+      'wallet_id'     => $wallet_id,
+      'saving_id'     => $saving_id,
+    ])->with(['wallet'])
       ->orderBy($orderBy ?? 'id', $order ?? 'asc')
       ->paginate($pageSize);
   }
