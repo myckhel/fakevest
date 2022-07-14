@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PaymentOptionController;
 use App\Http\Controllers\PlanController;
@@ -55,6 +56,7 @@ Route::group(['middleware' => ['auth:api']], function () {
   Route::apiResource('savings',         SavingController::class);
   Route::apiResource('user_accounts',   UserAccountController::class);
   Route::apiResource('transactions',    TransactionController::class)->only(['index', 'show']);
+  Route::apiResource('challenges',      ChallengeController::class);
   Route::post('payments/verify',        [PaymentController::class, 'verify']);
 
   Route::get('logout', 'AuthController@logout');

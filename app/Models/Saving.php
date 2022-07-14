@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Casts\ActiveCast;
 use App\Casts\FloatCast;
+use App\Models\Wallet as ModelsWallet;
 use App\Traits\HasImage;
 use App\Traits\HasWhenSetWhere;
 use Bavix\Wallet\Interfaces\Wallet;
@@ -54,6 +55,14 @@ class Saving extends Model implements Wallet, HasMedia
     );
   }
 
+  function scopeWithChallengeCompletion($q, User $user): Builder
+  {
+    return $q->withSum(
+      ['participantWallet as challenge_target_percentage' => fn ($q) => $q->where('user_challenges.user_id', $user->id)],
+      DB::raw(self::$syntaxTargetPercent)
+    );
+  }
+
   function loadBalanceChangePercentage(): self
   {
     return $this->loadSum([
@@ -68,6 +77,21 @@ class Saving extends Model implements Wallet, HasMedia
       ['wallet as target_percentage'],
       DB::raw(self::$syntaxTargetPercent)
     );
+  }
+
+  function participantsWallet()
+  {
+    return $this->hasManyThrough(ModelsWallet::class, UserChallenge::class, 'saving_id', 'holder_id')->whereHolderType(UserChallenge::class);
+  }
+
+  function participantWallet()
+  {
+    return $this->hasOneThrough(ModelsWallet::class, UserChallenge::class, 'saving_id', 'holder_id')->whereHolderType(UserChallenge::class);
+  }
+
+  function participants(): HasMany
+  {
+    return $this->hasMany(UserChallenge::class);
   }
 
   function trans(): HasMany
@@ -116,6 +140,7 @@ class Saving extends Model implements Wallet, HasMedia
     'metas'   => 'array',
     'target_percentage' => FloatCast::class,
     'balance_change_percentage' => FloatCast::class,
+    'challenge_target_percentage' => FloatCast::class,
     'active' => ActiveCast::class,
     'public' => 'boolean',
   ];
