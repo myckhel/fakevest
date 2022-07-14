@@ -18,6 +18,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\DB;
+use Myckhel\Paystack\Support\Charge;
+use Myckhel\Paystack\Support\Plan as PayPlan;
+use Myckhel\Paystack\Support\Subscription;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -28,6 +31,42 @@ class Saving extends Model implements Wallet, HasMedia
   static $syntaxTargetPercent = "NULLIF(wallets.balance, 0) / NULLIF(target, 0) * 100";
 
   static $syntaxBalancePercent = "amount / wallets.balance * 100";
+
+  function processCreated($userChallenge = null)
+  {
+    $email    = $this->user->email;
+    $isChallenge = $this->plan->name == 'Challenge';
+
+    if ($this->interval) {
+      $plan = (object) PayPlan::create([
+        'name'        => $this->desc,
+        'description' => $this->desc,
+        'amount'      => $this->amount * 100,
+        'interval'    => $this->interval,
+      ])['data'];
+
+      Subscription::create([
+        'plan'        => $plan->plan_code,
+        'customer'    => $email,
+        'start_date'  => Carbon::now()->addSeconds(40)->toIso8601String(),
+      ]);
+
+      $isChallenge
+        ? $userChallenge?->update(['payment_plan_id' => $plan->id])
+        : $this->update(['payment_plan_id' => $plan->id]);
+    } elseif ($this->metas['payment_option_id']) {
+      $option = PaymentOption::find($this->metas['payment_option_id']);
+
+      $option && Charge::create([
+        'authorization_code'  => $option->authorization_code,
+        'amount'              => $this->amount,
+        'email'               => $this->user->email,
+        'metadata'            => $isChallenge
+          ? ['user_challenge_id' => $userChallenge->id]
+          : ['saving_id' => $this->id]
+      ]);
+    }
+  }
 
   function scopeWhereIsChallenge($q): Builder
   {
