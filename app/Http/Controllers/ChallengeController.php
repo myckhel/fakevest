@@ -30,7 +30,7 @@ class ChallengeController extends Controller
       ::whereHas('plan', fn ($q) => $q->whereName('Challenge'))
       ->withCount(['participants', 'participant as is_joined' => fn ($q) => $q->whereBelongsTo($user)])
       ->withChallengeCompletion($user)
-      ->orderBy($orderBy ?? 'id', $order ?? 'asc')
+      ->orderBy($orderBy ?? 'until', $order ?? 'desc')
       ->paginate($pageSize);
   }
 
