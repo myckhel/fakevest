@@ -16,8 +16,10 @@ class SavingObserver
    */
   public function created(Saving $saving)
   {
-    $saving->balance;
-    $saving->plan->name != 'Challenge' && SavingCreatedJob::dispatch($saving);
+    if ($saving->plan->name != 'Challenge') {
+      $saving->balance;
+    }
+    SavingCreatedJob::dispatch($saving);
   }
 
   /**

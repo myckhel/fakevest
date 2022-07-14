@@ -152,6 +152,8 @@ class Saving extends Model implements Wallet, HasMedia
     'is_joined' => 'boolean',
   ];
 
+  protected $hidden = ['media'];
+
   protected $appends = ['active'];
 
   function registerMediaCollections(): void

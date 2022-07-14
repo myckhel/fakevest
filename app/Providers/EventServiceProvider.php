@@ -5,7 +5,9 @@ namespace App\Providers;
 use App\Listeners\PaystackWebHookListener;
 use App\Models\Saving;
 use App\Models\User;
+use App\Models\UserChallenge;
 use App\Observers\SavingObserver;
+use App\Observers\UserChallengeObserver;
 use App\Observers\UserObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -22,6 +24,7 @@ class EventServiceProvider extends ServiceProvider
   protected $observers = [
     Saving::class => [SavingObserver::class],
     User::class   => [UserObserver::class],
+    UserChallenge::class   => [UserChallengeObserver::class],
   ];
 
   /**

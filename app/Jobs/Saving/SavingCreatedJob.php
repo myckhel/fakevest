@@ -38,30 +38,35 @@ class SavingCreatedJob implements ShouldQueue
     $saving   = $this->saving;
     $email    = $saving->user->email;
 
-    if ($saving->interval) {
-      $plan = (object) Plan::create([
-        'name'        => $saving->desc,
-        'description' => $saving->desc,
-        'amount'      => $saving->amount * 10,
-        'interval'    => $saving->interval,
-      ])['data'];
+    if ($saving->plan->name == 'Challenge') {
+      $user    = $saving->user;
+      $user->challenges()->firstOrCreate(['saving_id' => $saving->id]);
+    } else {
+      if ($saving->interval) {
+        $plan = (object) Plan::create([
+          'name'        => $saving->desc,
+          'description' => $saving->desc,
+          'amount'      => $saving->amount * 10,
+          'interval'    => $saving->interval,
+        ])['data'];
 
-      Subscription::create([
-        'plan'        => $plan->plan_code,
-        'customer'    => $email,
-        'start_date'  => Carbon::now()->addSeconds(40)->toIso8601String(),
-      ]);
+        Subscription::create([
+          'plan'        => $plan->plan_code,
+          'customer'    => $email,
+          'start_date'  => Carbon::now()->addSeconds(40)->toIso8601String(),
+        ]);
 
-      $saving->update(['payment_plan_id' => $plan->id]);
-    } elseif ($saving->metas['payment_option_id']) {
-      $option = PaymentOption::find($saving->metas['payment_option_id']);
+        $saving->update(['payment_plan_id' => $plan->id]);
+      } elseif ($saving->metas['payment_option_id']) {
+        $option = PaymentOption::find($saving->metas['payment_option_id']);
 
-      $option && Charge::create([
-        'authorization_code'  => $option->authorization_code,
-        'amount'              => $saving->amount,
-        'email'               => $saving->user->email,
-        'metadata'            => ['saving_id' => $saving->id]
-      ]);
+        $option && Charge::create([
+          'authorization_code'  => $option->authorization_code,
+          'amount'              => $saving->amount,
+          'email'               => $saving->user->email,
+          'metadata'            => ['saving_id' => $saving->id]
+        ]);
+      }
     }
   }
 }

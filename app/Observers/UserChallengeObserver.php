@@ -1,0 +1,63 @@
+<?php
+
+namespace App\Observers;
+
+use App\Models\UserChallenge;
+
+class UserChallengeObserver
+{
+  /**
+   * Handle the UserChallenge "created" event.
+   *
+   * @param  \App\Models\UserChallenge  $userChallenge
+   * @return void
+   */
+  public function created(UserChallenge $userChallenge)
+  {
+    $userChallenge->balance;
+  }
+
+  /**
+   * Handle the UserChallenge "updated" event.
+   *
+   * @param  \App\Models\UserChallenge  $userChallenge
+   * @return void
+   */
+  public function updated(UserChallenge $userChallenge)
+  {
+    //
+  }
+
+  /**
+   * Handle the UserChallenge "deleted" event.
+   *
+   * @param  \App\Models\UserChallenge  $userChallenge
+   * @return void
+   */
+  public function deleted(UserChallenge $userChallenge)
+  {
+    //
+  }
+
+  /**
+   * Handle the UserChallenge "restored" event.
+   *
+   * @param  \App\Models\UserChallenge  $userChallenge
+   * @return void
+   */
+  public function restored(UserChallenge $userChallenge)
+  {
+    //
+  }
+
+  /**
+   * Handle the UserChallenge "force deleted" event.
+   *
+   * @param  \App\Models\UserChallenge  $userChallenge
+   * @return void
+   */
+  public function forceDeleted(UserChallenge $userChallenge)
+  {
+    //
+  }
+}

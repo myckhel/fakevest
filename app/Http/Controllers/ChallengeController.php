@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Plan;
 use App\Models\Saving;
 use Illuminate\Http\Request;
 
@@ -41,10 +42,11 @@ class ChallengeController extends Controller
    */
   public function store(Request $request)
   {
-    $request->validate([]);
-    $user     = $request->user();
+    $control = new SavingController;
 
-    return Saving::create($request->only([]));
+    $request->merge(['plan_id' => Plan::whereName('Challenge')->firstOrFail()->id]);
+
+    return $control->store($request);
   }
 
   /**
