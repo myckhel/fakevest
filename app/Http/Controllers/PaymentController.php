@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Payment;
 use App\Models\Saving;
 use App\Models\User;
+use App\Models\UserChallenge;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Myckhel\Paystack\Events\Hook;
@@ -84,8 +85,10 @@ class PaymentController extends Controller
           'savings',
           fn ($j) => $j->on('savings.id', 'wallets.holder_id')
             ->where('wallets.holder_type', Saving::class)
+            ->orWhere('wallets.holder_type', UserChallenge::class)
         )
         ->leftJoin('users', 'savings.user_id', 'users.id')
+        ->leftJoin('user_challenges', 'savings.id', 'user_challenges.saving_id')
         ->where(
           fn ($q) => $q
             ->where(
@@ -96,7 +99,10 @@ class PaymentController extends Controller
               fn ($q) => $q
                 ->whereHolderId($user->id)
                 ->whereHolderType(User::class)
-            ))
+            ))->orWhere(
+              fn ($q) => $q->where('wallets.holder_type', UserChallenge::class)
+                ->where('user_challenges.user_id', $user->id)
+            )
         )
         ->when(
           $wallet_id,
