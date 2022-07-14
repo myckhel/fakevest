@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -94,6 +95,11 @@ class Saving extends Model implements Wallet, HasMedia
     return $this->hasMany(UserChallenge::class);
   }
 
+  function participant(): HasOne
+  {
+    return $this->hasOne(UserChallenge::class);
+  }
+
   function trans(): HasMany
   {
     return $this->hasMany(Transaction::class, 'payable_id')->wherePayableType(self::class);
@@ -143,6 +149,7 @@ class Saving extends Model implements Wallet, HasMedia
     'challenge_target_percentage' => FloatCast::class,
     'active' => ActiveCast::class,
     'public' => 'boolean',
+    'is_joined' => 'boolean',
   ];
 
   protected $appends = ['active'];

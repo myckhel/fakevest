@@ -16,6 +16,16 @@ class UserChallenge extends Model implements Wallet
   protected $fillable = ['saving_id', 'user_id'];
 
   /**
+   * Get the user that owns the UserChallenge
+   *
+   * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+   */
+  public function user(): BelongsTo
+  {
+    return $this->belongsTo(User::class);
+  }
+
+  /**
    * Get the saving that owns the UserChallenge
    *
    * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
