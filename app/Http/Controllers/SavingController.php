@@ -48,7 +48,7 @@ class SavingController extends Controller
       'plan_id'   => 'required|int',
       'until'     => 'date',
       'times'     => 'int',
-      'interval'  => 'in:daily,weekly,monthly,biannually,annually',
+      'interval'  => 'in:daily,weekly,monthly,biannually,annually||nullable',
       'amount'    => 'digits_between:3,15',
       'target'    => 'digits_between:3,15',
       'public'    => 'bool',
