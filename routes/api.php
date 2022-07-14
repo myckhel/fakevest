@@ -8,6 +8,7 @@ use App\Http\Controllers\PlanController;
 use App\Http\Controllers\SavingController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserAccountController;
+use App\Http\Controllers\UserChallengeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WalletController;
 use Illuminate\Http\Request;
@@ -48,6 +49,8 @@ Route::group(['middleware' => ['auth:api']], function () {
   Route::post('wallets/withdraw',       [WalletController::class, 'withdraw']);
   Route::get('wallets/dollar',         [WalletController::class, 'viewDollar']);
 
+  Route::post('challenges/{saving}/join',         [UserChallengeController::class, 'store']);
+
   Route::apiResource('users',           UserController::class)->only(['update', 'show']);
   Route::apiResource('wallets',         WalletController::class);
   Route::apiResource('payments',        PaymentController::class);
@@ -56,7 +59,7 @@ Route::group(['middleware' => ['auth:api']], function () {
   Route::apiResource('savings',         SavingController::class);
   Route::apiResource('user_accounts',   UserAccountController::class);
   Route::apiResource('transactions',    TransactionController::class)->only(['index', 'show']);
-  Route::apiResource('challenges',      ChallengeController::class);
+  Route::apiResource('challenges',      ChallengeController::class)->only(['index', 'store']);
   Route::post('payments/verify',        [PaymentController::class, 'verify']);
 
   Route::get('logout', 'AuthController@logout');
