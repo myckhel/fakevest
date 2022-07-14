@@ -23,7 +23,7 @@ class Saving extends Model implements Wallet, HasMedia
 {
   use HasFactory, HasWhenSetWhere, HasWallet, HasWallets, InteractsWithMedia, HasImage;
 
-  static $syntaxTargetPercent = "NULLIF(wallets.balance, 0) / target * 100";
+  static $syntaxTargetPercent = "NULLIF(wallets.balance, 0) / NULLIF(target, 0) * 100";
 
   static $syntaxBalancePercent = "amount / wallets.balance * 100";
 
