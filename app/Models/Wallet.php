@@ -48,7 +48,7 @@ class Wallet extends BaseWallet
     ], 'amount')
       ->withSum([
         'trans as balance_change_percentage' => fn ($q) => $q->whereWithinDay(),
-      ], DB::raw('wallets.balance - amount / amount * 100'));
+      ], DB::raw('(wallets.balance - amount) / amount * 100'));
   }
 
   function trans()
