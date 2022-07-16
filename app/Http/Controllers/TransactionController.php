@@ -40,7 +40,7 @@ class TransactionController extends Controller
       'wallet_names'  => $wallet_names,
       'wallet_id'     => $wallet_id,
       'saving_id'     => $saving_id,
-    ])->with(['wallet'])
+    ])
       ->orderBy($orderBy ?? 'id', $order ?? 'asc')
       ->paginate($pageSize);
   }
