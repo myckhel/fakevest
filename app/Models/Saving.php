@@ -30,7 +30,8 @@ class Saving extends Model implements Wallet, HasMedia
 
   static $syntaxTargetPercent = "NULLIF(wallets.balance, 0) / NULLIF(target, 0) * 100";
 
-  static $syntaxBalancePercent = "(wallets.balance - amount) / amount * 100";
+  static $syntaxBalancePercent = "CASE WHEN wallets.balance - amount = 0 THEN amount
+    ELSE (wallets.balance - (wallets.balance - amount)) / (wallets.balance - amount) * 100 END";
 
   function processCreated($userChallenge = null)
   {

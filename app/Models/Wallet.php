@@ -13,7 +13,7 @@ class Wallet extends BaseWallet
 {
   use HasFactory;
 
-  static $changePercentageSyntax = "CASE WHEN (wallets.balance - (wallets.balance - amount)) = 0 THEN amount
+  static $changePercentageSyntax = "CASE WHEN wallets.balance - amount = 0 THEN amount
     ELSE (wallets.balance - (wallets.balance - amount)) / (wallets.balance - amount) * 100 END";
 
   function scopeBelongsToUser($q, User $user): Builder
