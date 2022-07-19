@@ -6,6 +6,7 @@ use App\Models\Saving;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Myckhel\Paystack\Support\Recipient;
 use Myckhel\Paystack\Support\Transfer;
 
@@ -34,17 +35,8 @@ class WalletController extends Controller
     $amount           = $request->amount;
 
     $wallet           = Wallet::whereId($from_wallet_id)
-      ->where(
-        fn ($q) => $q->where(fn ($q) => $q->whereHolderType(User::class)->whereHolderId($user->id))
-          ->orWhere(
-            fn ($q) => $q
-              ->whereHolderType(Saving::class)
-              ->join(
-                'savings',
-                fn ($lj) => $lj->on('savings.id', '=', 'wallets.holder_id')->where('savings.user_id', $user->id)
-              )
-          )
-      )->firstOrFail();
+      ->belongsToUser($user)
+      ->firstOrFail();
 
     $bankAccount  = $user->bankAccounts()->findOrFail($to_user_account);
 
