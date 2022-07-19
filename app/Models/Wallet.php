@@ -16,6 +16,42 @@ class Wallet extends BaseWallet
   static $changePercentageSyntax = "CASE WHEN wallets.balance - amount = 0 THEN amount
     ELSE (wallets.balance - (wallets.balance - amount)) / (wallets.balance - amount) * 100 END";
 
+  function scopePureUser($q, User $user)
+  {
+    $q->leftJoin(
+      'savings',
+      fn ($j) => $j->on('savings.id', 'wallets.holder_id')
+        ->where('wallets.holder_type', Saving::class)
+    )
+      ->leftJoin(
+        'user_challenges',
+        fn ($j) => $j->on('user_challenges.id', 'wallets.holder_id')
+          ->where('wallets.holder_type', UserChallenge::class)
+      )
+      ->leftJoin(
+        'users',
+        fn ($j) => $j->on('savings.user_id', 'users.id')
+          ->orOn('user_challenges.user_id', 'users.id')
+          ->orOn('wallets.holder_id', 'users.id')
+      )
+      ->where(
+        fn ($q) => $q
+          ->where(
+            fn ($q) => $q
+              ->where('wallets.holder_type', Saving::class)
+              ->where('users.id', $user->id)
+          )->orWhere(fn ($q) => $q->where(
+
+            fn ($q) => $q
+              ->whereHolderId($user->id)
+              ->whereHolderType(User::class)
+          ))->orWhere(
+            fn ($q) => $q->where('wallets.holder_type', UserChallenge::class)
+              ->where('user_challenges.user_id', $user->id)
+          )
+      );
+  }
+
   function scopeBelongsToUser($q, User $user): Builder
   {
     return $q->whereHas(

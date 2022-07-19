@@ -81,29 +81,7 @@ class PaymentController extends Controller
 
     if ($wallet_name || $wallet_id) {
       $wallet = Wallet::select('wallets.*')
-        ->leftJoin(
-          'savings',
-          fn ($j) => $j->on('savings.id', 'wallets.holder_id')
-            ->where('wallets.holder_type', Saving::class)
-            ->orWhere('wallets.holder_type', UserChallenge::class)
-        )
-        ->leftJoin('users', 'savings.user_id', 'users.id')
-        ->leftJoin('user_challenges', 'savings.id', 'user_challenges.saving_id')
-        ->where(
-          fn ($q) => $q
-            ->where(
-              fn ($q) => $q
-                ->where('wallets.holder_type', Saving::class)
-                ->where('users.id', $user->id)
-            )->orWhere(fn ($q) => $q->where(
-              fn ($q) => $q
-                ->whereHolderId($user->id)
-                ->whereHolderType(User::class)
-            ))->orWhere(
-              fn ($q) => $q->where('wallets.holder_type', UserChallenge::class)
-                ->where('user_challenges.user_id', $user->id)
-            )
-        )
+        ->pureUser($user)
         ->when(
           $wallet_id,
           fn ($q) => $q->where('wallets.id', $wallet_id),
@@ -127,7 +105,7 @@ class PaymentController extends Controller
     $responseData     = (object) $response['data'];
 
     $payment = $user->payments()->create([
-      'amount'        => $amount,
+      'amount'        => $request->amount,
       'access_code'   => $responseData->access_code,
       'reference'     => $responseData->reference,
       'wallet_id'     => $wallet?->id,
