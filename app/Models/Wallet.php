@@ -41,7 +41,6 @@ class Wallet extends BaseWallet
               ->where('wallets.holder_type', Saving::class)
               ->where('users.id', $user->id)
           )->orWhere(fn ($q) => $q->where(
-
             fn ($q) => $q
               ->whereHolderId($user->id)
               ->whereHolderType(User::class)

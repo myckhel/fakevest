@@ -100,6 +100,21 @@ class WalletController extends Controller
       ->paginate($pageSize);
   }
 
+  function allBalance(Request $request)
+  {
+    $request->validate([]);
+
+    $user     = $request->user();
+
+    $change = Wallet::pureUser($user)
+      ->sum(DB::raw(Wallet::$changePercentageSyntax));
+
+    $balance = Wallet::pureUser($user)
+      ->sum('balance');
+
+    return ['balance' => (float) $balance, 'balance_change_percentage' => (float) $change];
+  }
+
   /**
    * Store a newly created resource in storage.
    *

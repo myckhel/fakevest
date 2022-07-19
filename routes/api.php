@@ -47,7 +47,8 @@ Route::group(['middleware' => ['auth:api']], function () {
   Route::put('users/{user}/avatar',        [UserController::class, 'updateAvatar']);
 
   Route::post('wallets/withdraw',       [WalletController::class, 'withdraw']);
-  Route::get('wallets/dollar',         [WalletController::class, 'viewDollar']);
+  Route::get('wallets/dollar',          [WalletController::class, 'viewDollar']);
+  Route::get('wallets/balance',         [WalletController::class, 'allBalance']);
 
   Route::post('challenges/{saving}/join',         [UserChallengeController::class, 'store']);
 
