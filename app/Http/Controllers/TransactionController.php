@@ -41,7 +41,7 @@ class TransactionController extends Controller
       'wallet_id'     => $wallet_id,
       'saving_id'     => $saving_id,
     ])
-      ->orderBy($orderBy ?? 'id', $order ?? 'asc')
+      ->orderBy($orderBy ?? 'id', $order ?? 'desc')
       ->paginate($pageSize);
   }
 
