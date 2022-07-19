@@ -13,7 +13,8 @@ class Wallet extends BaseWallet
 {
   use HasFactory;
 
-
+  static $changePercentageSyntax = "CASE WHEN (wallets.balance - (wallets.balance - amount)) = 0 THEN amount
+    ELSE (wallets.balance - (wallets.balance - amount)) / (wallets.balance - amount) * 100 END";
 
   function scopeBelongsToUser($q, User $user): Builder
   {
@@ -33,6 +34,17 @@ class Wallet extends BaseWallet
                 ->whereColumn('wallets.holder_id', 'savings.id')
             )
         )
+        ->orWhere(
+          fn ($q) => $q->whereHolderType(UserChallenge::class)
+            ->where(
+              'holder_id',
+              fn ($q) => $q
+                ->select('id')
+                ->from('user_challenges')
+                ->whereUserId($user->id)
+                ->whereColumn('wallets.holder_id', 'user_challenges.id')
+            )
+        )
     );
   }
 
@@ -48,7 +60,7 @@ class Wallet extends BaseWallet
     ], 'amount')
       ->withSum([
         'trans as balance_change_percentage' => fn ($q) => $q->whereWithinDay(),
-      ], DB::raw('(wallets.balance - amount) / amount * 100'));
+      ], DB::raw(self::$changePercentageSyntax));
   }
 
   function trans()
