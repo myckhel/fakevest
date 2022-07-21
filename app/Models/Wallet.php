@@ -13,8 +13,8 @@ class Wallet extends BaseWallet
 {
   use HasFactory;
 
-  static $changePercentageSyntax = "CASE WHEN wallets.balance - amount = 0 THEN amount
-    ELSE (wallets.balance - (wallets.balance - amount)) / (wallets.balance - amount) * 100 END";
+  static $changePercentageSyntax = "CASE WHEN wallets.balance - transactions.amount = 0 THEN transactions.amount
+    ELSE (wallets.balance - (wallets.balance - transactions.amount)) / (wallets.balance - transactions.amount) * 100 END";
 
   function scopePureUser($q, User $user)
   {
@@ -34,6 +34,7 @@ class Wallet extends BaseWallet
           ->orOn('user_challenges.user_id', 'users.id')
           ->orOn('wallets.holder_id', 'users.id')
       )
+      ->leftJoin('transactions', 'transactions.wallet_id', 'wallets.id')
       ->where(
         fn ($q) => $q
           ->where(
@@ -83,9 +84,10 @@ class Wallet extends BaseWallet
     );
   }
 
-  function scopeWhereWithinDay($q)
+  function scopeWhereWithinDay($q, $column = false)
   {
-    $q->where("created_at", ">", Carbon::now()->subDay())->where("created_at", "<", Carbon::now());
+    $column = $column ? "$column." : "";
+    $q->where($column . "created_at", ">", Carbon::now()->subDay())->where($column . "created_at", "<", Carbon::now());
   }
 
   function scopeWithBalanceDiff($q)

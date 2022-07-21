@@ -106,13 +106,23 @@ class WalletController extends Controller
 
     $user     = $request->user();
 
-    $change = Wallet::pureUser($user)
-      ->sum(DB::raw(Wallet::$changePercentageSyntax));
-
-    $balance = Wallet::pureUser($user)
+    $balance = Wallet::belongstoUser($user)
       ->sum('balance');
 
-    return ['balance' => (float) $balance, 'balance_change_percentage' => (float) $change];
+    $collect = Wallet::belongstoUser($user)
+      ->whereHas('trans', fn ($q) => $q->whereWithinDay('transactions'))
+      ->withSum(['trans as balance_change' => fn ($q) => $q->whereWithinDay('transactions')], 'amount')
+      ->withSum(['trans as balance_change_percentage' => fn ($q) => $q->whereWithinDay('transactions')], DB::raw(Wallet::$changePercentageSyntax))
+      ->get();
+
+    $balance_change = $collect->sum('balance_change');
+    $balance_change_percentage = $collect->sum('balance_change_percentage');
+
+    return [
+      'balance' => (float) $balance,
+      'balance_change' => $balance_change,
+      'balance_change_percentage' => $balance_change_percentage
+    ];
   }
 
   /**
