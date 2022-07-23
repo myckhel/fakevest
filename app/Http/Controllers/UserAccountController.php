@@ -72,7 +72,8 @@ class UserAccountController extends Controller
 
     $account = $user->bankAccounts()->firstOrCreate([
       'account_number'  => $account_number,
-      'bank_code'       => $bank_code
+      'bank_code'       => $bank_code,
+      'account_name'    => $verification->data['account_name'],
     ], $request->only([
       'type', 'account_number', 'bank_code', 'description', 'currency'
     ]) + ['recipient_id' => $recipient->id]);

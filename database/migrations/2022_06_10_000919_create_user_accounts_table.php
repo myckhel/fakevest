@@ -17,10 +17,11 @@ return new class extends Migration
       $table->id();
       $table->string('type')->default('nuban');
       $table->foreignId('user_id')->constrained()->onDelete('cascade');
-      $table->string('account_number');
-      $table->string('bank_code')->nullable();
+      $table->string('account_number', 50);
+      $table->string('account_name', 100);
+      $table->string('bank_code', 100)->nullable();
       $table->string('description')->nullable();
-      $table->string('currency')->default('NGN');
+      $table->string('currency', 10)->default('NGN');
       $table->string('recipient_id')->nullable();
       $table->timestamps();
     });
