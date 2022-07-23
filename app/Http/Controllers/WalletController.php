@@ -12,6 +12,15 @@ use Myckhel\Paystack\Support\Transfer;
 
 class WalletController extends Controller
 {
+  function viewNaira(Request $request)
+  {
+    $request->validate([]);
+
+    $user = $request->user();
+
+    return $user->wallets()->firstOrCreate(['name' => 'naira'], ['name' => 'naira']);
+  }
+
   function viewDollar(Request $request)
   {
     $request->validate([]);
