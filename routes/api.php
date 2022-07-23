@@ -61,7 +61,7 @@ Route::group(['middleware' => ['auth:api']], function () {
   Route::apiResource('savings',         SavingController::class);
   Route::apiResource('user_accounts',   UserAccountController::class);
   Route::apiResource('transactions',    TransactionController::class)->only(['index', 'show']);
-  Route::apiResource('challenges',      ChallengeController::class)->only(['index', 'store']);
+  Route::apiResource('challenges',      ChallengeController::class)->only(['index', 'store', 'show']);
   Route::post('payments/verify',        [PaymentController::class, 'verify']);
 
   Route::get('logout', 'AuthController@logout');

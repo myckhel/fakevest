@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\FloatCast;
 use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Traits\HasWallet;
 use Bavix\Wallet\Traits\HasWallets;
@@ -34,4 +35,8 @@ class UserChallenge extends Model implements Wallet
   {
     return $this->belongsTo(Saving::class, 'saving_id');
   }
+
+  protected $casts = [
+    'target_percentage' => FloatCast::class,
+  ];
 }

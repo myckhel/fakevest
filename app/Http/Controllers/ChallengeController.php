@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Plan;
 use App\Models\Saving;
+use App\Models\UserChallenge;
 use Illuminate\Http\Request;
 
 class ChallengeController extends Controller
@@ -56,10 +57,24 @@ class ChallengeController extends Controller
    * @param  \App\Models\Saving  $saving
    * @return \Illuminate\Http\Response
    */
-  public function show(Saving $saving)
+  public function show(Request $request, Saving $challenge)
   {
-    $this->authorize('view', $saving);
-    return $saving;
+    $this->authorize('view', $challenge);
+
+    $user = $request->user();
+
+    return $challenge
+      ->loadCount(['participants', 'participant as is_joined' => fn ($q) => $q->whereBelongsTo($user)])
+      ->load([
+        'user:id,fullname',
+        'participants' => fn ($q) => $q
+          ->selectRaw("user_challenges.*, NULLIF(wallets.balance, 0) / $challenge->target * 100 as target_percentage")
+          ->with(['user:id,fullname,created_at', 'wallet:id,balance,holder_type,holder_id,uuid'])
+          ->leftJoin('wallets', fn ($q) => $q
+            ->on('wallets.holder_id', 'user_challenges.id')
+            ->whereHolderType(UserChallenge::class))
+          ->orderBy('wallets.balance', 'desc'),
+      ]);
   }
 
   /**

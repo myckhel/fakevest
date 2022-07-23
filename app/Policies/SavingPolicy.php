@@ -30,7 +30,7 @@ class SavingPolicy
    */
   public function view(User $user, Saving $saving)
   {
-    return $saving->user_id == $user->id;
+    return true;
   }
 
   /**
