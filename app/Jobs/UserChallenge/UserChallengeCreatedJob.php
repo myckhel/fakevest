@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Jobs\Saving;
+namespace App\Jobs\UserChallenge;
 
-use App\Models\Saving;
+use App\Models\UserChallenge;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class SavingCreatedJob implements ShouldQueue
+class UserChallengeCreatedJob implements ShouldQueue
 {
   use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -18,8 +19,9 @@ class SavingCreatedJob implements ShouldQueue
    *
    * @return void
    */
-  public function __construct(public Saving $saving)
+  public function __construct(public UserChallenge $userChallenge)
   {
+    //
   }
 
   /**
@@ -29,13 +31,8 @@ class SavingCreatedJob implements ShouldQueue
    */
   public function handle()
   {
-    $saving   = $this->saving;
-    $isChallenge = $saving->plan->isChallenge;
+    $saving   = $this->userChallenge->savings;
 
-    if ($isChallenge) {
-      $saving->user->challenges()->firstOrCreate(['saving_id' => $saving->id]);
-    }
-
-    !$isChallenge && $saving->processCreated();
+    $saving->processCreated($this->userChallenge);
   }
 }

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Casts\ActiveCast;
 use App\Casts\FloatCast;
+use App\Models\Wallet as ModelsWallet;
+use App\Traits\HasImage;
 use App\Traits\HasWhenSetWhere;
 use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Traits\HasWallet;
@@ -14,15 +16,63 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\DB;
+use Myckhel\Paystack\Support\Charge;
+use Myckhel\Paystack\Support\Plan as PayPlan;
+use Myckhel\Paystack\Support\Subscription;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Saving extends Model implements Wallet
+class Saving extends Model implements Wallet, HasMedia
 {
-  use HasFactory, HasWhenSetWhere, HasWallet, HasWallets;
+  use HasFactory, HasWhenSetWhere, HasWallet, HasWallets, InteractsWithMedia, HasImage;
 
-  static $syntaxTargetPercent = "NULLIF(wallets.balance, 0) / target * 100";
+  static $syntaxTargetPercent = "NULLIF(wallets.balance, 0) / NULLIF(target, 0) * 100";
 
-  static $syntaxBalancePercent = "amount / wallets.balance * 100";
+  static $syntaxBalancePercent = "CASE WHEN wallets.balance - amount = 0 THEN amount
+    ELSE (wallets.balance - (wallets.balance - amount)) / (wallets.balance - amount) * 100 END";
+
+  function processCreated($userChallenge = null)
+  {
+    $email    = $this->user->email;
+    $isChallenge = $this->plan->name == 'Challenge';
+
+    if ($this->interval) {
+      $plan = (object) PayPlan::create([
+        'name'        => $this->desc,
+        'description' => $this->desc,
+        'amount'      => $this->amount * 100,
+        'interval'    => $this->interval,
+      ])['data'];
+
+      Subscription::create([
+        'plan'        => $plan->plan_code,
+        'customer'    => $email,
+        'start_date'  => Carbon::now()->addSeconds(40)->toIso8601String(),
+      ]);
+
+      $isChallenge
+        ? $userChallenge?->update(['payment_plan_id' => $plan->id])
+        : $this->update(['payment_plan_id' => $plan->id]);
+    } elseif ($this->metas['payment_option_id']) {
+      $option = PaymentOption::find($this->metas['payment_option_id']);
+
+      $option && Charge::create([
+        'authorization_code'  => $option->authorization_code,
+        'amount'              => $this->amount,
+        'email'               => $this->user->email,
+        'metadata'            => $isChallenge
+          ? ['user_challenge_id' => $userChallenge->id]
+          : ['saving_id' => $this->id]
+      ]);
+    }
+  }
+
+  function scopeWhereIsChallenge($q): Builder
+  {
+    return $q->whereHas('plan', fn ($q) => $q->whereName('Challenge'));
+  }
 
   function scopeWhereActive($q): Builder
   {
@@ -40,11 +90,18 @@ class Saving extends Model implements Wallet
 
   function scopeWithTargetPercentage($q): Builder
   {
-    return $q
-      ->withSum(
-        ['plan as target_percentage' => fn ($q) => $q->joinWallets()],
-        DB::raw(self::$syntaxTargetPercent)
-      );
+    return $q->withSum(
+      ['wallet as target_percentage'],
+      DB::raw(self::$syntaxTargetPercent)
+    );
+  }
+
+  function scopeWithChallengeCompletion($q, User $user): Builder
+  {
+    return $q->withSum(
+      ['participantWallet as challenge_target_percentage' => fn ($q) => $q->where('user_challenges.user_id', $user->id)],
+      DB::raw(self::$syntaxTargetPercent)
+    );
   }
 
   function loadBalanceChangePercentage(): self
@@ -58,9 +115,29 @@ class Saving extends Model implements Wallet
   function loadTargetPercentage(): self
   {
     return $this->loadSum(
-      ['plan as target_percentage' => fn ($q) => $q->joinWallets()],
+      ['wallet as target_percentage'],
       DB::raw(self::$syntaxTargetPercent)
     );
+  }
+
+  function participantsWallet()
+  {
+    return $this->hasManyThrough(ModelsWallet::class, UserChallenge::class, 'saving_id', 'holder_id')->whereHolderType(UserChallenge::class);
+  }
+
+  function participantWallet()
+  {
+    return $this->hasOneThrough(ModelsWallet::class, UserChallenge::class, 'saving_id', 'holder_id')->whereHolderType(UserChallenge::class);
+  }
+
+  function participants(): HasMany
+  {
+    return $this->hasMany(UserChallenge::class);
+  }
+
+  function participant(): HasOne
+  {
+    return $this->hasOne(UserChallenge::class);
   }
 
   function trans(): HasMany
@@ -109,9 +186,22 @@ class Saving extends Model implements Wallet
     'metas'   => 'array',
     'target_percentage' => FloatCast::class,
     'balance_change_percentage' => FloatCast::class,
+    'challenge_target_percentage' => FloatCast::class,
     'active' => ActiveCast::class,
     'public' => 'boolean',
+    'is_joined' => 'boolean',
   ];
 
+  protected $hidden = ['media'];
+
   protected $appends = ['active'];
+
+  function registerMediaCollections(): void
+  {
+    $mimes = ['image/jpeg', 'image/png', 'image/gif'];
+    $this->addMediaCollection('avatar')
+      ->acceptsMimeTypes($mimes)
+      ->singleFile()->useDisk('saving_avatars')
+      ->registerMediaConversions($this->convertionCallback(false, false));
+  }
 }

@@ -89,8 +89,11 @@ trait HasImage
   {
     $image = new \stdClass();
     $fallbackUrl    = config('app.url') . "/assets/img/user-profile.png";
-    $image->thumb   = $fallback ? $fallbackUrl : $media->getUrl('thumb');
-    $image->medium  = $fallback ? $fallbackUrl : $media->getUrl('medium');
+    try {
+      $image->thumb   = $fallback ? $fallbackUrl : $media->getUrl('thumb');
+      $image->medium  = $fallback ? $fallbackUrl : $media->getUrl('medium');
+    } catch (\Throwable $th) {
+    }
     $image->url     = $fallback ? $fallbackUrl : $media->getUrl();
     !$fallback && ($image->id      = $media->id);
     $image->metas   = $fallback ? ['fallback' => true] : ['fallback' => false] + $media->custom_properties;

@@ -13,16 +13,12 @@ return new class extends Migration
    */
   public function up()
   {
-    Schema::create('user_accounts', function (Blueprint $table) {
+    Schema::create('user_challenges', function (Blueprint $table) {
       $table->id();
-      $table->string('type')->default('nuban');
       $table->foreignId('user_id')->constrained()->onDelete('cascade');
-      $table->string('account_number', 50);
-      $table->string('account_name', 100);
-      $table->string('bank_code', 100)->nullable();
-      $table->string('description')->nullable();
-      $table->string('currency', 10)->default('NGN');
-      $table->string('recipient_id')->nullable();
+      $table->foreignId('saving_id')->constrained()->onDelete('cascade');
+      $table->integer('payment_plan_id')->index()->nullable(true);
+      $table->json('metas')->default("{}");
       $table->timestamps();
     });
   }
@@ -34,6 +30,6 @@ return new class extends Migration
    */
   public function down()
   {
-    Schema::dropIfExists('user_accounts');
+    Schema::dropIfExists('user_challenges');
   }
 };

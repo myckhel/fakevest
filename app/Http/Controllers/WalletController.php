@@ -6,11 +6,21 @@ use App\Models\Saving;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Myckhel\Paystack\Support\Recipient;
 use Myckhel\Paystack\Support\Transfer;
 
 class WalletController extends Controller
 {
+  function viewNaira(Request $request)
+  {
+    $request->validate([]);
+
+    $user = $request->user();
+
+    return $user->wallets()->firstOrCreate(['name' => 'naira'], ['name' => 'naira']);
+  }
+
   function viewDollar(Request $request)
   {
     $request->validate([]);
@@ -34,17 +44,8 @@ class WalletController extends Controller
     $amount           = $request->amount;
 
     $wallet           = Wallet::whereId($from_wallet_id)
-      ->where(
-        fn ($q) => $q->where(fn ($q) => $q->whereHolderType(User::class)->whereHolderId($user->id))
-          ->orWhere(
-            fn ($q) => $q
-              ->whereHolderType(Saving::class)
-              ->join(
-                'savings',
-                fn ($lj) => $lj->on('savings.id', '=', 'wallets.holder_id')->where('savings.user_id', $user->id)
-              )
-          )
-      )->firstOrFail();
+      ->belongsToUser($user)
+      ->firstOrFail();
 
     $bankAccount  = $user->bankAccounts()->findOrFail($to_user_account);
 
@@ -106,6 +107,31 @@ class WalletController extends Controller
       ->withBalanceDiff()
       ->orderBy($orderBy ?? 'id', $order ?? 'asc')
       ->paginate($pageSize);
+  }
+
+  function allBalance(Request $request)
+  {
+    $request->validate([]);
+
+    $user     = $request->user();
+
+    $balance = Wallet::belongstoUser($user)
+      ->sum('balance');
+
+    $collect = Wallet::belongstoUser($user)
+      ->whereHas('trans', fn ($q) => $q->whereWithinDay('transactions'))
+      ->withSum(['trans as balance_change' => fn ($q) => $q->whereWithinDay('transactions')], 'amount')
+      ->withSum(['trans as balance_change_percentage' => fn ($q) => $q->whereWithinDay('transactions')], DB::raw(Wallet::$changePercentageSyntax))
+      ->get();
+
+    $balance_change = $collect->sum('balance_change');
+    $balance_change_percentage = $collect->sum('balance_change_percentage');
+
+    return [
+      'balance' => (float) $balance,
+      'balance_change' => $balance_change,
+      'balance_change_percentage' => $balance_change_percentage
+    ];
   }
 
   /**

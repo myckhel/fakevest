@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Payment;
+use App\Models\Saving;
+use App\Models\User;
+use App\Models\UserChallenge;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Myckhel\Paystack\Events\Hook;
@@ -77,23 +80,32 @@ class PaymentController extends Controller
     $wallet           = null;
 
     if ($wallet_name || $wallet_id) {
-      $wallet = $user->wallets()
+      $wallet = Wallet::select('wallets.*')
+        ->pureUser($user)
         ->when(
           $wallet_id,
-          fn ($q) => $q->whereId($wallet_id),
-          fn ($q) => $q->whereName($wallet_name)
+          fn ($q) => $q->where('wallets.id', $wallet_id),
+          fn ($q) => $q->where('wallets.name', $wallet_name)
         )->firstOrFail();
     } else {
       $wallet = $user->wallet;
     }
 
-    $amount           = $request->amount;
-    $data             = ["amount" => $amount, "email" => $user->email, 'reference' => $reference];
+    $amount           = $request->amount * 100;
+    $data             = [
+      "amount"        => $amount,
+      "email"         => $user->email,
+      'reference'     => $reference,
+      'callback_url'  => config('app.url') . "/api/v1/paystack/hooks",
+      "metadata"      => [
+        'wallet_id'   => $wallet->id,
+      ]
+    ];
     $response         = Transaction::initialize($data);
     $responseData     = (object) $response['data'];
 
     $payment = $user->payments()->create([
-      'amount'        => $amount,
+      'amount'        => $request->amount,
       'access_code'   => $responseData->access_code,
       'reference'     => $responseData->reference,
       'wallet_id'     => $wallet?->id,

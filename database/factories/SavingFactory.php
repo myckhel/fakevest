@@ -25,6 +25,8 @@ class SavingFactory extends Factory
       'until' => $this->faker->dateTimeBetween('+1 week', '+5 month'),
       'times' => 1,
       'interval' => $this->faker->randomElement(['daily', 'weekly', 'monthly']),
+      'amount' => $this->faker->numberBetween(10, 1000),
+      'target' => $this->faker->numberBetween(1000, 100000),
     ];
   }
 }

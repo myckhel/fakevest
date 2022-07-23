@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Saving;
 use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
@@ -20,21 +21,27 @@ class TransactionController extends Controller
       'order'       => 'in:asc,desc',
       'pageSize'    => 'int',
       'saving_id'   => 'int',
+      'wallet_name' => '',
+      'wallet_id'   => 'int',
+      'wallet_names'  => 'array',
     ]);
 
-    $user       = $request->user();
-    $pageSize   = $request->pageSize;
-    $order      = $request->order;
-    $orderBy    = $request->orderBy;
-    $saving_id  = $request->saving_id;
+    $user         = $request->user();
+    $pageSize     = $request->pageSize;
+    $order        = $request->order;
+    $orderBy      = $request->orderBy;
+    $saving_id    = $request->saving_id;
+    $wallet_name  = $request->wallet_name;
+    $wallet_names = $request->wallet_names;
+    $wallet_id    = $request->wallet_id;
 
-    return $user->transactions()
-      ->when($saving_id, fn ($q) => $q->orWhere(
-        fn ($q) => $q
-          ->wherePayableType(Saving::class)
-          ->wherePayableId($saving_id)
-      ))
-      ->orderBy($orderBy ?? 'id', $order ?? 'asc')
+    return Transaction::user($user, [
+      'wallet_name'   => $wallet_name,
+      'wallet_names'  => $wallet_names,
+      'wallet_id'     => $wallet_id,
+      'saving_id'     => $saving_id,
+    ])
+      ->orderBy($orderBy ?? 'id', $order ?? 'desc')
       ->paginate($pageSize);
   }
 

@@ -18,9 +18,9 @@ class Jsonable implements CastsAttributes
    */
   public function get($model, string $key, $value, array $attributes)
   {
-    if (Str::startsWith($value, '{') && Str::endsWith($value, '}')) {
+    if ($value && Str::startsWith($value, '{') && Str::endsWith($value, '}')) {
       return json_decode($value, true);
-    } elseif (Str::startsWith($value, "\"")) {
+    } elseif ($value && Str::startsWith($value, "\"")) {
       return trim($value, "\"");
     } else {
       return $value;
