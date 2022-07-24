@@ -13,6 +13,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\WalletController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Myckhel\Paystack\Http\Controllers\MiscellaneousController;
+use Myckhel\Paystack\Http\Controllers\VerificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +54,18 @@ Route::group(['middleware' => ['auth:api']], function () {
   Route::get('wallets/naira',           [WalletController::class, 'viewNaira']);
 
   Route::post('challenges/{saving}/join',         [UserChallengeController::class, 'store']);
+
+  Route::group(['prefix' => 'paystack'], function () {
+    // miscellaneous
+    Route::get('bank',                    [MiscellaneousController::class, 'listBanks']);
+    Route::get('banks',                   [MiscellaneousController::class, 'listProviders']);
+    Route::get('country',                 [MiscellaneousController::class, 'listCountries']);
+
+    // verifications
+    Route::get('bank/resolve',             [VerificationController::class, 'resolve']);
+    Route::post('bank/validate',           [VerificationController::class, 'validateAccount']);
+    Route::get('decision/bin/{bin}',       [VerificationController::class, 'resolveCardBIN']);
+  });
 
   Route::apiResource('users',           UserController::class)->only(['update', 'show']);
   Route::apiResource('wallets',         WalletController::class);

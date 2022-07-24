@@ -7,7 +7,8 @@ return [
   "merchant_email"    => env("PAYSTACK_MERCHANT_EMAIL"),
 
   "route" => [
-    "middleware"    => ['api'], // For injecting middleware to the package's routes
-    "prefix"        => 'api/v1/paystack', // For injecting middleware to the package's routes
+    "middleware"        => ["paystack_route_disabled", "api"], // For injecting middleware to the package's routes
+    "prefix"            => "api/v1/paystack", // For injecting middleware to the package's routes
+    "hook_middleware"   => ["api", "validate_paystack_hook"]
   ],
 ];
