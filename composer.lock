@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ceeaef49e36e41b65350997ee81748a5",
+    "content-hash": "d0cf61879609f647eacc0a42f69fd683",
     "packages": [
         {
             "name": "bavix/laravel-wallet",
@@ -2806,17 +2806,11 @@
         },
         {
             "name": "myckhel/laravel-paystack",
-            "version": "v1.0.0-beta.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/myckhel/laravel-paystack.git",
-                "reference": "25665afc0657fb83432d3dcec70f76212f99e13d"
-            },
+            "version": "dev-main",
             "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/myckhel/laravel-paystack/zipball/25665afc0657fb83432d3dcec70f76212f99e13d",
-                "reference": "25665afc0657fb83432d3dcec70f76212f99e13d",
-                "shasum": ""
+                "type": "path",
+                "url": "/Users/ace/Desktop/apps/package/paystack",
+                "reference": "42b4ce1c5433b0eac0e7da6005b9bc2c44e3bb52"
             },
             "require": {
                 "illuminate/support": "^7.0|^8.0|^9.0"
@@ -2840,7 +2834,16 @@
                     "Myckhel\\Paystack\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "Myckhel\\Paystack\\Tests\\": "tests"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/phpunit"
+                ]
+            },
             "license": [
                 "MIT"
             ],
@@ -2854,11 +2857,9 @@
             "keywords": [
                 "laravel"
             ],
-            "support": {
-                "issues": "https://github.com/myckhel/laravel-paystack/issues",
-                "source": "https://github.com/myckhel/laravel-paystack/tree/v1.0.0-beta.0"
-            },
-            "time": "2022-05-27T08:22:39+00:00"
+            "transport-options": {
+                "relative": false
+            }
         },
         {
             "name": "myclabs/php-enum",
