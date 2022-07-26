@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
 use Myckhel\Paystack\Support\Charge;
 use Myckhel\Paystack\Support\Plan as PayPlan;
@@ -140,9 +141,9 @@ class Saving extends Model implements Wallet, HasMedia
     return $this->hasOne(UserChallenge::class);
   }
 
-  function trans(): HasMany
+  function trans(): MorphMany
   {
-    return $this->hasMany(Transaction::class, 'payable_id')->wherePayableType(self::class);
+    return $this->morphMany(Transaction::class, 'payable');
   }
 
   /**
