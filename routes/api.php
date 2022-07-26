@@ -11,6 +11,7 @@ use App\Http\Controllers\UserAccountController;
 use App\Http\Controllers\UserChallengeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WalletController;
+use App\Http\Controllers\WalletInterestController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Myckhel\Paystack\Http\Controllers\MiscellaneousController;
@@ -77,6 +78,7 @@ Route::group(['middleware' => ['auth:api']], function () {
   Route::apiResource('transactions',    TransactionController::class)->only(['index', 'show']);
   Route::apiResource('challenges',      ChallengeController::class)->only(['index', 'store', 'show']);
   Route::post('payments/verify',        [PaymentController::class, 'verify']);
+  Route::apiResource('wallet_interests',  WalletInterestController::class)->only(['index']);
 
   Route::get('logout', 'AuthController@logout');
 

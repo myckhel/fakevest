@@ -1,0 +1,35 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+  /**
+   * Run the migrations.
+   *
+   * @return void
+   */
+  public function up()
+  {
+    Schema::create('wallet_interests', function (Blueprint $table) {
+      $table->id();
+      $table->foreignId('wallet_id')->constrained()->onDelete('cascade');
+      $table->decimal('amount', 64, 10, true)->default(0);
+      $table->timestamp('last_earned');
+      $table->timestamp('last_payout')->useCurrent();
+      $table->timestamps();
+    });
+  }
+
+  /**
+   * Reverse the migrations.
+   *
+   * @return void
+   */
+  public function down()
+  {
+    Schema::dropIfExists('wallet_interests');
+  }
+};

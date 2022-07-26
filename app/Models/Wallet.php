@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Bavix\Wallet\Models\Wallet as BaseWallet;
 use Carbon\Carbon;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\DB;
 
 class Wallet extends BaseWallet
@@ -103,6 +104,16 @@ class Wallet extends BaseWallet
   function trans()
   {
     return $this->hasMany(Transaction::class);
+  }
+
+  /**
+   * Get the interest associated with the Wallet
+   *
+   * @return \Illuminate\Database\Eloquent\Relations\HasOne
+   */
+  public function interest(): HasOne
+  {
+    return $this->hasOne(WalletInterest::class);
   }
 
   protected $casts = [
