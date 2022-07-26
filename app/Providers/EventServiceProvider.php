@@ -4,9 +4,11 @@ namespace App\Providers;
 
 use App\Listeners\PaystackWebHookListener;
 use App\Models\Saving;
+use App\Models\Transaction;
 use App\Models\User;
 use App\Models\UserChallenge;
 use App\Observers\SavingObserver;
+use App\Observers\TransactionObserver;
 use App\Observers\UserChallengeObserver;
 use App\Observers\UserObserver;
 use Illuminate\Auth\Events\Registered;
@@ -25,6 +27,7 @@ class EventServiceProvider extends ServiceProvider
     Saving::class => [SavingObserver::class],
     User::class   => [UserObserver::class],
     UserChallenge::class   => [UserChallengeObserver::class],
+    Transaction::class   => [TransactionObserver::class],
   ];
 
   /**
