@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Saving;
 use App\Models\WalletInterest;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\Request;
 
@@ -50,6 +51,20 @@ class WalletInterestController extends Controller
     }
 
     return $interests;
+  }
+
+  function accept(Request $request, WalletInterest $walletInterest)
+  {
+    $request->validate([]);
+
+    if (!$walletInterest->isPayoutDue) {
+      $dueDate = Carbon::parse($walletInterest->last_earned)->addMonth(1)->firstOfMonth();
+      abort(403, "Interest not due for collection \n until $dueDate");
+    }
+
+    $walletInterest->earnInterest();
+
+    return $walletInterest;
   }
 
   /**

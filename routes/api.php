@@ -53,6 +53,7 @@ Route::group(['middleware' => ['auth:api']], function () {
   Route::get('wallets/dollar',          [WalletController::class, 'viewDollar']);
   Route::get('wallets/balance',         [WalletController::class, 'allBalance']);
   Route::get('wallets/naira',           [WalletController::class, 'viewNaira']);
+  Route::post('wallet_interests/{walletInterest}/accept', [WalletInterestController::class, 'accept']);
 
   Route::post('challenges/{saving}/join',         [UserChallengeController::class, 'store']);
 

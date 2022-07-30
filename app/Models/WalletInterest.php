@@ -14,6 +14,30 @@ class WalletInterest extends Model
 
   const nTime = 365;
 
+  function resetEarning()
+  {
+    return $this->update([
+      'last_payout' => Carbon::now(),
+      'amount' => 0
+    ]);
+  }
+
+  function earnInterest()
+  {
+    $this->wallet->loadMorph('holder', [Saving::class => ['user', 'plan']]);
+
+    $this->calculate($this->wallet->holder->plan);
+
+    $user = $this->wallet->holder->user;
+    $saving = $this->wallet->holder;
+
+    $user->deposit("$this->amount", [
+      'desc' => "Interest on ($saving->desc)", 'interest_id' => $this->id
+    ]);
+
+    $this->resetEarning();
+  }
+
   function scopeUserInterests($q, User $user)
   {
     return $q
@@ -38,11 +62,16 @@ class WalletInterest extends Model
       $elapsedDays = $elapsedMs / (1000 * 3600 * 24);
       $amount = $wallet->balance * pow(1 + ($plan->interest / 100) / self::nTime, $elapsedDays);
 
+      $earned = ($amount - $wallet->balance) + $this->amount;
+
       $this->update([
         'last_earned' => $now,
-        'amount' => ($amount - $wallet->balance) + $this->amount,
+        'amount' => $earned,
       ]);
+
+      return $earned;
     }
+    return 0;
   }
 
   function getIsPayoutDueAttribute()
