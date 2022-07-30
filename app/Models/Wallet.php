@@ -53,34 +53,40 @@ class Wallet extends BaseWallet
       );
   }
 
-  function scopeBelongsToUser($q, User $user): Builder
+  function scopeBelongsToUser($q, User $user, $excludeUser = false): Builder
   {
-    return $q->whereHas(
+    $morphs = [Saving::class, UserChallenge::class];
+
+    if (!$excludeUser) {
+      array_push($morphs, User::class);
+    }
+
+    return $q->whereHasMorph(
       'holder',
-      fn ($q) => $q
-        ->where(fn ($q) => $q->whereHolderType(User::class)
-          ->whereHolderId($user->id))
-        ->orWhere(
-          fn ($q) => $q->whereHolderType(Saving::class)
-            ->where(
-              'holder_id',
-              fn ($q) => $q
-                ->select('id')
-                ->from('savings')
-                ->whereUserId($user->id)
-                ->whereColumn('wallets.holder_id', 'savings.id')
-            )
+      $morphs,
+      fn ($q, $type) => $q
+        ->when($type == User::class, fn ($q) => $q->whereHolderId($user->id))
+        ->when(
+          $type == Saving::class,
+          fn ($q) => $q->where(
+            'holder_id',
+            fn ($q) => $q
+              ->select('id')
+              ->from('savings')
+              ->whereUserId($user->id)
+              ->whereColumn('wallets.holder_id', 'savings.id')
+          )
         )
-        ->orWhere(
-          fn ($q) => $q->whereHolderType(UserChallenge::class)
-            ->where(
-              'holder_id',
-              fn ($q) => $q
-                ->select('id')
-                ->from('user_challenges')
-                ->whereUserId($user->id)
-                ->whereColumn('wallets.holder_id', 'user_challenges.id')
-            )
+        ->when(
+          $type == UserChallenge::class,
+          fn ($q) => $q->where(
+            'holder_id',
+            fn ($q) => $q
+              ->select('id')
+              ->from('user_challenges')
+              ->whereUserId($user->id)
+              ->whereColumn('wallets.holder_id', 'user_challenges.id')
+          )
         )
     );
   }
