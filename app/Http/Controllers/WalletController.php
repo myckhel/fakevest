@@ -109,16 +109,16 @@ class WalletController extends Controller
       ->paginate($pageSize);
   }
 
-  function allBalance(Request $request)
+  function totalSavings(Request $request)
   {
     $request->validate([]);
 
     $user     = $request->user();
 
-    $balance = Wallet::belongstoUser($user)
+    $balance = Wallet::belongsToUser($user, true)
       ->sum('balance');
 
-    $collect = Wallet::belongstoUser($user)
+    $collect = Wallet::belongsToUser($user, true)
       ->whereHas('trans', fn ($q) => $q->whereWithinDay('transactions'))
       ->withSum(['trans as balance_change' => fn ($q) => $q->whereWithinDay('transactions')], 'amount')
       ->withSum(['trans as balance_change_percentage' => fn ($q) => $q->whereWithinDay('transactions')], DB::raw(Wallet::$changePercentageSyntax))

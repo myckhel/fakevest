@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ceeaef49e36e41b65350997ee81748a5",
+    "content-hash": "be3b23e0d75f268e110a4e9e91403161",
     "packages": [
         {
             "name": "bavix/laravel-wallet",
@@ -2806,16 +2806,16 @@
         },
         {
             "name": "myckhel/laravel-paystack",
-            "version": "v1.0.0-beta.0",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myckhel/laravel-paystack.git",
-                "reference": "25665afc0657fb83432d3dcec70f76212f99e13d"
+                "reference": "47f9a074955052b8306089ed79581606fde4ea14"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myckhel/laravel-paystack/zipball/25665afc0657fb83432d3dcec70f76212f99e13d",
-                "reference": "25665afc0657fb83432d3dcec70f76212f99e13d",
+                "url": "https://api.github.com/repos/myckhel/laravel-paystack/zipball/47f9a074955052b8306089ed79581606fde4ea14",
+                "reference": "47f9a074955052b8306089ed79581606fde4ea14",
                 "shasum": ""
             },
             "require": {
@@ -2856,9 +2856,15 @@
             ],
             "support": {
                 "issues": "https://github.com/myckhel/laravel-paystack/issues",
-                "source": "https://github.com/myckhel/laravel-paystack/tree/v1.0.0-beta.0"
+                "source": "https://github.com/myckhel/laravel-paystack/tree/v1.0.0"
             },
-            "time": "2022-05-27T08:22:39+00:00"
+            "funding": [
+                {
+                    "url": "https://ko-fi.com/myckhel",
+                    "type": "ko_fi"
+                }
+            ],
+            "time": "2022-07-24T14:37:36+00:00"
         },
         {
             "name": "myclabs/php-enum",
@@ -9442,9 +9448,9 @@
     "prefer-lowest": false,
     "platform": {
         "php": "^8.1",
+        "ext-gd": "*",
         "ext-pcntl": "*",
-        "ext-swoole": "^4.8",
-        "ext-gd": "*"
+        "ext-swoole": "^4.8"
     },
     "platform-dev": [],
     "plugin-api-version": "2.3.0"
