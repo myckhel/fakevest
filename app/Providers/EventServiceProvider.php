@@ -2,15 +2,15 @@
 
 namespace App\Providers;
 
+use App\Listeners\BalanceUpdatedListener;
 use App\Listeners\PaystackWebHookListener;
 use App\Models\Saving;
-use App\Models\Transaction;
 use App\Models\User;
 use App\Models\UserChallenge;
 use App\Observers\SavingObserver;
-use App\Observers\TransactionObserver;
 use App\Observers\UserChallengeObserver;
 use App\Observers\UserObserver;
+use Bavix\Wallet\Internal\Events\BalanceUpdatedEventInterface;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -27,7 +27,6 @@ class EventServiceProvider extends ServiceProvider
     Saving::class => [SavingObserver::class],
     User::class   => [UserObserver::class],
     UserChallenge::class   => [UserChallengeObserver::class],
-    Transaction::class   => [TransactionObserver::class],
   ];
 
   /**
@@ -42,6 +41,9 @@ class EventServiceProvider extends ServiceProvider
     Hook::class => [
       PaystackWebHookListener::class,
     ],
+    BalanceUpdatedEventInterface::class => [
+      BalanceUpdatedListener::class
+    ]
   ];
 
   /**
