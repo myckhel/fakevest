@@ -27,7 +27,7 @@ class {{ class }} extends Controller
         $orderBy  = $request->orderBy;
 
         return {{model}}
-            ::orderBy($orderBy ?? 'id', $order ?? 'asc')
+            ::orderBy($orderBy ?? 'id', $order ?? 'desc')
             ->paginate($pageSize);
     }
 
