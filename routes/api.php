@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChallengeController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PaymentOptionController;
 use App\Http\Controllers\PlanController;
@@ -80,6 +81,7 @@ Route::group(['middleware' => ['auth:api']], function () {
   Route::apiResource('challenges',      ChallengeController::class)->only(['index', 'store', 'show']);
   Route::post('payments/verify',        [PaymentController::class, 'verify']);
   Route::apiResource('wallet_interests',  WalletInterestController::class)->only(['index']);
+  Route::apiResource('notifications',  NotificationController::class)->only(['index', 'show']);
 
   Route::get('logout', 'AuthController@logout');
 
