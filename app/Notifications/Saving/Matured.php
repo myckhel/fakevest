@@ -1,39 +1,27 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Notifications\Saving;
 
 use App\Models\Saving;
-use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ChallengeWon extends Notification
+class Matured extends Notification
 {
   use Queueable;
-
-  public $desc, $saving_id, $user_name;
+  public $desc, $saving_id, $plan_name;
 
   /**
    * Create a new notification instance.
    *
    * @return void
    */
-  public function __construct(Saving $challenge, User $user)
+  public function __construct(Saving $saving)
   {
-    $this->desc = $challenge->desc;
-    $this->saving_id = $challenge->id;
-    $this->user_name = $user->fullname;
-  }
-
-  public function toDatabase($notifiable)
-  {
-    return [
-      "saving_id"     => $this->saving_id,
-      "type"          => "challenge.won",
-      "message"       => trans('notice.challenge._won', ['desc' => $this->desc, 'user' => $this->user_name]),
-    ];
+    $this->desc = $saving->desc;
+    $this->saving_id = $saving->id;
+    $this->plan_name = $saving->plan->name;
   }
 
   /**
@@ -70,7 +58,9 @@ class ChallengeWon extends Notification
   public function toArray($notifiable)
   {
     return [
-      //
+      "saving_id"     => $this->saving_id,
+      "type"          => "savings.matured",
+      "message"       => trans('notice.savings._matured', ['desc' => $this->desc, 'name' => $this->plan_name]),
     ];
   }
 }

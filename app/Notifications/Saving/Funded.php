@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Notifications\Saving;
 
 use App\Models\Saving;
 use App\Models\Transaction;
@@ -10,7 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class SavingFunded extends Notification
+class Funded extends Notification
 {
   use Queueable;
   public $desc, $saving_id, $amount;
@@ -25,15 +25,6 @@ class SavingFunded extends Notification
     $this->desc = $saving->desc;
     $this->saving_id = $saving->id;
     $this->amount = $transaction->amount;
-  }
-
-  public function toDatabase($notifiable)
-  {
-    return [
-      "saving_id"     => $this->saving_id,
-      "type"          => "savings.funded",
-      "message"       => trans('notice.savings._funded', ['desc' => $this->desc, 'amount' => $this->amount]),
-    ];
   }
 
   /**
@@ -70,7 +61,9 @@ class SavingFunded extends Notification
   public function toArray($notifiable)
   {
     return [
-      //
+      "saving_id"     => $this->saving_id,
+      "type"          => "savings.funded",
+      "message"       => trans('notice.savings._funded', ['desc' => $this->desc, 'amount' => $this->amount]),
     ];
   }
 }
