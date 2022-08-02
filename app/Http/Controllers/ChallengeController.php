@@ -78,7 +78,8 @@ class ChallengeController extends Controller
             ->on('wallets.holder_id', 'user_challenges.id')
             ->whereHolderType(UserChallenge::class))
           ->orderBy('wallets.balance', 'desc'),
-      ]);
+      ])
+      ->withUrls('avatar');
   }
 
   /**
