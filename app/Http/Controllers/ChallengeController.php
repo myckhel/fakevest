@@ -27,13 +27,17 @@ class ChallengeController extends Controller
     $order    = $request->order;
     $orderBy  = $request->orderBy;
 
-    return Saving
+    $challenges = Saving
       ::whereHas('plan', fn ($q) => $q->whereName('Challenge'))
       ->withCount(['participants', 'participant as is_joined' => fn ($q) => $q->whereBelongsTo($user)])
       ->with(['user:id,fullname', 'participantWallet' => fn ($q) => $q->where('user_challenges.user_id', $user->id)])
       ->withChallengeCompletion($user)
-      ->orderBy($orderBy ?? 'until', $order ?? 'desc')
+      ->orderBy($orderBy ?? 'until', $order ?? 'asc')
       ->paginate($pageSize);
+
+    $challenges->map(fn ($challenge) => $challenge->withUrls('avatar'));
+
+    return $challenges;
   }
 
   /**
