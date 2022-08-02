@@ -40,10 +40,12 @@ class UserChallengeController extends Controller
   public function store(Request $request, $saving)
   {
     $challenge = Saving::whereId($saving)->whereIsChallenge()->firstOrFail();
-    $request->validate([]);
+    $request->validate([
+      'metas' => 'array'
+    ]);
     $user     = $request->user();
 
-    return $user->challenges()->firstOrCreate(['saving_id' => $challenge->id]);
+    return $user->challenges()->firstOrCreate(['saving_id' => $challenge->id], ['saving_id' => $challenge->id, 'metas' => $request->metas]);
   }
 
   /**

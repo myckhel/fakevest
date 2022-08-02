@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Casts\FloatCast;
+use App\Casts\Jsonable;
 use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Traits\HasWallet;
 use Bavix\Wallet\Traits\HasWallets;
@@ -14,7 +15,7 @@ class UserChallenge extends Model implements Wallet
 {
   use HasFactory, HasWallet, HasWallets;
 
-  protected $fillable = ['saving_id', 'user_id'];
+  protected $fillable = ['saving_id', 'user_id', 'metas'];
 
   /**
    * Get the user that owns the UserChallenge
@@ -38,5 +39,6 @@ class UserChallenge extends Model implements Wallet
 
   protected $casts = [
     'target_percentage' => FloatCast::class,
+    'metas' => Jsonable::class
   ];
 }
