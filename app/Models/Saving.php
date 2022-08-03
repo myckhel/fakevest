@@ -177,6 +177,7 @@ class Saving extends Model implements Wallet, HasMedia
     'payment_plan_id',
     'metas',
     'public',
+    'title'
   ];
 
   protected $casts = [

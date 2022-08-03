@@ -18,6 +18,7 @@ return new class extends Migration
       $table->foreignId('user_id')->constrained()->onDelete('cascade');
       $table->foreignId('plan_id')->constrained()->onDelete('cascade');
       $table->string('desc')->nullable();
+      $table->string('title')->nullable();
       $table->date('until')->nullable();
       $table->integer('times')->nullable();
       $table->enum('interval', ['daily', 'weekly', 'monthly', 'biannually', 'annually'])->nullable();
