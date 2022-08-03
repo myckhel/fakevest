@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Jobs\UserChallenge\UseJoinedChallengeJob;
 use App\Jobs\UserChallenge\UserChallengeCreatedJob;
 use App\Models\UserChallenge;
+use App\Notifications\Challenge\Milestone;
 
 class UserChallengeObserver
 {
@@ -17,7 +18,16 @@ class UserChallengeObserver
   public function created(UserChallenge $userChallenge)
   {
     $userChallenge->balance;
+    $challenge = $userChallenge->savings;
+    $user = $challenge->user;
+    $participantCount = $challenge->loadCount('participants')->participants_count;
+
     UseJoinedChallengeJob::dispatch($userChallenge);
+
+    if ($participantCount == 1000) {
+      $user->notify(new Milestone($challenge));
+    }
+
     UserChallengeCreatedJob::dispatch($userChallenge);
   }
 
