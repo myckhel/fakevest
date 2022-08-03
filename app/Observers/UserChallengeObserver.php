@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Jobs\UserChallenge\UseJoinedChallengeJob;
 use App\Jobs\UserChallenge\UserChallengeCreatedJob;
 use App\Models\UserChallenge;
 
@@ -16,6 +17,7 @@ class UserChallengeObserver
   public function created(UserChallenge $userChallenge)
   {
     $userChallenge->balance;
+    UseJoinedChallengeJob::dispatch($userChallenge);
     UserChallengeCreatedJob::dispatch($userChallenge);
   }
 
