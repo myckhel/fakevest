@@ -65,7 +65,7 @@ class WithdrawToAccount extends Notification
       "wallet_id"     => $this->wallet_id,
       "type"          => "wallet.withdraw2account",
       "message"       => trans('notice.wallet._withdraw2account', [
-        'amount'      => $this->amount,
+        'amount'      => 0 - $this->amount,
         'bank_name'   => $this->bank_name,
         'currency'    => 'NGN',
         'account_number' => $this->account_number,
