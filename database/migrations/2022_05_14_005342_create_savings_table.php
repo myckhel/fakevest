@@ -25,6 +25,7 @@ return new class extends Migration
       $table->decimal('amount', 15)->default(0);
       $table->decimal('target', 15)->default(0);
       $table->boolean('public')->default(true);
+      $table->tinyInteger('active')->default(1)->index();
       $table->integer('payment_plan_id')->index()->nullable(true);
       $table->json('metas')->default("{}");
       $table->timestamps();

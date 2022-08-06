@@ -32,6 +32,7 @@ class SavingController extends Controller
       ->withTargetPercentage()
       ->withBalanceChangePercentage()
       ->whereActive()
+      ->active()
       ->orderBy($orderBy ?? 'id', $order ?? 'desc')
       ->paginate($pageSize);
   }
