@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChallengeController;
+use App\Http\Controllers\JobController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PaymentOptionController;
@@ -57,6 +58,8 @@ Route::group(['middleware' => ['auth:api']], function () {
   Route::post('wallet_interests/{walletInterest}/accept', [WalletInterestController::class, 'accept']);
 
   Route::post('challenges/{saving}/join',         [UserChallengeController::class, 'store']);
+
+  Route::get('jobs/user/savings/matured',         [JobController::class, 'userSavingMatured']);
 
   Route::group(['prefix' => 'paystack'], function () {
     // miscellaneous
