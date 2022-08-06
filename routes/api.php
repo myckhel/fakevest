@@ -60,6 +60,7 @@ Route::group(['middleware' => ['auth:api']], function () {
   Route::post('challenges/{saving}/join',         [UserChallengeController::class, 'store']);
 
   Route::get('jobs/user/savings/matured',         [JobController::class, 'userSavingMatured']);
+  Route::get('jobs/challenge/won',           [JobController::class, 'userChallengeWon']);
 
   Route::group(['prefix' => 'paystack'], function () {
     // miscellaneous
