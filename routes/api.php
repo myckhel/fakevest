@@ -12,12 +12,13 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserAccountController;
 use App\Http\Controllers\UserChallengeController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\WalletInterestController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Myckhel\Paystack\Http\Controllers\MiscellaneousController;
-use Myckhel\Paystack\Http\Controllers\VerificationController;
+use Myckhel\Paystack\Http\Controllers\VerificationController as PVerificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -69,9 +70,9 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::get('country',                 [MiscellaneousController::class, 'listCountries']);
 
     // verifications
-    Route::get('bank/resolve',             [VerificationController::class, 'resolve']);
-    Route::post('bank/validate',           [VerificationController::class, 'validateAccount']);
-    Route::get('decision/bin/{bin}',       [VerificationController::class, 'resolveCardBIN']);
+    Route::get('bank/resolve',             [PVerificationController::class, 'resolve']);
+    Route::post('bank/validate',           [PVerificationController::class, 'validateAccount']);
+    Route::get('decision/bin/{bin}',       [PVerificationController::class, 'resolveCardBIN']);
   });
 
   Route::apiResource('users',           UserController::class)->only(['update', 'show']);
@@ -85,7 +86,8 @@ Route::group(['middleware' => ['auth:api']], function () {
   Route::apiResource('challenges',      ChallengeController::class)->only(['index', 'store', 'show']);
   Route::post('payments/verify',        [PaymentController::class, 'verify']);
   Route::apiResource('wallet_interests',  WalletInterestController::class)->only(['index']);
-  Route::apiResource('notifications',  NotificationController::class)->only(['index', 'show']);
+  Route::apiResource('notifications',   NotificationController::class)->only(['index', 'show']);
+  Route::apiResource('verifications',   VerificationController::class);
 
   Route::get('logout', 'AuthController@logout');
 
