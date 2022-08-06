@@ -10,7 +10,7 @@ class UserAccount extends Model
 {
   use HasFactory;
 
-  protected $fillable = ['type', 'user_id', 'account_number', 'account_name', 'bank_code', 'description', 'currency', 'recipient_id'];
+  protected $fillable = ['type', 'user_id', 'account_number', 'account_name', 'bank_code', 'description', 'currency', 'recipient_id', 'bank_name'];
 
   protected $casts = ['user_id' => 'int', 'account_number' => 'int', 'recipient_id' => 'int'];
 
