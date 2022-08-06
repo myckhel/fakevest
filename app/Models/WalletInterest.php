@@ -22,11 +22,11 @@ class WalletInterest extends Model
     ]);
   }
 
-  function earnInterest()
+  function earnInterest(Wallet $wallet = null, $calculate = true, $deleteInterest = false)
   {
-    $wallet = $this->wallet->loadMorph('holder', [Saving::class => ['user', 'plan']]);
+    $wallet = $wallet ?? $this->wallet->loadMorph('holder', [Saving::class => ['user', 'plan']]);
 
-    $this->calculate($wallet->holder->plan, $wallet);
+    !$calculate && $this->calculate($wallet->holder->plan, $wallet);
 
     $user = $wallet->holder->user;
     $saving = $wallet->holder;
@@ -35,7 +35,7 @@ class WalletInterest extends Model
       'desc' => "Interest on ($saving->desc)", 'interest_id' => $this->id
     ]);
 
-    $this->resetEarning();
+    $deleteInterest ? $this->delete() : $this->resetEarning();
   }
 
   function scopeUserInterests($q, User $user)
@@ -66,7 +66,7 @@ class WalletInterest extends Model
 
       $this->update([
         'last_earned' => $now,
-        'amount' => number_format((float)$earned, 10, '.', ''),
+        'amount' => number_format(max((float)$earned, 0.0000000000), 10, '.', ''),
       ]);
 
       return $earned;
