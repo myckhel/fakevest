@@ -34,15 +34,6 @@ class Payment extends Model
       }
 
       if ($paymentDetails->status == 'success') {
-        $payment->update([
-          'status'              => $paymentDetails->status,
-          'message'             => $paymentDetails->message,
-          'reference'           => $paymentDetails->reference,
-          'authorization_code'  => $paymentDetails->authorization['authorization_code'],
-          'currency_code'       => $paymentDetails->currency,
-          'paid_at'            => now(), //$paymentDetails['data']['paidAt'],
-        ]);
-
         $user             = $payment->user;
 
         $wallet = null;
@@ -83,6 +74,15 @@ class Payment extends Model
             $paymentDetails->authorization
           );
         }
+
+        $payment->update([
+          'status'              => $paymentDetails->status,
+          'message'             => $paymentDetails->message,
+          'reference'           => $paymentDetails->reference,
+          'authorization_code'  => $paymentDetails->authorization['authorization_code'],
+          'currency_code'       => $paymentDetails->currency,
+          'paid_at'            => now(), //$paymentDetails['data']['paidAt'],
+        ]);
       }
 
       return ['status' => true, 'payment' => $payment];
