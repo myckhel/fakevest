@@ -24,12 +24,12 @@ class WalletInterest extends Model
 
   function earnInterest()
   {
-    $this->wallet->loadMorph('holder', [Saving::class => ['user', 'plan']]);
+    $wallet = $this->wallet->loadMorph('holder', [Saving::class => ['user', 'plan']]);
 
-    $this->calculate($this->wallet->holder->plan);
+    $this->calculate($wallet->holder->plan, $wallet);
 
-    $user = $this->wallet->holder->user;
-    $saving = $this->wallet->holder;
+    $user = $wallet->holder->user;
+    $saving = $wallet->holder;
 
     $user->deposit("$this->amount", [
       'desc' => "Interest on ($saving->desc)", 'interest_id' => $this->id
@@ -66,7 +66,7 @@ class WalletInterest extends Model
 
       $this->update([
         'last_earned' => $now,
-        'amount' => $earned,
+        'amount' => number_format((float)$earned, 10, '.', ''),
       ]);
 
       return $earned;
