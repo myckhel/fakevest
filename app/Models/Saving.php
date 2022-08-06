@@ -27,7 +27,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Saving extends Model implements Wallet, HasMedia
 {
-  use HasFactory, HasWhenSetWhere, HasWallet, HasWallets, InteractsWithMedia, HasImage;
+  use HasFactory, HasWhenSetWhere, HasWallet, HasWallets, InteractsWithMedia, HasImage, HasSavingWallet;
 
   static $syntaxTargetPercent = "NULLIF(wallets.balance, 0) / NULLIF(target, 0) * 100";
 
@@ -37,20 +37,13 @@ class Saving extends Model implements Wallet, HasMedia
   function processMatured()
   {
     // disable saving subscriptions
-    if ($this->payment_plan_id) {
-      $plan = (object) PayPlan::fetch($this->payment_plan_id)['data'];
-      try {
-        collect($plan?->subscriptions)->map(
-          fn ($sub) => Subscription::disable([
-            'code' => $sub['subscription_code'],
-            'token' => $sub['email_token']
-          ])
-        );
-      } catch (\Throwable $th) {
-      }
-    }
+    $this->stopPlanSubscription();
 
-    $this->transferBalance();
+    $transfer = $this->transferBalance();
+
+    $this->earnInterest($this->wallet);
+
+    $transfer && $this->sendMaturedNotification($this->wallet->holder);
 
     $this->update(['active' => false]);
   }
@@ -58,18 +51,25 @@ class Saving extends Model implements Wallet, HasMedia
   function transferBalance()
   {
     $wallet = $this->wallet;
-
     // deposit balance to user wallet
-    $saving = $wallet->holder;
+    if ($wallet->balance > 0) {
+      $saving = $wallet->holder;
 
-    $transaction = $saving?->transfer($saving?->user, $wallet->balance, ['desc' => "Saving matured wallet tranfser (`$saving->desc`)"]);
+      return $saving?->transfer($saving?->user, $wallet->balance, ['desc' => "Saving matured wallet tranfser (`$saving->desc`)"]);
+    }
+  }
 
+  function sendMaturedNotification(Saving $saving)
+  {
+    $saving?->user?->notify(new Matured($saving));
+  }
+
+  function earnInterest(Wallet $wallet)
+  {
     $interest = $wallet->interest;
     if ($interest) {
       $interest->earnInterest($wallet, false, true);
     }
-
-    $transaction && $saving?->user?->notify(new Matured($saving));
   }
 
   function processCreated($userChallenge = null)
@@ -247,5 +247,24 @@ class Saving extends Model implements Wallet, HasMedia
       ->acceptsMimeTypes($mimes)
       ->singleFile()->useDisk('saving_avatars')
       ->registerMediaConversions($this->convertionCallback(false, false));
+  }
+}
+
+trait HasSavingWallet
+{
+  function stopPlanSubscription()
+  {
+    if ($this->payment_plan_id) {
+      $plan = (object) PayPlan::fetch($this->payment_plan_id)['data'];
+      try {
+        collect($plan?->subscriptions)->map(
+          fn ($sub) => Subscription::disable([
+            'code' => $sub['subscription_code'],
+            'token' => $sub['email_token']
+          ])
+        );
+      } catch (\Throwable $th) {
+      }
+    }
   }
 }

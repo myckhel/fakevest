@@ -13,7 +13,25 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class UserChallenge extends Model implements Wallet
 {
-  use HasFactory, HasWallet, HasWallets;
+  use HasFactory, HasWallet, HasWallets, HasSavingWallet;
+
+  function processChallengeWon()
+  {
+    $this->stopPlanSubscription();
+
+    $this->transferBalance();
+  }
+
+  function transferBalance()
+  {
+    $wallet = $this->wallet;
+    // deposit balance to user wallet
+    if ($wallet->balance > 0) {
+      $saving = $this->savings;
+
+      return $this->transfer($this->user, $wallet->balance, ['desc' => "Challenge Won wallet tranfser (`$saving->desc`)"]);
+    }
+  }
 
   protected $fillable = ['saving_id', 'user_id', 'metas'];
 
