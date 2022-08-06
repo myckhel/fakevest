@@ -87,6 +87,11 @@ class User extends Authenticatable implements HasMedia, Wallet
     return $this->hasMany(Provider::class);
   }
 
+  function verifications()
+  {
+    return $this->hasMany(Verification::class);
+  }
+
   /**
    * The attributes that are mass assignable.
    *
