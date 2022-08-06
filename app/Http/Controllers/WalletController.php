@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Saving;
 use App\Models\User;
 use App\Models\Wallet;
+use App\Notifications\Wallet\WithdrawToAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Myckhel\Paystack\Support\Recipient;
@@ -61,7 +62,7 @@ class WalletController extends Controller
       }
     }
 
-    $wallet->withdraw($amount);
+    $transaction = $wallet->withdraw($amount, ['desc' => 'wallet withdrawal']);
 
     $wallet->balance;
 
@@ -72,8 +73,10 @@ class WalletController extends Controller
         'amount'    => $amount * 100,
         'reason'    => "Withdrawal from $wallet->name wallet",
       ]);
+
+      $user->notify(new WithdrawToAccount($transaction, $bankAccount));
     } catch (\Throwable $th) {
-      $wallet->deposit($amount);
+      $wallet->deposit($amount, ['desc' => 'wallet withdrawal failed']);
       throw $th;
     }
 

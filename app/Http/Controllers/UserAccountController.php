@@ -47,6 +47,7 @@ class UserAccountController extends Controller
       'bank_code'       => 'required',
       'description'     => '',
       'currency'        => 'in:NGN,USD',
+      'bank_name'       => '',
     ]);
 
     $user     = $request->user();
@@ -70,12 +71,12 @@ class UserAccountController extends Controller
       'bank_code'       => $bank_code
     ])['data'];
 
-    $account = $user->bankAccounts()->firstOrCreate([
+    $account = $user->bankAccounts()->updateOrCreate([
       'account_number'  => $account_number,
       'bank_code'       => $bank_code,
       'account_name'    => $verification->data['account_name'],
     ], $request->only([
-      'type', 'account_number', 'bank_code', 'description', 'currency'
+      'type', 'account_number', 'bank_code', 'description', 'currency', 'bank_name'
     ]) + ['recipient_id' => $recipient->id]);
 
     return $account;

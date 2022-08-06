@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Saving;
-use App\Models\UserChallenge;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 
-class UserChallengeController extends Controller
+class NotificationController extends Controller
 {
   /**
    * Display a listing of the resource.
@@ -26,8 +25,8 @@ class UserChallengeController extends Controller
     $order    = $request->order;
     $orderBy  = $request->orderBy;
 
-    return UserChallenge
-      ::orderBy($orderBy ?? 'id', $order ?? 'asc')
+    return $user->notifications()
+      ->orderBy($orderBy ?? 'id', $order ?? 'desc')
       ->paginate($pageSize);
   }
 
@@ -37,58 +36,55 @@ class UserChallengeController extends Controller
    * @param  \Illuminate\Http\Request  $request
    * @return \Illuminate\Http\Response
    */
-  public function store(Request $request, $saving)
+  public function store(Request $request)
   {
-    $challenge = Saving::whereId($saving)->whereIsChallenge()->firstOrFail();
-    $request->validate([
-      'metas' => 'array'
-    ]);
+    $request->validate([]);
     $user     = $request->user();
 
-    return $user->challenges()->firstOrCreate(['saving_id' => $challenge->id], ['saving_id' => $challenge->id, 'metas' => $request->metas]);
+    return Notification::create($request->only([]));
   }
 
   /**
    * Display the specified resource.
    *
-   * @param  \App\Models\UserChallenge  $userChallenge
+   * @param  \App\Models\Notification  $notification
    * @return \Illuminate\Http\Response
    */
-  public function show(UserChallenge $userChallenge)
+  public function show(Notification $notification)
   {
-    $this->authorize('view', $userChallenge);
-    return $userChallenge;
+    $this->authorize('view', $notification);
+    return $notification;
   }
 
   /**
    * Update the specified resource in storage.
    *
    * @param  \Illuminate\Http\Request  $request
-   * @param  \App\Models\UserChallenge  $userChallenge
+   * @param  \App\Models\Notification  $notification
    * @return \Illuminate\Http\Response
    */
-  public function update(Request $request, UserChallenge $userChallenge)
+  public function update(Request $request, Notification $notification)
   {
-    $this->authorize('update', $userChallenge);
+    $this->authorize('update', $notification);
     $request->validate([]);
     $user     = $request->user();
 
-    $userChallenge->update(array_filter($request->only($userChallenge->getFillable())));
+    $notification->update(array_filter($request->only($notification->getFillable())));
 
-    return $userChallenge;
+    return $notification;
   }
 
   /**
    * Remove the specified resource from storage.
    *
-   * @param  \App\Models\UserChallenge  $userChallenge
+   * @param  \App\Models\Notification  $notification
    * @return \Illuminate\Http\Response
    */
-  public function destroy(UserChallenge $userChallenge)
+  public function destroy(Notification $notification)
   {
-    $this->authorize('delete', $userChallenge);
+    $this->authorize('delete', $notification);
 
-    $userChallenge->delete();
+    $notification->delete();
 
     return ['status' => true];
   }

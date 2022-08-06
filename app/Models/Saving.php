@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use App\Casts\ActiveCast;
 use App\Casts\FloatCast;
 use App\Models\Wallet as ModelsWallet;
+use App\Notifications\Saving\Matured;
 use App\Traits\HasImage;
 use App\Traits\HasWhenSetWhere;
 use Bavix\Wallet\Interfaces\Wallet;
@@ -27,12 +27,50 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Saving extends Model implements Wallet, HasMedia
 {
-  use HasFactory, HasWhenSetWhere, HasWallet, HasWallets, InteractsWithMedia, HasImage;
+  use HasFactory, HasWhenSetWhere, HasWallet, HasWallets, InteractsWithMedia, HasImage, HasSavingWallet;
 
   static $syntaxTargetPercent = "NULLIF(wallets.balance, 0) / NULLIF(target, 0) * 100";
 
   static $syntaxBalancePercent = "CASE WHEN wallets.balance - amount = 0 THEN amount
     ELSE (wallets.balance - (wallets.balance - amount)) / (wallets.balance - amount) * 100 END";
+
+  function processMatured()
+  {
+    // disable saving subscriptions
+    $this->stopPlanSubscription();
+
+    $transfer = $this->transferBalance();
+
+    $this->earnInterest($this->wallet);
+
+    $transfer && $this->sendMaturedNotification($this->wallet->holder);
+
+    $this->update(['active' => false]);
+  }
+
+  function transferBalance()
+  {
+    $wallet = $this->wallet;
+    // deposit balance to user wallet
+    if ($wallet->balance > 0) {
+      $saving = $wallet->holder;
+
+      return $saving?->transfer($saving?->user, $wallet->balance, ['desc' => "Saving matured wallet tranfser (`$saving->desc`)"]);
+    }
+  }
+
+  function sendMaturedNotification(Saving $saving)
+  {
+    $saving?->user?->notify(new Matured($saving));
+  }
+
+  function earnInterest(Wallet $wallet)
+  {
+    $interest = $wallet->interest;
+    if ($interest) {
+      $interest->earnInterest($wallet, false, true);
+    }
+  }
 
   function processCreated($userChallenge = null)
   {
@@ -56,12 +94,12 @@ class Saving extends Model implements Wallet, HasMedia
       $isChallenge
         ? $userChallenge?->update(['payment_plan_id' => $plan->id])
         : $this->update(['payment_plan_id' => $plan->id]);
-    } elseif ($this->metas['payment_option_id']) {
+    } elseif (isset($this->metas['payment_option_id'])) {
       $option = PaymentOption::find($this->metas['payment_option_id']);
 
       $option && Charge::create([
         'authorization_code'  => $option->authorization_code,
-        'amount'              => $this->amount,
+        'amount'              => $this->amount * 100,
         'email'               => $this->user->email,
         'metadata'            => $isChallenge
           ? ['user_challenge_id' => $userChallenge->id]
@@ -78,6 +116,11 @@ class Saving extends Model implements Wallet, HasMedia
   function scopeWhereActive($q): Builder
   {
     return $q->where('until', '>=', Carbon::now());
+  }
+
+  function scopeActive($q): Builder
+  {
+    return $q->where('active', 1);
   }
 
   function scopeWithBalanceChangePercentage($q): Builder
@@ -177,6 +220,8 @@ class Saving extends Model implements Wallet, HasMedia
     'payment_plan_id',
     'metas',
     'public',
+    'title',
+    'active'
   ];
 
   protected $casts = [
@@ -188,14 +233,12 @@ class Saving extends Model implements Wallet, HasMedia
     'target_percentage' => FloatCast::class,
     'balance_change_percentage' => FloatCast::class,
     'challenge_target_percentage' => FloatCast::class,
-    'active' => ActiveCast::class,
-    'public' => 'boolean',
+    'active'    => 'boolean',
+    'public'    => 'boolean',
     'is_joined' => 'boolean',
   ];
 
   protected $hidden = ['media'];
-
-  protected $appends = ['active'];
 
   function registerMediaCollections(): void
   {
@@ -204,5 +247,24 @@ class Saving extends Model implements Wallet, HasMedia
       ->acceptsMimeTypes($mimes)
       ->singleFile()->useDisk('saving_avatars')
       ->registerMediaConversions($this->convertionCallback(false, false));
+  }
+}
+
+trait HasSavingWallet
+{
+  function stopPlanSubscription()
+  {
+    if ($this->payment_plan_id) {
+      $plan = (object) PayPlan::fetch($this->payment_plan_id)['data'];
+      try {
+        collect($plan?->subscriptions)->map(
+          fn ($sub) => Subscription::disable([
+            'code' => $sub['subscription_code'],
+            'token' => $sub['email_token']
+          ])
+        );
+      } catch (\Throwable $th) {
+      }
+    }
   }
 }

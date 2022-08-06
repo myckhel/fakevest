@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\Saving\Funded;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -33,18 +34,10 @@ class Payment extends Model
       }
 
       if ($paymentDetails->status == 'success') {
-        $payment->update([
-          'status'              => $paymentDetails->status,
-          'message'             => $paymentDetails->message,
-          'reference'           => $paymentDetails->reference,
-          'authorization_code'  => $paymentDetails->authorization['authorization_code'],
-          'currency_code'       => $paymentDetails->currency,
-          'paid_at'            => now(), //$paymentDetails['data']['paidAt'],
-        ]);
-
         $user             = $payment->user;
 
         $wallet = null;
+        $saving = null;
 
         if ($paymentDetails->plan) {
           $saving = Saving::wherePaymentPlanId($paymentDetails->plan['id'])->first();
@@ -60,14 +53,19 @@ class Payment extends Model
           $wallet = $challenge?->wallet;
         } elseif ($paymentDetails->metadata && isset($paymentDetails->metadata['wallet_id'])) {
           $wallet = Wallet::find($paymentDetails->metadata['wallet_id']);
+          $saving = Saving::whereHas('wallet', fn ($q) => $q->whereId($wallet->id))->first();
         } else {
           $wallet = $payment->wallet;
         }
 
         if ($wallet) {
-          $wallet->deposit($wallet::fromKobo($paymentDetails->amount));
+          $transaction = $wallet->deposit($wallet::fromKobo($paymentDetails->amount));
         } else {
-          $user->deposit(Wallet::fromKobo($paymentDetails->amount));
+          $transaction = $user->deposit(Wallet::fromKobo($paymentDetails->amount));
+        }
+
+        if ($saving) {
+          $saving->user->notify(new Funded($saving, $transaction));
         }
 
         if ($paymentDetails->status = "success" && $paymentDetails->authorization['reusable']) {
@@ -76,6 +74,15 @@ class Payment extends Model
             $paymentDetails->authorization
           );
         }
+
+        $payment->update([
+          'status'              => $paymentDetails->status,
+          'message'             => $paymentDetails->message,
+          'reference'           => $paymentDetails->reference,
+          'authorization_code'  => $paymentDetails->authorization['authorization_code'],
+          'currency_code'       => $paymentDetails->currency,
+          'paid_at'            => now(), //$paymentDetails['data']['paidAt'],
+        ]);
       }
 
       return ['status' => true, 'payment' => $payment];

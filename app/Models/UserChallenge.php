@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Casts\FloatCast;
+use App\Casts\Jsonable;
 use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Traits\HasWallet;
 use Bavix\Wallet\Traits\HasWallets;
@@ -12,9 +13,27 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class UserChallenge extends Model implements Wallet
 {
-  use HasFactory, HasWallet, HasWallets;
+  use HasFactory, HasWallet, HasWallets, HasSavingWallet;
 
-  protected $fillable = ['saving_id', 'user_id'];
+  function processChallengeWon()
+  {
+    $this->stopPlanSubscription();
+
+    $this->transferBalance();
+  }
+
+  function transferBalance()
+  {
+    $wallet = $this->wallet;
+    // deposit balance to user wallet
+    if ($wallet->balance > 0) {
+      $saving = $this->savings;
+
+      return $this->transfer($this->user, $wallet->balance, ['desc' => "Challenge Won wallet tranfser (`$saving->desc`)"]);
+    }
+  }
+
+  protected $fillable = ['saving_id', 'user_id', 'metas'];
 
   /**
    * Get the user that owns the UserChallenge
@@ -38,5 +57,6 @@ class UserChallenge extends Model implements Wallet
 
   protected $casts = [
     'target_percentage' => FloatCast::class,
+    'metas' => Jsonable::class
   ];
 }
