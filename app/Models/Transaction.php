@@ -31,31 +31,47 @@ class Transaction extends ModelsTransaction
             fn ($q) => $q->whereId($wallet_id),
           )
       ),
-      fn ($q) => $q->belongsToUser($user, $queries),
+      fn ($q) => $q->belongsToUser($user, $queries, []),
     );
   }
 
-  function scopeBelongsToUser($q, User $user, array $queries = []): Builder
+  function scopeBelongsToUser($q, User $user, array $queries = [], $morphs = [Saving::class, UserChallenge::class, User::class]): Builder
   {
     @[
-      'saving_id'     => $saving_id,
+      'saving_id' => $saving_id,
     ] = $queries;
 
-    return $q->whereHas(
+    return $q->whereHasMorph(
       'payable',
-      fn ($q) => $q->wherePayableType(Saving::class)
-        ->when($saving_id, fn ($q) => $q->wherePayableId($saving_id))
-        ->where(
-          'payable_id',
+      $morphs,
+      fn ($q, $type) => $q
+        ->when($type == User::class, fn ($q) => $q->whereHolderId($user->id))
+        ->when(
+          $type == Saving::class,
           fn ($q) => $q
-            ->select('id')
-            ->from('savings')
-            ->whereUserId($user->id)
-            ->whereColumn('transactions.payable_id', 'savings.id')
+            ->when($saving_id, fn ($q) => $q->wherePayableId($saving_id))
+            ->where(
+              'payable_id',
+              fn ($q) => $q
+                ->select('id')
+                ->from('savings')
+                ->whereUserId($user->id)
+                ->whereColumn('transactions.payable_id', 'savings.id')
+            )
         )
-    )->when(!$saving_id, fn ($q) => $q->orWhere(
-      fn ($q) => $q->wherePayableType(User::class)->wherePayableId($user->id)
-    ));
+        ->when(
+          $type == UserChallenge::class,
+          fn ($q) => $q->where(
+            'payable_id',
+            fn ($q) => $q
+              ->select('id')
+              ->from('user_challenges')
+              ->when($saving_id, fn ($q) => $q->whereSavingId($saving_id))
+              ->whereUserId($user->id)
+              ->whereColumn('transactions.payable_id', 'user_challenges.id')
+          )
+        )
+    );
   }
 
   function scopeWhereWithinDay($q, $column = false)
