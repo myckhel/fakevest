@@ -45,7 +45,7 @@ class Transaction extends ModelsTransaction
       'payable',
       $morphs,
       fn ($q, $type) => $q
-        ->when($type == User::class, fn ($q) => $q->whereHolderId($user->id))
+        ->when($type == User::class, fn ($q) => $q->wherePayableId($user->id))
         ->when(
           $type == Saving::class,
           fn ($q) => $q
