@@ -149,8 +149,9 @@ class UserController extends Controller
    * @param  \App\Models\User  $user
    * @return \Illuminate\Http\Response
    */
-  public function show(User $user)
+  public function show($userIdOrName)
   {
+    $user = User::whereId($userIdOrName)->orWhere('username', $userIdOrName)->firstOrFail();
     $this->authorize('view', $user);
     return $user->withUrls(['avatar']);
   }
