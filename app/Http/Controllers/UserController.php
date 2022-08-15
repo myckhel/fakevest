@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Wallet;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -40,18 +41,18 @@ class UserController extends Controller
     $balance_change_percentage = $collect->sum('balance_change_percentage');
 
     $thisYear = $transactionQuery
-      ->whereRaw('YEAR(created_at) = YEAR(CURRENT_DATE)')
+      ->whereYear('created_at', Carbon::now()->year)
       ->sum('amount');
 
     $thisMonth = $transactionQuery
-      ->whereRaw('MONTH(created_at) = MONTH(CURRENT_DATE)')
-      ->whereRaw('YEAR(created_at) = YEAR(CURRENT_DATE)')
+      ->whereMonth('created_at', Carbon::now()->month)
+      ->whereYear('created_at', Carbon::now()->year)
       ->sum('amount');
 
     $thisWeek = $transactionQuery
-      ->whereRaw('MONTH(created_at) = MONTH(CURRENT_DATE)')
-      ->whereRaw('YEAR(created_at) = YEAR(CURRENT_DATE)')
-      ->whereRaw('WEEK(created_at) = WEEK(CURRENT_DATE)')
+      ->whereMonth('created_at', Carbon::now()->month)
+      ->whereYear('created_at', Carbon::now()->year)
+      ->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
       ->sum('amount');
 
     $walletLifetime = Wallet::whereHolderId($user->id)->whereHolderType($user::class)
