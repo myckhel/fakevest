@@ -40,18 +40,18 @@ class UserController extends Controller
     $balance_change_percentage = $collect->sum('balance_change_percentage');
 
     $thisYear = $transactionQuery
-      ->whereRaw('YEAR(created_at) = YEAR(CURRENT_DATE())')
+      ->whereRaw('YEAR(created_at) = YEAR(CURRENT_DATE)')
       ->sum('amount');
 
     $thisMonth = $transactionQuery
-      ->whereRaw('MONTH(created_at) = MONTH(CURRENT_DATE())')
-      ->whereRaw('YEAR(created_at) = YEAR(CURRENT_DATE())')
+      ->whereRaw('MONTH(created_at) = MONTH(CURRENT_DATE)')
+      ->whereRaw('YEAR(created_at) = YEAR(CURRENT_DATE)')
       ->sum('amount');
 
     $thisWeek = $transactionQuery
-      ->whereRaw('MONTH(created_at) = MONTH(CURRENT_DATE())')
-      ->whereRaw('YEAR(created_at) = YEAR(CURRENT_DATE())')
-      ->whereRaw('WEEK(created_at) = WEEK(CURRENT_DATE())')
+      ->whereRaw('MONTH(created_at) = MONTH(CURRENT_DATE)')
+      ->whereRaw('YEAR(created_at) = YEAR(CURRENT_DATE)')
+      ->whereRaw('WEEK(created_at) = WEEK(CURRENT_DATE)')
       ->sum('amount');
 
     $walletLifetime = Wallet::whereHolderId($user->id)->whereHolderType($user::class)
