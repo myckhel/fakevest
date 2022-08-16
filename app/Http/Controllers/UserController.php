@@ -151,8 +151,14 @@ class UserController extends Controller
    */
   public function show($userIdOrName)
   {
-    $user = User::whereId($userIdOrName)->orWhere('username', $userIdOrName)->firstOrFail();
+    $user = User::when(
+      (int) $userIdOrName,
+      fn ($q) => $q->whereId($userIdOrName),
+      fn ($q) => $q->whereUsername($userIdOrName)
+    )->firstOrFail();
+
     $this->authorize('view', $user);
+
     return $user->withUrls(['avatar']);
   }
 
