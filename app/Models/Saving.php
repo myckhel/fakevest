@@ -88,7 +88,7 @@ class Saving extends Model implements Wallet, HasMedia
       Subscription::create([
         'plan'        => $plan->plan_code,
         'customer'    => $email,
-        'start_date'  => Carbon::now()->addSeconds(40)->toIso8601String(),
+        'start_date'  => Carbon::now()->addSeconds(60 * 2)->toIso8601String(),
       ]);
 
       $isChallenge
