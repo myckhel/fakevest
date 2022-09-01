@@ -17,7 +17,14 @@ class Transaction extends ModelsTransaction
       'wallet_name'   => $wallet_name,
       'wallet_names'  => $wallet_names,
       'wallet_id'     => $wallet_id,
+      'saving_id'     => $saving_id,
     ] = $queries;
+
+    $morphs = [User::class];
+
+    if ($saving_id) {
+      $morphs = [Saving::class, UserChallenge::class];
+    }
 
     $q->when(
       $wallet_name || $wallet_names || $wallet_id,
@@ -31,7 +38,7 @@ class Transaction extends ModelsTransaction
             fn ($q) => $q->whereId($wallet_id),
           )
       ),
-      fn ($q) => $q->belongsToUser($user, $queries, []),
+      fn ($q) => $q->belongsToUser($user, $queries, $morphs),
     );
   }
 
