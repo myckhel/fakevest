@@ -60,7 +60,7 @@ class UserController extends Controller
       ->leftJoin('transactions', 'transactions.wallet_id', 'wallets.id')
       ->sum('amount');
 
-    $savingPer = ($lifetime - $walletLifetime) / $lifetime * 100;
+    $savingPer = $lifetime ? ($lifetime - $walletLifetime) / $lifetime * 100 : 0;
 
     return [
       'lifetime'  => (float) $lifetime,
