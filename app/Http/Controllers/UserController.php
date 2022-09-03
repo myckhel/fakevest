@@ -8,9 +8,55 @@ use App\Models\Wallet;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+  function verifyPin(Request $request)
+  {
+    $user = $request->user();
+
+    $request->validate([
+      'pin'     => 'required|digits_between:4,8',
+    ]);
+
+    $pin = (int) $request->pin;
+
+    if (isset($user->pin)) {
+      if (((int) $user->pin) != $pin) {
+        abort(403, "Pin incorrect");
+      }
+    } else {
+      return ['message' => 'No Existing Pin Set', 'status' => false];
+    }
+
+    return ['message' => 'Pin Correct', 'status' => true];
+  }
+
+  function updatePin(Request $request)
+  {
+    $user = $request->user();
+
+    $request->validate([
+      'pin'     => 'required|digits_between:4,8',
+      'old_pin' => ['integer|between:4,8', Rule::requiredIf($user->pin)],
+    ]);
+
+    $pin = (int) $request->pin;
+    $old_pin = (int) $request->old_pin;
+
+    if (isset($user->pin)) {
+      if (((int) $user->pin) != $old_pin) {
+        abort(403, "Old pin incorrect");
+      } elseif (((int) $user->pin) == $pin) {
+        abort(403, "You cannot set old pin");
+      }
+    }
+
+    $user->update(['pin' => $pin]);
+
+    return ['message' => 'Pin Updated Successfully', 'status' => true];
+  }
   /**
    * Get portfolio of the auth user.
    *

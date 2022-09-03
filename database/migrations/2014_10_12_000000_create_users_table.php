@@ -21,6 +21,7 @@ return new class extends Migration
       $table->string('fullname');
       $table->enum('gender', ['male', 'female'])->nullable();
       $table->date('dob')->nullable();
+      $table->bigInteger('pin')->nullable();
       $table->string('next_of_kin')->nullable();
       $table->string('address')->nullable();
       $table->json('profile')->nullable();

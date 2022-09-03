@@ -108,6 +108,7 @@ class User extends Authenticatable implements HasMedia, Wallet
     'gender',
     'next_of_kin',
     'address',
+    'pin',
   ];
 
   /**
@@ -118,7 +119,8 @@ class User extends Authenticatable implements HasMedia, Wallet
   protected $hidden = [
     'password',
     'remember_token',
-    'media'
+    'media',
+    'pin',
   ];
 
   /**
