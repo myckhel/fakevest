@@ -39,6 +39,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::group(['middleware' => 'guest'], function () {
   Route::post('login', 'AuthController@login');
   Route::post('register', 'AuthController@register');
+  Route::post('forgot-password', 'AuthController@sendResetLinkEmail')->name('password.reset');
+  Route::post('reset-password', 'AuthController@resetPassword');
+
   Route::get('users/random', [UserController::class, 'random']);
   // social
   Route::get('/login/{provider}', [AuthController::class, 'redirectToProvider']);
