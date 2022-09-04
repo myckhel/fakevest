@@ -58,6 +58,7 @@ Route::group(['middleware' => ['auth:api']], function () {
   Route::get('users/portfolio',         [UserController::class, 'portfolio']);
   Route::put('users/pin',               [UserController::class, 'updatePin']);
   Route::get('users/pin',               [UserController::class, 'verifyPin']);
+  Route::put('users/password',          [UserController::class, 'changePassword']);
 
   Route::post('wallets/withdraw',       [WalletController::class, 'withdraw']);
   Route::get('wallets/dollar',          [WalletController::class, 'viewDollar']);

@@ -8,10 +8,36 @@ use App\Models\Wallet;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+  function changePassword(Request $request)
+  {
+    $request->validate([
+      'password'     => 'required|min:6',
+      'old_password' => 'required|min:6',
+    ]);
+
+    $user = $request->user();
+
+    $password = $request->password;
+    $old_password = $request->old_password;
+
+    if (!Hash::check($old_password, $user->password)) {
+      abort(403, "Old password incorrect");
+    } elseif (Hash::check($password, $user->password)) {
+      abort(403, "You cannot set old password");
+    }
+
+    $user->update([
+      'password' => Hash::make($password)
+    ]);
+
+    return ['message' => 'Password Updated Successfully', 'status' => true];
+  }
+
   function verifyPin(Request $request)
   {
     $user = $request->user();
