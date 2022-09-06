@@ -65,7 +65,7 @@ class UserController extends Controller
 
     $request->validate([
       'pin'     => 'required|digits_between:4,8',
-      'old_pin' => ['integer|between:4,8', Rule::requiredIf($user->pin)],
+      'old_pin' => ['digits_between:4,8', Rule::requiredIf($user->pin)],
     ]);
 
     $pin = (int) $request->pin;
