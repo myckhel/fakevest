@@ -250,11 +250,12 @@ class UserController extends Controller
       'gender'      => 'in:male,female',
       'next_of_kin' => '',
       'address'     => '',
+      'has_notifications'     => 'boolean',
     ]);
 
     $user     = $request->user();
 
-    $user->update(array_filter($request->only($user->getFillable())));
+    $user->update($request->only($user->getFillable()));
 
     return $user;
   }

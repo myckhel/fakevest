@@ -137,7 +137,8 @@ class User extends Authenticatable implements HasMedia, Wallet
     'next_of_kin',
     'address',
     'pin',
-    'metas'
+    'metas',
+    'has_notifications',
   ];
 
   /**
@@ -162,6 +163,7 @@ class User extends Authenticatable implements HasMedia, Wallet
     'dob' => 'date',
     'phone' => 'int', 'profile' => Jsonable::class,
     'metas' => AsArrayObject::class,
+    'has_notifications' => 'boolean',
   ];
 
   protected $appends = ['has_pin'];

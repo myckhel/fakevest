@@ -25,6 +25,7 @@ return new class extends Migration
       $table->string('next_of_kin')->nullable();
       $table->string('address')->nullable();
       $table->json('profile')->nullable();
+      $table->boolean('has_notifications')->default(true);
       $table->json('metas')->default("{}");
       $table->timestamp('email_verified_at')->nullable();
       $table->string('password')->nullable();

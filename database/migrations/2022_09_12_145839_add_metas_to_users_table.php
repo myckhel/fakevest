@@ -14,6 +14,7 @@ return new class extends Migration
   public function up()
   {
     Schema::table('users', function (Blueprint $table) {
+      $table->boolean('has_notifications')->default(true);
       $table->json('metas')->default("{}");
     });
   }
@@ -26,7 +27,7 @@ return new class extends Migration
   public function down()
   {
     Schema::table('users', function (Blueprint $table) {
-      $table->dropColumn(['metas']);
+      $table->dropColumn(['metas', 'has_notifications']);
     });
   }
 };
