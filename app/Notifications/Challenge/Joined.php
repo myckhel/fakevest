@@ -8,6 +8,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\OneSignal\OneSignalChannel;
+use NotificationChannels\OneSignal\OneSignalMessage;
 
 class Joined extends Notification
 {
@@ -35,7 +37,24 @@ class Joined extends Notification
    */
   public function via($notifiable)
   {
-    return ['database'];
+    $channels = ['database'];
+
+    if ($notifiable->push_notification) {
+      $channels[] = OneSignalChannel::class;
+    }
+
+    return $channels;
+  }
+
+  public function toOneSignal($notifiable)
+  {
+    return OneSignalMessage::create()
+      ->setSubject($this->user_name . ' Joined you challenge')
+      ->setBody(trans('notice.challenge._joined', ['desc' => $this->desc, 'user' => $this->user_name]))
+      ->setGroup($this->saving_id, ['en' => "$this->user_name Joined you challenge"])
+      ->setData('saving_id',  $this->saving_id)
+      ->setData("type",             'challenge.joined')
+      ->setParameter('thread_id',   $this->saving_id);
   }
 
   /**

@@ -8,6 +8,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\OneSignal\OneSignalMessage;
 
 class Won extends Notification
 {
@@ -35,7 +36,13 @@ class Won extends Notification
    */
   public function via($notifiable)
   {
-    return ['database'];
+    $channels = ['database'];
+
+    if ($notifiable->push_notification) {
+      $channels[] = OneSignalChannel::class;
+    }
+
+    return $channels;
   }
 
   /**
@@ -50,6 +57,19 @@ class Won extends Notification
       ->line('The introduction to the notification.')
       ->action('Notification Action', url('/'))
       ->line('Thank you for using our application!');
+  }
+
+  public function toOneSignal($notifiable)
+  {
+    $subject = "Challenge won";
+
+    return OneSignalMessage::create()
+      ->setSubject($subject)
+      ->setBody(trans('notice.challenge._won', ['desc' => $this->desc, 'user' => $this->user_name]))
+      ->setGroup($this->saving_id, ['en' => $subject])
+      ->setData('saving_id',  $this->saving_id)
+      ->setData("type",             'challenge.won')
+      ->setParameter('thread_id',   $this->saving_id);
   }
 
   /**

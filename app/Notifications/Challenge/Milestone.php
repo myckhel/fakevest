@@ -7,6 +7,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\OneSignal\OneSignalChannel;
+use NotificationChannels\OneSignal\OneSignalMessage;
 
 class Milestone extends Notification
 {
@@ -43,7 +45,26 @@ class Milestone extends Notification
    */
   public function via($notifiable)
   {
-    return ['database'];
+    $channels = ['database'];
+
+    if ($notifiable->push_notification) {
+      $channels[] = OneSignalChannel::class;
+    }
+
+    return $channels;
+  }
+
+  public function toOneSignal($notifiable)
+  {
+    $subject = "$this->desc Reached a milestone";
+
+    return OneSignalMessage::create()
+      ->setSubject($subject)
+      ->setBody(trans('notice.challenge._milestone', ['desc' => $this->desc, 'count' => $this->count]))
+      ->setGroup($this->saving_id, ['en' => $subject])
+      ->setData('saving_id',  $this->saving_id)
+      ->setData("type",             'challenge.milestone')
+      ->setParameter('thread_id',   $this->saving_id);
   }
 
   /**
