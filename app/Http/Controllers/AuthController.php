@@ -226,6 +226,9 @@ class AuthController extends Controller
       'password'            => 'required|min:6',
       'fullname'            => 'required|min:6',
       'avatar'              => 'image',
+      'player_id'           => '',
+      'device_type'         => 'in:ios,android,web',
+      'device_name'         => '',
     ], [
       'password.confirmed'  => 'The password does not match.'
     ]);
@@ -239,6 +242,14 @@ class AuthController extends Controller
     ));
 
     ($user && $avatar) && $user->saveImage($avatar, 'avatar');
+
+    $request->player_id && $user?->updatePush(
+      $request->only([
+        'player_id',
+        'device_type',
+        'device_name'
+      ])
+    );
 
     try {
       // $user->notify(new SignupActivate($user));
@@ -273,6 +284,9 @@ class AuthController extends Controller
       'phone'       => [Rule::requiredIf(!$request->email && !$request->username), "digits_between:10,11"],
       'email'       => [Rule::requiredIf(!$request->phone && !$request->username), 'email'],
       'password'    => 'required|string',
+      'player_id'   => '',
+      'device_type' => 'in:ios,android,web',
+      'device_name' => '',
     ]);
 
     $email    = $request->email;
@@ -316,6 +330,14 @@ class AuthController extends Controller
           401
         );
       }
+
+      $request->player_id && $user->updatePush(
+        $request->only([
+          'player_id',
+          'device_type',
+          'device_name'
+        ])
+      );
 
       $user->withUrls('avatar');
 

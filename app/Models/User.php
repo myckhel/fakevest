@@ -14,6 +14,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\HasMedia;
 use Bavix\Wallet\Traits\HasWallet;
 use Bavix\Wallet\Traits\HasWallets;
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -22,6 +23,15 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 class User extends Authenticatable implements HasMedia, Wallet
 {
   use HasApiTokens, HasFactory, Notifiable, HasImage, InteractsWithMedia, HasWallet, HasWallets;
+
+  function updatePush(array $push)
+  {
+    $metas = $this->metas;
+    $metas['push'] = $push;
+    $this->metas = $metas;
+    $this->save();
+    return $this;
+  }
 
   /**
    * Get the user's has_pin.
@@ -105,6 +115,11 @@ class User extends Authenticatable implements HasMedia, Wallet
     return $this->hasMany(Verification::class);
   }
 
+  public function routeNotificationForOneSignal()
+  {
+    return $this->metas['push']['player_id'] ?? null;
+  }
+
   /**
    * The attributes that are mass assignable.
    *
@@ -122,6 +137,7 @@ class User extends Authenticatable implements HasMedia, Wallet
     'next_of_kin',
     'address',
     'pin',
+    'metas'
   ];
 
   /**
@@ -145,6 +161,7 @@ class User extends Authenticatable implements HasMedia, Wallet
     'email_verified_at' => 'datetime',
     'dob' => 'date',
     'phone' => 'int', 'profile' => Jsonable::class,
+    'metas' => AsArrayObject::class,
   ];
 
   protected $appends = ['has_pin'];
