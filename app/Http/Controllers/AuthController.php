@@ -3,16 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Mail\PasswordResetMailer;
 use App\Models\User;
 use GuzzleHttp\Exception\ClientException;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\UnauthorizedException;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -146,19 +150,38 @@ class AuthController extends Controller
   {
     $request->validate(['email' => 'required|email']);
 
-    // We will send the password reset link to this user. Once we have attempted
-    // to send the link, we will examine the response then see the message we
-    // need to show to the user. Finally, we'll send out a proper response.
-    $response = $this->broker()->sendResetLink(
-      $request->only('email')
+    $user = User::whereEmail($request->email)->firstOrFail();
+    $token = Password::getRepository()->create($user);
+
+    Mail::to($user)->send(new PasswordResetMailer($token));
+
+    return ['message' => 'We have emailed your password reset token!', 'status' => true];
+  }
+
+  function resetPassword(Request $request)
+  {
+    $request->validate([
+      'token'     => 'required',
+      'email'     => 'required|email',
+      'password'  => 'required|min:8|confirmed',
+    ]);
+
+    $status = Password::reset(
+      $request->only('email', 'password', 'password_confirmation', 'token'),
+      function ($user, $password) {
+        $user->forceFill([
+          'password' => Hash::make($password)
+        ])->setRememberToken(Str::random(60));
+
+        $user->save();
+
+        event(new PasswordReset($user));
+      }
     );
 
-    return $response == Password::RESET_LINK_SENT
-      ? ['message' => trans($response)]
-      :
-      throw ValidationException::withMessages([
-        'email' => [trans($response)],
-      ]);
+    return $status === Password::PASSWORD_RESET
+      ? ['status' => true, 'message' => 'Password Reset Successfully']
+      : response()->json(['email' => [__($status)]], 422);
   }
 
   /**
@@ -203,6 +226,9 @@ class AuthController extends Controller
       'password'            => 'required|min:6',
       'fullname'            => 'required|min:6',
       'avatar'              => 'image',
+      'player_id'           => '',
+      'device_type'         => 'in:ios,android,web',
+      'device_name'         => '',
     ], [
       'password.confirmed'  => 'The password does not match.'
     ]);
@@ -216,6 +242,14 @@ class AuthController extends Controller
     ));
 
     ($user && $avatar) && $user->saveImage($avatar, 'avatar');
+
+    $request->player_id && $user?->updatePush(
+      $request->only([
+        'player_id',
+        'device_type',
+        'device_name'
+      ])
+    );
 
     try {
       // $user->notify(new SignupActivate($user));
@@ -250,6 +284,9 @@ class AuthController extends Controller
       'phone'       => [Rule::requiredIf(!$request->email && !$request->username), "digits_between:10,11"],
       'email'       => [Rule::requiredIf(!$request->phone && !$request->username), 'email'],
       'password'    => 'required|string',
+      'player_id'   => '',
+      'device_type' => 'in:ios,android,web',
+      'device_name' => '',
     ]);
 
     $email    = $request->email;
@@ -293,6 +330,14 @@ class AuthController extends Controller
           401
         );
       }
+
+      $request->player_id && $user->updatePush(
+        $request->only([
+          'player_id',
+          'device_type',
+          'device_name'
+        ])
+      );
 
       $user->withUrls('avatar');
 

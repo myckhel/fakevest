@@ -14,6 +14,8 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\HasMedia;
 use Bavix\Wallet\Traits\HasWallet;
 use Bavix\Wallet\Traits\HasWallets;
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
@@ -21,6 +23,27 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 class User extends Authenticatable implements HasMedia, Wallet
 {
   use HasApiTokens, HasFactory, Notifiable, HasImage, InteractsWithMedia, HasWallet, HasWallets;
+
+  function updatePush(array $push)
+  {
+    $metas = $this->metas;
+    $metas['push'] = $push;
+    $this->metas = $metas;
+    $this->save();
+    return $this;
+  }
+
+  /**
+   * Get the user's has_pin.
+   *
+   * @return \Illuminate\Database\Eloquent\Casts\Attribute
+   */
+  protected function hasPin(): Attribute
+  {
+    return Attribute::make(
+      get: fn ($value, $attributes) => isset($attributes['pin']),
+    );
+  }
 
   /**
    * Get all of the challenges for the User
@@ -92,6 +115,11 @@ class User extends Authenticatable implements HasMedia, Wallet
     return $this->hasMany(Verification::class);
   }
 
+  public function routeNotificationForOneSignal()
+  {
+    return $this->metas['push']['player_id'] ?? null;
+  }
+
   /**
    * The attributes that are mass assignable.
    *
@@ -108,6 +136,9 @@ class User extends Authenticatable implements HasMedia, Wallet
     'gender',
     'next_of_kin',
     'address',
+    'pin',
+    'metas',
+    'has_notifications',
   ];
 
   /**
@@ -118,7 +149,8 @@ class User extends Authenticatable implements HasMedia, Wallet
   protected $hidden = [
     'password',
     'remember_token',
-    'media'
+    'media',
+    'pin',
   ];
 
   /**
@@ -129,8 +161,12 @@ class User extends Authenticatable implements HasMedia, Wallet
   protected $casts = [
     'email_verified_at' => 'datetime',
     'dob' => 'date',
-    'phone' => 'int', 'profile' => Jsonable::class
+    'phone' => 'int', 'profile' => Jsonable::class,
+    'metas' => AsArrayObject::class,
+    'has_notifications' => 'boolean',
   ];
+
+  protected $appends = ['has_pin'];
 
   public function grantMeToken()
   {

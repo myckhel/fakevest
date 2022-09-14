@@ -9,6 +9,7 @@ use App\Http\Controllers\PaymentOptionController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\SavingController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\TransferController;
 use App\Http\Controllers\UserAccountController;
 use App\Http\Controllers\UserChallengeController;
 use App\Http\Controllers\UserController;
@@ -38,6 +39,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::group(['middleware' => 'guest'], function () {
   Route::post('login', 'AuthController@login');
   Route::post('register', 'AuthController@register');
+  Route::post('forgot-password', 'AuthController@sendResetLinkEmail')->name('password.reset');
+  Route::post('reset-password', 'AuthController@resetPassword');
+
   Route::get('users/random', [UserController::class, 'random']);
   // social
   Route::get('/login/{provider}', [AuthController::class, 'redirectToProvider']);
@@ -50,7 +54,11 @@ Route::group(['middleware' => ['auth:api']], function () {
     fn (Request $request) => $request->user()
   );
 
-  Route::put('users/{user}/avatar',        [UserController::class, 'updateAvatar']);
+  Route::put('users/{user}/avatar',     [UserController::class, 'updateAvatar']);
+  Route::get('users/portfolio',         [UserController::class, 'portfolio']);
+  Route::put('users/pin',               [UserController::class, 'updatePin']);
+  Route::get('users/pin',               [UserController::class, 'verifyPin']);
+  Route::put('users/password',          [UserController::class, 'changePassword']);
 
   Route::post('wallets/withdraw',       [WalletController::class, 'withdraw']);
   Route::get('wallets/dollar',          [WalletController::class, 'viewDollar']);
@@ -58,9 +66,9 @@ Route::group(['middleware' => ['auth:api']], function () {
   Route::get('wallets/naira',           [WalletController::class, 'viewNaira']);
   Route::post('wallet_interests/{walletInterest}/accept', [WalletInterestController::class, 'accept']);
 
-  Route::post('challenges/{saving}/join',         [UserChallengeController::class, 'store']);
+  Route::post('challenges/{saving}/join',    [UserChallengeController::class, 'store']);
 
-  Route::get('jobs/user/savings/matured',         [JobController::class, 'userSavingMatured']);
+  Route::get('jobs/user/savings/matured',    [JobController::class, 'userSavingMatured']);
   Route::get('jobs/challenge/won',           [JobController::class, 'userChallengeWon']);
 
   Route::group(['prefix' => 'paystack'], function () {
@@ -88,6 +96,7 @@ Route::group(['middleware' => ['auth:api']], function () {
   Route::apiResource('wallet_interests',  WalletInterestController::class)->only(['index']);
   Route::apiResource('notifications',   NotificationController::class)->only(['index', 'show']);
   Route::apiResource('verifications',   VerificationController::class);
+  Route::apiResource('transfers',       TransferController::class)->only(['index', 'store']);
 
   Route::get('logout', 'AuthController@logout');
 

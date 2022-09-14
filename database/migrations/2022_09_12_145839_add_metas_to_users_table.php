@@ -13,8 +13,9 @@ return new class extends Migration
    */
   public function up()
   {
-    Schema::table('savings', function (Blueprint $table) {
-      $table->tinyInteger('active')->default(1)->index();
+    Schema::table('users', function (Blueprint $table) {
+      $table->boolean('has_notifications')->default(true);
+      $table->json('metas')->default("{}");
     });
   }
 
@@ -25,8 +26,8 @@ return new class extends Migration
    */
   public function down()
   {
-    Schema::table('savings', function (Blueprint $table) {
-      $table->removeColumn(['active']);
+    Schema::table('users', function (Blueprint $table) {
+      $table->dropColumn(['metas', 'has_notifications']);
     });
   }
 };

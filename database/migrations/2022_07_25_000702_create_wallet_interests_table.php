@@ -17,7 +17,7 @@ return new class extends Migration
       $table->id();
       $table->foreignId('wallet_id')->constrained()->onDelete('cascade');
       $table->decimal('amount', 64, 10, true)->default(0);
-      $table->timestamp('last_earned');
+      $table->timestamp('last_earned')->nullable();
       $table->timestamp('last_payout')->useCurrent();
       $table->timestamps();
     });
