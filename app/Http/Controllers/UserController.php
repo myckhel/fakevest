@@ -251,11 +251,22 @@ class UserController extends Controller
       'next_of_kin' => '',
       'address'     => '',
       'has_notifications'     => 'boolean',
+      'player_id'   => '',
+      'device_type' => 'in:ios,android,web',
+      'device_name' => '',
     ]);
 
     $user     = $request->user();
 
     $user->update($request->only($user->getFillable()));
+
+    $request->player_id && $user->updatePush(
+      $request->only([
+        'player_id',
+        'device_type',
+        'device_name'
+      ])
+    );
 
     return $user;
   }
