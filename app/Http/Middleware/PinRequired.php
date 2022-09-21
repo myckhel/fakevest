@@ -18,13 +18,11 @@ class PinRequired
   {
     $user = $request->user();
 
-    if (isset($user->pin)) {
-      $request->validate(['pin' => 'required|digits_between:4,8']);
-      $pin = $request->pin;
+    $request->validate(['pin' => 'required|digits_between:4,8']);
+    $pin = $request->pin;
 
-      if (((int) $user->pin) != $pin) {
-        abort(403, "Pin incorrect");
-      }
+    if (((int) $user->pin) != $pin) {
+      abort(403, "Pin incorrect");
     }
 
     return $next($request);
