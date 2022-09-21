@@ -33,11 +33,12 @@ class UseJoinedChallengeJob implements ShouldQueue
   public function handle()
   {
     $challenge = $this->userChallenge->savings;
-    $user = $challenge->user;
+    $owner = $challenge->user;
+    $user = $this->userChallenge->user;
     $user_id = $this->userChallenge->user_id;
 
-    if ($user->id != $user_id) {
-      $user->notify(new Joined($challenge, $user));
+    if ($owner->id != $user_id) {
+      $owner->notify(new Joined($challenge, $user));
     }
   }
 }
