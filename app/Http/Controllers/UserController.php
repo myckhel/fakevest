@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -244,6 +245,9 @@ class UserController extends Controller
   public function update(Request $request, User $user)
   {
     $this->authorize('update', $user);
+
+    $request->merge(['device_type' => Str::lower($request->device_type)]);
+
     $request->validate([
       'fullname'    => '',
       'dob'         => 'date',
