@@ -8,8 +8,10 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\OneSignal\OneSignalChannel;
+use NotificationChannels\OneSignal\OneSignalMessage;
 
-class WithdrawToAccount extends Notification
+class WithdrawToAccount extends Notification implements ShouldQueue
 {
   use Queueable;
 
@@ -36,7 +38,13 @@ class WithdrawToAccount extends Notification
    */
   public function via($notifiable)
   {
-    return ['database'];
+    $channels = ['database'];
+
+    if ($notifiable->has_notifications) {
+      $channels[] = OneSignalChannel::class;
+    }
+
+    return $channels;
   }
 
   /**
@@ -51,6 +59,24 @@ class WithdrawToAccount extends Notification
       ->line('The introduction to the notification.')
       ->action('Notification Action', url('/'))
       ->line('Thank you for using our application!');
+  }
+
+  public function toOneSignal($notifiable)
+  {
+    $subject = "Withdrawal to account";
+
+    return OneSignalMessage::create()
+      ->setSubject($subject)
+      ->setBody(trans('notice.wallet._withdraw2account', [
+        'amount'      => 0 - $this->amount,
+        'bank_name'   => $this->bank_name,
+        'currency'    => 'NGN',
+        'account_number' => $this->account_number,
+      ]))
+      ->setGroup($this->wallet_id, ['en' => $subject])
+      ->setData('wallet_id',  $this->wallet_id)
+      ->setData("type",             'wallet.withdraw2account')
+      ->setParameter('thread_id',   $this->wallet_id);
   }
 
   /**
