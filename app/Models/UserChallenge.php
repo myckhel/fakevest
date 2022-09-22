@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Casts\FloatCast;
 use App\Casts\Jsonable;
+use App\Notifications\Challenge\Won;
 use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Traits\HasWallet;
 use Bavix\Wallet\Traits\HasWallets;
@@ -28,6 +29,9 @@ class UserChallenge extends Model implements Wallet
     // deposit balance to user wallet
     if ($wallet->balance > 0) {
       $saving = $this->savings;
+      $owner = $saving->user;
+
+      $owner->id != $this->user->id && $owner->notify(new Won($saving, $this->user));
 
       return $this->transfer($this->user, $wallet->balance, ['desc' => "Challenge Won wallet tranfser (`$saving->desc`)"]);
     }
