@@ -4,10 +4,13 @@ namespace App\Notifications\Saving;
 
 use App\Models\Saving;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\OneSignal\OneSignalChannel;
+use NotificationChannels\OneSignal\OneSignalMessage;
 
-class Matured extends Notification
+class Matured extends Notification implements ShouldQueue
 {
   use Queueable;
   public $desc, $saving_id, $plan_name;
@@ -32,7 +35,13 @@ class Matured extends Notification
    */
   public function via($notifiable)
   {
-    return ['database'];
+    $channels = ['database'];
+
+    if ($notifiable->has_notifications) {
+      $channels[] = OneSignalChannel::class;
+    }
+
+    return $channels;
   }
 
   /**
@@ -47,6 +56,19 @@ class Matured extends Notification
       ->line('The introduction to the notification.')
       ->action('Notification Action', url('/'))
       ->line('Thank you for using our application!');
+  }
+
+  public function toOneSignal($notifiable)
+  {
+    $subject = "'$this->desc' has Matured";
+
+    return OneSignalMessage::create()
+      ->setSubject($subject)
+      ->setBody(trans('notice.savings._matured', ['desc' => $this->desc, 'name' => $this->plan_name]))
+      ->setGroup($this->saving_id, ['en' => $subject])
+      ->setData('saving_id',  $this->saving_id)
+      ->setData("type",             'savings.matured')
+      ->setParameter('thread_id',   $this->saving_id);
   }
 
   /**
