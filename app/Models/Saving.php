@@ -19,11 +19,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Myckhel\Paystack\Support\Charge;
 use Myckhel\Paystack\Support\Plan as PayPlan;
 use Myckhel\Paystack\Support\Subscription;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+
+use function Psy\debug;
 
 class Saving extends Model implements Wallet, HasMedia
 {
@@ -76,6 +79,39 @@ class Saving extends Model implements Wallet, HasMedia
   {
     $email    = $this->user->email;
     $isChallenge = $this->plan->name == 'Challenge';
+    $wallet_id = $this->metas['wallet_id'] ?? null;
+
+    if ($wallet_id) {
+      $wallet = $this->wallet;
+
+      $fromWallet = $this->user->wallets()->whereName('naira')->findOrFail($wallet_id);
+
+      try {
+        $fromWallet->transfer($wallet, $this->amount, ['desc' => "Transfer between wallets"]);
+      } catch (\Throwable $e) {
+        if (get_class($e) == BalanceIsEmpty::class) {
+          abort(400, $e->getMessage());
+        } else {
+          throw $e;
+        }
+      }
+    } else {
+      $payment_option_id = $this->metas['payment_option_id'] ?? null;
+      if ($payment_option_id) {
+        $option = PaymentOption::find($payment_option_id);
+      } else {
+        $option = PaymentOption::first();
+      }
+
+      $option && Charge::create([
+        'authorization_code'  => $option->authorization_code,
+        'amount'              => $this->amount * 100,
+        'email'               => $this->user->email,
+        'metadata'            => $isChallenge
+          ? ['user_challenge_id' => $userChallenge->id]
+          : ['saving_id' => $this->id]
+      ]);
+    }
 
     if ($this->interval) {
       $plan = (object) PayPlan::create([
@@ -94,17 +130,6 @@ class Saving extends Model implements Wallet, HasMedia
       $isChallenge
         ? $userChallenge?->update(['payment_plan_id' => $plan->id])
         : $this->update(['payment_plan_id' => $plan->id]);
-    } elseif (isset($this->metas['payment_option_id'])) {
-      $option = PaymentOption::find($this->metas['payment_option_id']);
-
-      $option && Charge::create([
-        'authorization_code'  => $option->authorization_code,
-        'amount'              => $this->amount * 100,
-        'email'               => $this->user->email,
-        'metadata'            => $isChallenge
-          ? ['user_challenge_id' => $userChallenge->id]
-          : ['saving_id' => $this->id]
-      ]);
     }
   }
 
