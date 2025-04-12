@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\PaymentOption;
+use App\Service\PaymentOptionService;
 use Illuminate\Http\Request;
-use Myckhel\Paystack\Support\Transaction;
+use Binkode\Paystack\Support\Transaction;
 
 class PaymentOptionController extends Controller
 {
@@ -37,30 +38,12 @@ class PaymentOptionController extends Controller
    * @param  \Illuminate\Http\Request  $request
    * @return \Illuminate\Http\Response
    */
-  public function store(Request $request)
+  public function store(Request $request, PaymentOptionService $paymentOptionService)
   {
     $request->validate([]);
     $user       = $request->user();
-    $amount     = 100 * 100;
 
-    $response   = Transaction::initialize([
-      'email'   => $user->email,
-      'amount'  => $amount,
-      'callback_url' => config('app.url') . "/api/paystack/hooks"
-    ]);
-
-    $responseData     = (object) $response['data'];
-
-    $wallet = $user->wallet;
-
-    $payment = $user->payments()->create([
-      'amount'        => $amount,
-      'access_code'   => $responseData->access_code,
-      'reference'     => $responseData->reference,
-      'wallet_id'     => $wallet?->id,
-    ]);
-
-    $payment->authorization_url = $responseData->authorization_url;
+    $payment = $paymentOptionService->addCard($user);
 
     return $payment;
   }

@@ -16,10 +16,11 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\WalletInterestController;
+use Binkode\Paystack\Http\Controllers\HookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Myckhel\Paystack\Http\Controllers\MiscellaneousController;
-use Myckhel\Paystack\Http\Controllers\VerificationController as PVerificationController;
+use Binkode\Paystack\Http\Controllers\MiscellaneousController;
+use Binkode\Paystack\Http\Controllers\VerificationController as PVerificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,77 +33,82 @@ use Myckhel\Paystack\Http\Controllers\VerificationController as PVerificationCon
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-  return $request->user();
-});
+Route::prefix('/v1')->group(function () {
+  // middleware('api.version:v1')->
 
-Route::group(['middleware' => 'guest'], function () {
-  Route::post('login', 'AuthController@login');
-  Route::post('register', 'AuthController@register');
-  Route::post('forgot-password', 'AuthController@sendResetLinkEmail')->name('password.reset');
-  Route::post('reset-password', 'AuthController@resetPassword');
 
-  Route::get('users/random', [UserController::class, 'random']);
-  // social
-  Route::get('/login/{provider}', [AuthController::class, 'redirectToProvider']);
-  Route::get('/login/{provider}/callback', [AuthController::class, 'handleProviderCallback']);
-});
-
-Route::group(['middleware' => ['auth:api']], function () {
-  Route::get(
-    'whoami',
-    fn (Request $request) => $request->user()
-  );
-
-  Route::put('users/{user}/avatar',     [UserController::class, 'updateAvatar']);
-  Route::get('users/portfolio',         [UserController::class, 'portfolio']);
-  Route::put('users/pin',               [UserController::class, 'updatePin']);
-  Route::get('users/pin',               [UserController::class, 'verifyPin']);
-  Route::put('users/password',          [UserController::class, 'changePassword']);
-
-  Route::post('wallets/withdraw',       [WalletController::class, 'withdraw']);
-  Route::get('wallets/dollar',          [WalletController::class, 'viewDollar']);
-  Route::get('wallets/balance',         [WalletController::class, 'totalSavings']);
-  Route::get('wallets/naira',           [WalletController::class, 'viewNaira']);
-  Route::post('wallet_interests/{walletInterest}/accept', [WalletInterestController::class, 'accept']);
-
-  Route::post('challenges/{saving}/join',    [UserChallengeController::class, 'store']);
-
-  Route::get('jobs/user/savings/matured',    [JobController::class, 'userSavingMatured']);
-  Route::get('jobs/challenge/won',           [JobController::class, 'userChallengeWon']);
-
-  Route::group(['prefix' => 'paystack'], function () {
-    // miscellaneous
-    Route::get('bank',                    [MiscellaneousController::class, 'listBanks']);
-    Route::get('banks',                   [MiscellaneousController::class, 'listProviders']);
-    Route::get('country',                 [MiscellaneousController::class, 'listCountries']);
-
-    // verifications
-    Route::get('bank/resolve',             [PVerificationController::class, 'resolve']);
-    Route::post('bank/validate',           [PVerificationController::class, 'validateAccount']);
-    Route::get('decision/bin/{bin}',       [PVerificationController::class, 'resolveCardBIN']);
+  Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
   });
 
-  Route::apiResource('users',           UserController::class)->only(['update', 'show']);
-  Route::apiResource('wallets',         WalletController::class);
-  Route::apiResource('payments',        PaymentController::class);
-  Route::apiResource('payment_options', PaymentOptionController::class);
-  Route::apiResource('plans',           PlanController::class)->only(['index', 'show']);
-  Route::apiResource('savings',         SavingController::class);
-  Route::apiResource('user_accounts',   UserAccountController::class);
-  Route::apiResource('transactions',    TransactionController::class)->only(['index', 'show']);
-  Route::apiResource('challenges',      ChallengeController::class)->only(['index', 'store', 'show']);
-  Route::post('payments/verify',        [PaymentController::class, 'verify']);
-  Route::apiResource('wallet_interests',  WalletInterestController::class)->only(['index']);
-  Route::apiResource('notifications',   NotificationController::class)->only(['index', 'show']);
-  Route::apiResource('verifications',   VerificationController::class);
-  Route::apiResource('transfers',       TransferController::class)->only(['index', 'store']);
+  Route::group(['middleware' => 'guest'], function () {
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('forgot-password', [AuthController::class, 'sendResetLinkEmail'])->name('password.reset');
+    Route::post('reset-password', [AuthController::class, 'resetPassword']);
 
-  Route::get('logout', 'AuthController@logout');
+    Route::get('users/random', [UserController::class, 'random']);
+    // social
+    Route::get('/login/{provider}', [AuthController::class, 'redirectToProvider']);
+    Route::get('/login/{provider}/callback', [AuthController::class, 'handleProviderCallback']);
+  });
 
-  Route::post('hooks', 'PaymentController@hooks');
-});
+  Route::group(['middleware' => ['auth:api']], function () {
+    Route::get(
+      'whoami',
+      fn(Request $request) => $request->user()
+    );
 
-Route::group([], function () {
-  Route::get('version', fn () => config('app.api.version'));
+    Route::put('users/{user}/avatar',     [UserController::class, 'updateAvatar']);
+    Route::get('users/portfolio',         [UserController::class, 'portfolio']);
+    Route::put('users/pin',               [UserController::class, 'updatePin']);
+    Route::get('users/pin',               [UserController::class, 'verifyPin']);
+    Route::put('users/password',          [UserController::class, 'changePassword']);
+
+    Route::post('wallets/withdraw',       [WalletController::class, 'withdraw']);
+    Route::get('wallets/dollar',          [WalletController::class, 'viewDollar']);
+    Route::get('wallets/balance',         [WalletController::class, 'totalSavings']);
+    Route::get('wallets/naira',           [WalletController::class, 'viewNaira']);
+    Route::post('wallet_interests/{walletInterest}/accept', [WalletInterestController::class, 'accept']);
+
+    Route::post('challenges/{saving}/join',    [UserChallengeController::class, 'store']);
+
+    Route::get('jobs/user/savings/matured',    [JobController::class, 'userSavingMatured']);
+    Route::get('jobs/challenge/won',           [JobController::class, 'userChallengeWon']);
+
+    Route::group(['prefix' => 'paystack'], function () {
+      // miscellaneous
+      Route::get('bank',                    [MiscellaneousController::class, 'listBanks']);
+      Route::get('banks',                   [MiscellaneousController::class, 'listProviders']);
+      Route::get('country',                 [MiscellaneousController::class, 'listCountries']);
+
+      // verifications
+      Route::get('bank/resolve',             [PVerificationController::class, 'resolve']);
+      Route::post('bank/validate',           [PVerificationController::class, 'validateAccount']);
+      Route::get('decision/bin/{bin}',       [PVerificationController::class, 'resolveCardBIN']);
+    });
+
+    Route::apiResource('users',           UserController::class)->only(['update', 'show']);
+    Route::apiResource('wallets',         WalletController::class);
+    Route::apiResource('payments',        PaymentController::class);
+    Route::apiResource('payment_options', PaymentOptionController::class);
+    Route::apiResource('plans',           PlanController::class)->only(['index', 'show']);
+    Route::apiResource('savings',         SavingController::class);
+    Route::apiResource('user_accounts',   UserAccountController::class);
+    Route::apiResource('transactions',    TransactionController::class)->only(['index', 'show']);
+    Route::apiResource('challenges',      ChallengeController::class)->only(['index', 'store', 'show']);
+    Route::post('payments/verify',        [PaymentController::class, 'verify']);
+    Route::apiResource('wallet_interests',  WalletInterestController::class)->only(['index']);
+    Route::apiResource('notifications',   NotificationController::class)->only(['index', 'show']);
+    Route::apiResource('verifications',   VerificationController::class);
+    Route::apiResource('transfers',       TransferController::class)->only(['index', 'store']);
+
+    Route::get('logout', [AuthController::class, 'logout']);
+
+    Route::post('hooks', [HookController::class, 'hook']);
+  });
+
+  Route::group([], function () {
+    Route::get('version', fn() => config('app.api.version'));
+  });
 });

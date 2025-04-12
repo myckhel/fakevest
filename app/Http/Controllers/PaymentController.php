@@ -3,13 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Payment;
-use App\Models\Saving;
-use App\Models\User;
-use App\Models\UserChallenge;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
-use Myckhel\Paystack\Events\Hook;
-use Myckhel\Paystack\Support\Transaction;
+use Binkode\Paystack\Events\Hook;
+use Binkode\Paystack\Support\Transaction;
 
 class PaymentController extends Controller
 {
@@ -49,7 +46,7 @@ class PaymentController extends Controller
     $orderBy  = $request->orderBy;
 
     $payments = $user->payments()
-      ->when($search, fn ($q) => $q->where('status', 'LIKE', "%$search%")
+      ->when($search, fn($q) => $q->where('status', 'LIKE', "%$search%")
         ->orWhere('amount', 'LIKE', "%$search%")->orWhere('reference', 'LIKE', "%$search%")
         ->orWhere('message', 'LIKE', "%$search%")->orWhere('currency_code', 'LIKE', "%$search%"))
       ->with(['wallet'])
@@ -84,8 +81,8 @@ class PaymentController extends Controller
         ->pureUser($user)
         ->when(
           $wallet_id,
-          fn ($q) => $q->where('wallets.id', $wallet_id),
-          fn ($q) => $q->where('wallets.name', $wallet_name)
+          fn($q) => $q->where('wallets.id', $wallet_id),
+          fn($q) => $q->where('wallets.name', $wallet_name)
         )->firstOrFail();
     } else {
       $wallet = $user->wallet;

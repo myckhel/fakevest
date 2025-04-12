@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Jobs\User\CreateCustomer;
 use App\Models\User;
 
 class UserObserver
@@ -16,6 +17,7 @@ class UserObserver
   {
     $user->balance;
     $user->createWallet(['name' => 'dollar']);
+    CreateCustomer::dispatch($user);
   }
 
   /**

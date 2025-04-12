@@ -3,7 +3,7 @@
 namespace App\Listeners;
 
 use App\Models\Payment;
-use Myckhel\Paystack\Events\Hook;
+use Binkode\Paystack\Events\Hook;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
@@ -24,7 +24,7 @@ class PaystackWebHookListener implements ShouldQueue
   /**
    * Handle the event.
    *
-   * @param  \App\Events\Myckhel\Paystack\Events\Hook  $event
+   * @param  \App\Events\Binkode\Paystack\Events\Hook  $event
    * @return void
    */
   public function handle(Hook $event)

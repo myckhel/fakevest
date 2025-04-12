@@ -221,7 +221,7 @@ class AuthController extends Controller
   {
     $request->validate([
       'username'            => "unique:users",
-      'phone'               => [Rule::requiredIf(!$request->email), "digits_between:10,11"],
+      'phone'               => [Rule::requiredIf(!$request->email), "digits_between:10,20"],
       'email'               => [Rule::requiredIf(!$request->phone), "email", "unique:users,email"],
       'password'            => 'required|min:6',
       'fullname'            => 'required|min:6',
@@ -296,11 +296,11 @@ class AuthController extends Controller
 
     $user = User::when(
       $email,
-      fn ($q) => $q->whereEmail($request->email),
-      fn ($q) => $q->when(
+      fn($q) => $q->whereEmail($request->email),
+      fn($q) => $q->when(
         $username,
-        fn ($q) => $q->whereUsername($username),
-        fn ($q) => $q->wherePhone($phone),
+        fn($q) => $q->whereUsername($username),
+        fn($q) => $q->wherePhone($phone),
       )
     )->first();
 

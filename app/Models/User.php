@@ -14,18 +14,21 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\HasMedia;
 use Bavix\Wallet\Traits\HasWallet;
 use Bavix\Wallet\Traits\HasWallets;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Illuminate\Support\Facades\Log;
 
-class User extends Authenticatable implements HasMedia, Wallet
+class User extends Authenticatable implements HasMedia, Wallet, MustVerifyEmail
 {
   use HasApiTokens, HasFactory, Notifiable, HasImage, InteractsWithMedia, HasWallet, HasWallets;
 
   function updatePush(array $push)
   {
+    $this->refresh();
     $metas = $this->metas;
     $metas['push'] = $push;
     $this->metas = $metas;
@@ -41,7 +44,7 @@ class User extends Authenticatable implements HasMedia, Wallet
   protected function hasPin(): Attribute
   {
     return Attribute::make(
-      get: fn ($value, $attributes) => isset($attributes['pin']),
+      get: fn($value, $attributes) => isset($attributes['pin']),
     );
   }
 
@@ -161,7 +164,8 @@ class User extends Authenticatable implements HasMedia, Wallet
   protected $casts = [
     'email_verified_at' => 'datetime',
     'dob' => 'date',
-    'phone' => 'int', 'profile' => Jsonable::class,
+    'phone' => 'int',
+    'profile' => Jsonable::class,
     'metas' => AsArrayObject::class,
     'has_notifications' => 'boolean',
   ];

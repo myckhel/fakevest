@@ -9,7 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Myckhel\Paystack\Support\Plan;
+use Binkode\Paystack\Support\Plan;
 
 class SavingUpdatedJob implements ShouldQueue
 {

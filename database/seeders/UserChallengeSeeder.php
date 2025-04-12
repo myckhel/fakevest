@@ -14,6 +14,6 @@ class UserChallengeSeeder extends Seeder
    */
   public function run()
   {
-    UserChallenge::factory(5)->create();
+    UserChallenge::factory(3)->create();
   }
 }

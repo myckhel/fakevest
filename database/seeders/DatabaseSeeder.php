@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
       WalletSeeder::class,
       PlanSeeder::class,
       SavingSeeder::class,
-      UserChallengeSeeder::class,
+      // UserChallengeSeeder::class,
     ]);
   }
 }

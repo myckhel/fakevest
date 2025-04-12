@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\UserAccount;
 use Illuminate\Http\Request;
-use Myckhel\Paystack\Support\Recipient;
-use Myckhel\Paystack\Support\Verification;
+use Binkode\Paystack\Support\Recipient;
+use Binkode\Paystack\Support\Verification;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 class UserAccountController extends Controller
@@ -76,7 +76,12 @@ class UserAccountController extends Controller
       'bank_code'       => $bank_code,
       'account_name'    => $verification->data['account_name'],
     ], $request->only([
-      'type', 'account_number', 'bank_code', 'description', 'currency', 'bank_name'
+      'type',
+      'account_number',
+      'bank_code',
+      'description',
+      'currency',
+      'bank_name'
     ]) + ['recipient_id' => $recipient->id]);
 
     return $account;

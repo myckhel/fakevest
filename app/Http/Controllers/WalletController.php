@@ -8,8 +8,8 @@ use App\Models\Wallet;
 use App\Notifications\Wallet\WithdrawToAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Myckhel\Paystack\Support\Recipient;
-use Myckhel\Paystack\Support\Transfer;
+use Binkode\Paystack\Support\Recipient;
+use Binkode\Paystack\Support\Transfer;
 
 class WalletController extends Controller
 {
@@ -122,9 +122,9 @@ class WalletController extends Controller
       ->sum('balance');
 
     $collect = Wallet::belongsToUser($user, true)
-      ->whereHas('trans', fn ($q) => $q->whereWithinDay('transactions'))
-      ->withSum(['trans as balance_change' => fn ($q) => $q->whereWithinDay('transactions')], 'amount')
-      ->withSum(['trans as balance_change_percentage' => fn ($q) => $q->whereWithinDay('transactions')], DB::raw(Wallet::$changePercentageSyntax))
+      ->whereHas('trans', fn($q) => $q->whereWithinDay('transactions'))
+      ->withSum(['trans as balance_change' => fn($q) => $q->whereWithinDay('transactions')], 'amount')
+      ->withSum(['trans as balance_change_percentage' => fn($q) => $q->whereWithinDay('transactions')], DB::raw(Wallet::$changePercentageSyntax))
       ->get();
 
     $balance_change = $collect->sum('balance_change');

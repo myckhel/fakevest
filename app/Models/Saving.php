@@ -19,9 +19,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
-use Myckhel\Paystack\Support\Charge;
-use Myckhel\Paystack\Support\Plan as PayPlan;
-use Myckhel\Paystack\Support\Subscription;
+use Binkode\Paystack\Support\Charge;
+use Binkode\Paystack\Support\Plan as PayPlan;
+use Binkode\Paystack\Support\Subscription;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -75,6 +75,7 @@ class Saving extends Model implements Wallet, HasMedia
   function processCreated($userChallenge = null)
   {
     $email    = $this->user->email;
+    $customer_code    = $this->user->metas['customer_code'] ?? null;
     $isChallenge = $this->plan->name == 'Challenge';
 
     if ($this->interval) {
@@ -87,7 +88,7 @@ class Saving extends Model implements Wallet, HasMedia
 
       Subscription::create([
         'plan'        => $plan->plan_code,
-        'customer'    => $email,
+        'customer'    => $customer_code ?? $email,
         'start_date'  => Carbon::now()->addSeconds(60 * 2)->toIso8601String(),
       ]);
 
@@ -110,7 +111,7 @@ class Saving extends Model implements Wallet, HasMedia
 
   function scopeWhereIsChallenge($q): Builder
   {
-    return $q->whereHas('plan', fn ($q) => $q->whereName('Challenge'));
+    return $q->whereHas('plan', fn($q) => $q->whereName('Challenge'));
   }
 
   function scopeWhereActive($q): Builder
@@ -127,7 +128,7 @@ class Saving extends Model implements Wallet, HasMedia
   {
     return $q
       ->withSum([
-        'trans as balance_change_percentage' => fn ($q) => $q
+        'trans as balance_change_percentage' => fn($q) => $q
           ->whereWithinDay('transactions')->join('wallets', 'transactions.wallet_id', 'wallets.id')
       ], DB::raw(self::$syntaxBalancePercent));
   }
@@ -143,7 +144,7 @@ class Saving extends Model implements Wallet, HasMedia
   function scopeWithChallengeCompletion($q, User $user): Builder
   {
     return $q->withSum(
-      ['participantWallet as challenge_target_percentage' => fn ($q) => $q->where('user_challenges.user_id', $user->id)],
+      ['participantWallet as challenge_target_percentage' => fn($q) => $q->where('user_challenges.user_id', $user->id)],
       DB::raw(self::$syntaxTargetPercent)
     );
   }
@@ -151,7 +152,7 @@ class Saving extends Model implements Wallet, HasMedia
   function loadBalanceChangePercentage(): self
   {
     return $this->loadSum([
-      'trans as balance_change_percentage' => fn ($q) => $q
+      'trans as balance_change_percentage' => fn($q) => $q
         ->whereWithinDay('transactions')->join('wallets', 'transactions.wallet_id', 'wallets.id'),
     ], DB::raw(self::$syntaxBalancePercent));
   }
@@ -258,7 +259,7 @@ trait HasSavingWallet
       $plan = (object) PayPlan::fetch($this->payment_plan_id)['data'];
       try {
         collect($plan?->subscriptions)->map(
-          fn ($sub) => Subscription::disable([
+          fn($sub) => Subscription::disable([
             'code' => $sub['subscription_code'],
             'token' => $sub['email_token']
           ])
