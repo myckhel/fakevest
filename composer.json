@@ -12,6 +12,7 @@
     "binkode/laravel-paystack": "^1.4",
     "fakerphp/faker": "^1.21",
     "guzzlehttp/guzzle": "^7.7",
+    "inertiajs/inertia-laravel": "^2.0.2",
     "intervention/image": "^2.7",
     "laravel-notification-channels/onesignal": "^2.8",
     "laravel/framework": "^12.0",
@@ -23,7 +24,8 @@
     "predis/predis": "^2.0",
     "spatie/laravel-medialibrary": "^11.0",
     "symfony/http-client": "^6.3",
-    "symfony/mailgun-mailer": "^6.3"
+    "symfony/mailgun-mailer": "^6.3",
+    "tightenco/ziggy": "^2.5"
   },
   "repositories": [],
   "require-dev": {
@@ -60,7 +62,11 @@
     ],
     "dev": [
       "Composer\\Config::disableProcessTimeout",
-      "php artisan octane:start --workers=1 --task-workers=1 --watch"
+      "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite"
+    ],
+    "test": [
+      "@php artisan config:clear --ansi",
+      "@php artisan test"
     ],
     "deploy:main": "git push heroku main",
     "deploy:dev-main": "git push heroku dev:main"
