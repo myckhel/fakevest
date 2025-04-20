@@ -15,3 +15,4 @@ use Inertia\Inertia;
 */
 
 Route::get('/', fn() => Inertia::render('app'));
+Route::get('/app', fn() => Inertia::render('Dashboard'));
