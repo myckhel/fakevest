@@ -16,3 +16,8 @@ use Inertia\Inertia;
 
 Route::get('/', fn() => Inertia::render('app'));
 Route::get('/app', fn() => Inertia::render('Dashboard'));
+
+// UI Theme Showcase (Dev only)
+Route::get('/ui/theme-showcase', function () {
+    return inertia('Demo/ThemeShowcasePage');
+});
