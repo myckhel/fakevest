@@ -1,118 +1,140 @@
-Fakevest
+# ✅ Fakevest — Best Practices
 
-Here are best practices tailored for a project using **Laravel**, **Inertia.js (React adapter)**, **TailwindCSS**, **Vite**, and **Refine**. These practices aim to maintain scalability, performance, developer experience, and maintainability.
+These best practices are tailored for a project using **Laravel**, **Inertia.js (React + TypeScript)**, **TailwindCSS**, **Vite**, **Zustand**, **Yarn**, and **Ant Design (AntD)**. The goal is to maintain **scalability**, **performance**, **developer experience**, and **maintainability**.
 
 ---
 
 ## ✅ General Best Practices
 
-### 1. **Keep a Clean Architecture**
-- **Backend (Laravel)**: Use a service-repository pattern for complex logic.
-- **Frontend (React)**: Use composable and reusable components.
-- Use **Inertia** only for top-level routing and props, not for deeply nested communication.
+### 1. **Maintain a Clean Architecture**
+- **Backend (Laravel)**: Use the service-repository pattern for separation of concerns.
+- **Frontend (React + TS)**: Write reusable, typed, composable components.
+- Use **Inertia.js** strictly for page transitions and server-side props.
+
+### 2. **Type Safety**
+- Use TypeScript everywhere in the frontend (`*.tsx`, `*.ts`).
+- Use `zod` or custom types/interfaces for shared shape validation (e.g., props from Laravel).
 
 ---
 
 ## 🧱 Laravel Best Practices
 
-### 1. **Controllers**
-- Keep controllers slim — delegate business logic to Services.
-- Use Form Request classes for validation.
-- Group routes and use route names for clarity.
+### 1. **Controllers & Services**
+- Controllers should only delegate requests to services.
+- Validate inputs via Form Request classes, not in controllers.
 
 ### 2. **Models**
-- Use accessors/mutators for attribute transformations.
-- Always define `fillable` or `guarded` properties.
-- Use Laravel Eloquent relationships effectively for clear data access.
+- Define `fillable` properties explicitly.
+- Use accessors/mutators to handle formatting logic (e.g., dates, currency).
+- Use Eloquent relationships smartly for efficient querying.
 
 ### 3. **API & Routing**
-- Prefer **resource routes** and **API Resources** when exposing data.
-- Keep route files organized by feature (`routes/admin.php`, `routes/api.php`, etc.)
+- Use **API Resource classes** for clean API responses.
+- Separate routes by concern (`routes/api.php`, `routes/web.php`, `routes/admin.php`).
+- Use **versioning** if planning to support public APIs (`/api/v1/...`).
 
 ---
 
-## ⚛️ Inertia + React Best Practices
+## ⚛️ Inertia + React + Zustand Best Practices
 
-### 1. **Page Structure**
-- Place all React pages under `resources/js/Pages`.
-- Structure components inside `resources/js/Components`, `Layouts`, and possibly `Hooks`.
+### 1. **Page & Component Structure**
+- Organize files like:
+  ```
+  resources/ts/
+  ├── Pages/
+  ├── Components/
+  ├── Layouts/
+  ├── Stores/
+  └── Hooks/
+  ```
+- Break down complex UI into small, testable components.
 
-### 2. **Props Management**
-- Avoid deeply nested props — use shared props via `handleInertiaRequests()` middleware.
-- Use Inertia’s `usePage()` hook wisely to extract props.
+### 2. **State Management with Zustand**
+- Use Zustand for **UI-level state** (modals, tabs, filters, etc.).
+- Keep **persistent/auth state** centralized in one global store (`authStore.ts`).
+- Avoid prop drilling — rely on Zustand and Inertia props smartly.
 
-### 3. **Code Splitting**
-- Lazy load pages/components where possible using `React.lazy()` or dynamic imports.
+### 3. **Props & Data Handling**
+- Use Inertia’s `usePage<T>()` with strong TypeScript types.
+- Limit page-level props. Use shared props via `handleInertiaRequests()` middleware.
 
 ### 4. **Routing**
-- Use Laravel for top-level routing only.
-- Avoid client-side routing libraries like `react-router-dom` — Inertia handles this.
+- Handle all routing via Laravel and Inertia. Avoid `react-router-dom`.
+
+### 5. **Performance**
+- Lazy load large components/pages with `React.lazy()` or dynamic imports.
+- Use React’s `memo()` and Zustand selectors to avoid unnecessary re-renders.
 
 ---
 
-## 🎨 Tailwind CSS Best Practices
+## 🎨 TailwindCSS + Ant Design Best Practices
 
-### 1. **Atomic Classes**
-- Favor utility classes over custom styles unless necessary.
-- Use `@apply` in component-scoped CSS for repeated style patterns.
+### 1. **UI Consistency**
+- Use **AntD** for complex UI elements (modals, tables, dropdowns, inputs).
+- Use **TailwindCSS** for layout, spacing, colors, and simple styling.
+- Use `clsx` or `classnames` for clean dynamic className management.
 
-### 2. **Componentization**
-- Wrap common layouts (cards, modals, etc.) into React components and reuse.
+### 2. **Theming**
+- Configure Ant Design theme with Tailwind-friendly primary color: `#3b8cb7`.
+- Apply theme via `ConfigProvider` at app level.
 
-### 3. **Dark Mode / Themes**
-- Configure and support dark mode in your `tailwind.config.js` (`media` or `class`).
+### 3. **Custom Components**
+- Wrap AntD components with Tailwind when necessary (e.g., for spacing, layout).
+- Reuse UI components (buttons, cards, forms) to avoid duplication.
 
 ---
 
 ## ⚡ Vite Best Practices
 
-### 1. **Alias & Imports**
-- Configure aliases in `vite.config.js` to simplify imports:
-  ```js
-  resolve: {
-    alias: {
-      '@': '/resources/ts',
-    },
+### 1. **Alias Setup**
+```ts
+// vite.config.ts
+resolve: {
+  alias: {
+    '@': '/resources/ts',
   },
-  ```
+},
+```
 
-### 2. **Hot Reload**
-- Ensure Vite is set up properly with Inertia so hot reload works for both Laravel and React changes.
+### 2. **Hot Module Reloading**
+- Ensure `@vite` plugin is properly used in `app.blade.php`.
+- Enable Fast Refresh for React in development.
 
-### 3. **Env Variables**
-- Use `.env` and `import.meta.env` safely — never expose sensitive backend envs to frontend.
-
----
-
-## 🧠 Refine Integration Best Practices
-
-### 1. **RouterProvider**
-- Use `@refinedev/inertia-router` to bridge Laravel routes with Refine’s router.
-
-### 2. **Access Control**
-- Define access policies in Laravel, then reflect those as permissions in Refine with `canAccess()` or `accessControlProvider`.
-
-### 3. **Data Provider**
-- Connect a custom dataProvider to your Laravel API endpoints.
-- Handle pagination, filtering, and sorting using query parameters consistently.
-
-### 4. **Theming**
-- TailwindCSS is not used out-of-the-box in Refine — use `Refine` with a custom layout and Tailwind styles for consistency.
+### 3. **Environment Variables**
+- Use `import.meta.env.VITE_*` for frontend envs.
+- Never expose Laravel secrets to the frontend.
 
 ---
 
-## 🛠 Dev & Deployment Practices
+## 🛠 Dev & Deployment
 
 ### 1. **Testing**
-- Write **Pest** or **PHPUnit** tests for backend logic.
-- Use **Jest**/**React Testing Library** for front-end unit/component tests.
+- **Backend**: Write tests using **Pest** or **PHPUnit**.
+- **Frontend**: Use **Jest**, **React Testing Library**, and **MSW** (for API mocking).
+- Consider end-to-end tests using **Playwright** or **Cypress**.
 
 ### 2. **Linting & Formatting**
-- Use **ESLint**, **Prettier**, and **PHP CS Fixer**.
-- Add hooks with **Husky** to enforce quality before commit.
+- Use:
+  - **ESLint** with React/TS config
+  - **Prettier** for formatting
+  - **PHP CS Fixer** for Laravel
+- Add **Husky** + **lint-staged** for pre-commit quality checks.
 
 ### 3. **CI/CD**
-- Set up GitHub Actions or another CI to run tests, lint, and deploy automatically.
+- Use GitHub Actions or similar CI tools to:
+  - Run tests
+  - Lint code
+  - Deploy to staging/production environments
+
+---
+
+## 📈 Bonus Tips
+
+- Use **React DevTools**, **Zustand Devtools**, and **Laravel Telescope** in development.
+- Enable **dark mode** with Tailwind (`media` or `class`).
+- Set up a robust error boundary + 404/403 pages.
+
+---
 
 # Copilot Instructions for Fakevest Frontend (TypeScript)
 
