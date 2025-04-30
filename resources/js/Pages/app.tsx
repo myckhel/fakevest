@@ -45,7 +45,7 @@ const HomePage = () => {
             className="w-full object-cover"
             onError={(e) => {
               e.currentTarget.src =
-                "https://via.placeholder.com/1200x600/3b8cb7/FFFFFF?text=Fakevest+Dashboard";
+                "https://fakeimg.pl/1200x600/?text=Fakevest+Dashboard";
             }}
           />
         </div>

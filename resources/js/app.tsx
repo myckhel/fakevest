@@ -2,13 +2,24 @@ import "../css/app.css";
 import "./bootstrap";
 import "@ant-design/v5-patch-for-react-19";
 
+import React from "react";
 import { createInertiaApp } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { createRoot, hydrateRoot } from "react-dom/client";
 import { ThemeProvider } from "./theme";
 import { StyleProvider } from "@ant-design/cssinjs";
+import { ConfigProvider } from "antd";
+import Toast from "./Components/Toast";
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
+
+// Apply AntD theming
+const theme = {
+  token: {
+    colorPrimary: "#3b8cb7",
+    borderRadius: 4,
+  },
+};
 
 createInertiaApp({
   title: (title) => `${title} - ${appName}`,
@@ -18,11 +29,24 @@ createInertiaApp({
       import.meta.glob("./Pages/**/*.tsx")
     ),
   setup({ el, App, props }) {
+    // Check if user has dark mode enabled
+    const darkMode = localStorage.getItem("ui-storage")
+      ? JSON.parse(localStorage.getItem("ui-storage") || "{}").state?.darkMode
+      : false;
+
+    // Apply dark mode class if needed
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    }
+
     // Wrap with StyleProvider for better styles rendering in React 19
     const AppWithTheme = () => (
       <StyleProvider hashPriority="high">
         <ThemeProvider>
-          <App {...props} />
+          <ConfigProvider theme={theme}>
+            <App {...props} />
+            <Toast />
+          </ConfigProvider>
         </ThemeProvider>
       </StyleProvider>
     );
