@@ -373,19 +373,30 @@ class AuthController extends Controller
     // $this->middleware('signed')->only('verify');
     // $this->middleware('throttle:6,1')->only('verify', 'resend');
   }
+
   /**
    * Log the user out of the application.
    *
    * @param  \Illuminate\Http\Request  $request
-   * @return \Illuminate\Http\JsonResponse
+   * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
    */
   public function logout(Request $request)
   {
-    $request->user()->currentAccessToken()->delete();
+    // For API token-based authentication
+    if ($request->wantsJson()) {
+      $request->user()->currentAccessToken()->delete();
 
-    return response()->json([
-      'message' => 'Successfully logged out'
-    ]);
+      return response()->json([
+        'message' => 'Successfully logged out'
+      ]);
+    }
+
+    // For web session-based authentication (Inertia)
+    auth('web')->logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect()->route('login')->with('status', 'You have been logged out successfully');
   }
 
   /**

@@ -104,22 +104,19 @@ const useAuthStore = create<AuthState>()(
         logout: () => {
           set({ isLoading: true });
 
-          // Use inertiaApi to ensure proper API base path
-          inertiaApi.get(
-            "logout",
-            {},
-            {
-              onFinish: () => {
-                set({
-                  user: null,
-                  isAuthenticated: false,
-                  isLoading: false,
-                });
-              },
-              preserveState: false,
-              preserveScroll: false,
-            }
-          );
+          // Use direct Inertia navigation to the logout route
+          router.visit("/logout", {
+            method: "get",
+            onFinish: () => {
+              set({
+                user: null,
+                isAuthenticated: false,
+                isLoading: false,
+              });
+            },
+            preserveState: false,
+            preserveScroll: false,
+          });
         },
 
         checkAuth: async () => {
