@@ -31,8 +31,8 @@ Route::middleware('guest')->group(function () {
   Route::get('/login/{provider}/callback', [AuthController::class, 'handleProviderCallback'])->name('social.callback');
 });
 
-// Protected routes
-Route::middleware('auth')->group(function () {
+// Protected routes - Changed from 'auth' to 'auth:web' for session-based authentication
+Route::middleware('auth:web')->group(function () {
   // Email verification
   Route::get('/email/verify', fn() => Inertia::render('Auth/EmailVerification'))->name('verification.notice');
   Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])->middleware(['signed'])->name('verification.verify');

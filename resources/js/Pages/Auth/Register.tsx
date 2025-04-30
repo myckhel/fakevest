@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Head, Link, router } from "@inertiajs/react";
+import React, { useState, useEffect } from "react";
+import { Head, Link, router, usePage } from "@inertiajs/react";
 import { Button, Form, Input, Upload, Divider, message } from "antd";
 import {
   UserOutlined,
@@ -13,18 +13,38 @@ import {
 } from "@ant-design/icons";
 import AuthLayout from "@/Layouts/AuthLayout";
 import useAuthStore from "@/Stores/authStore";
+import { inertiaApi } from "@/utils/inertiaApi";
 import type { RcFile, UploadFile } from "antd/es/upload/interface";
 
+interface PageProps {
+  errors: Record<string, string>;
+  status?: string;
+}
+
 const Register: React.FC = () => {
-  const { register, getSocialLoginUrl } = useAuthStore();
+  const { errors, status } = usePage<PageProps>().props;
+  const { getSocialLoginUrl } = useAuthStore();
   const [loading, setLoading] = useState(false);
-  const [avatar, setAvatar] = useState<File | null>(null);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [socialLoading, setSocialLoading] = useState({
     google: false,
     facebook: false,
     github: false,
   });
+
+  // Display flash messages from server
+  useEffect(() => {
+    if (status) {
+      message.success(status);
+    }
+
+    // Display validation errors
+    if (Object.keys(errors).length > 0) {
+      Object.values(errors).forEach((error) => {
+        message.error(error);
+      });
+    }
+  }, [errors, status]);
 
   const beforeUpload = (file: RcFile) => {
     const isImage = file.type.startsWith("image/");
@@ -38,7 +58,6 @@ const Register: React.FC = () => {
     }
 
     if (isImage && isLt2M) {
-      setAvatar(file);
       setFileList([file]);
     }
 
@@ -46,43 +65,30 @@ const Register: React.FC = () => {
     return false;
   };
 
-  const handleRegister = async (values: any) => {
+  const handleRegister = (values: any) => {
     setLoading(true);
-    try {
-      await register(
-        {
-          fullname: values.fullname,
-          email: values.email,
-          phone: values.phone,
-          username: values.username,
-          password: values.password,
-          password_confirmation: values.confirm,
-          device_type: "web",
-          device_name: navigator.userAgent,
-        },
-        avatar || undefined
-      );
 
-      message.success("Registration successful!");
-      router.visit("/dashboard");
-    } catch (error: any) {
-      const errorData = error.response?.data;
-      const errorMessage =
-        errorData?.message || "Registration failed. Please try again.";
+    // Use FormData to handle file uploads with Inertia
+    const formData = new FormData();
+    formData.append("fullname", values.fullname);
+    formData.append("email", values.email);
+    if (values.phone) formData.append("phone", values.phone);
+    if (values.username) formData.append("username", values.username);
+    formData.append("password", values.password);
+    formData.append("password_confirmation", values.confirm);
 
-      // Handle validation errors from the server
-      if (errorData?.errors) {
-        const formErrors = Object.entries(errorData.errors)
-          .map(([field, messages]) => `${field}: ${messages.join(", ")}`)
-          .join(". ");
-
-        message.error(formErrors);
-      } else {
-        message.error(errorMessage);
-      }
-    } finally {
-      setLoading(false);
+    if (fileList.length > 0 && fileList[0].originFileObj) {
+      formData.append("avatar", fileList[0].originFileObj);
     }
+
+    // Use inertiaApi to properly handle API routes with the /api/v1 prefix
+    inertiaApi.post("auth/register", formData, {
+      onFinish: () => {
+        setLoading(false);
+      },
+      preserveScroll: true,
+      forceFormData: true,
+    });
   };
 
   const handleSocialLogin = async (
@@ -115,6 +121,8 @@ const Register: React.FC = () => {
           rules={[
             { required: true, message: "Please enter your full name", min: 6 },
           ]}
+          validateStatus={errors.fullname ? "error" : ""}
+          help={errors.fullname}
         >
           <Input
             prefix={<UserOutlined className="site-form-item-icon" />}
@@ -129,6 +137,8 @@ const Register: React.FC = () => {
             { required: true, message: "Please enter your email" },
             { type: "email", message: "Please enter a valid email" },
           ]}
+          validateStatus={errors.email ? "error" : ""}
+          help={errors.email}
         >
           <Input
             prefix={<MailOutlined className="site-form-item-icon" />}
@@ -145,6 +155,8 @@ const Register: React.FC = () => {
               message: "Please enter a valid phone number",
             },
           ]}
+          validateStatus={errors.phone ? "error" : ""}
+          help={errors.phone}
         >
           <Input
             prefix={<PhoneOutlined className="site-form-item-icon" />}
@@ -158,6 +170,8 @@ const Register: React.FC = () => {
           rules={[
             { message: "Username must be at least 3 characters", min: 3 },
           ]}
+          validateStatus={errors.username ? "error" : ""}
+          help={errors.username}
         >
           <Input
             prefix={<UserOutlined className="site-form-item-icon" />}
@@ -172,6 +186,8 @@ const Register: React.FC = () => {
             { required: true, message: "Please enter your password" },
             { min: 6, message: "Password must be at least 6 characters" },
           ]}
+          validateStatus={errors.password ? "error" : ""}
+          help={errors.password}
         >
           <Input.Password
             prefix={<LockOutlined className="site-form-item-icon" />}
@@ -196,6 +212,8 @@ const Register: React.FC = () => {
               },
             }),
           ]}
+          validateStatus={errors.password_confirmation ? "error" : ""}
+          help={errors.password_confirmation}
         >
           <Input.Password
             prefix={<LockOutlined className="site-form-item-icon" />}
@@ -204,13 +222,17 @@ const Register: React.FC = () => {
           />
         </Form.Item>
 
-        <Form.Item name="avatar" label="Profile Picture (optional)">
+        <Form.Item
+          name="avatar"
+          label="Profile Picture (optional)"
+          validateStatus={errors.avatar ? "error" : ""}
+          help={errors.avatar}
+        >
           <Upload
             beforeUpload={beforeUpload}
             maxCount={1}
             fileList={fileList}
             onRemove={() => {
-              setAvatar(null);
               setFileList([]);
             }}
             listType="picture"

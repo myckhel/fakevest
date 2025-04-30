@@ -6,9 +6,10 @@ import {
   useSavingsLoading,
   useDarkMode,
 } from "@/Stores";
-import useAuthStore from "@/Stores/authStore";
 import useSavingsStore from "@/Stores/savingsStore";
 import useUIStore from "@/Stores/uiStore";
+import MainLayout from "../Layouts/MainLayout";
+import { Head } from "@inertiajs/react";
 
 const Dashboard = () => {
   // Access state from individual selectors to prevent unnecessary re-renders
@@ -19,7 +20,6 @@ const Dashboard = () => {
   const darkMode = useDarkMode();
 
   // Access actions directly from store
-  const { checkAuth } = useAuthStore();
   const { fetchPlans, fetchSavings, fetchPortfolio } = useSavingsStore();
   const { showToast, toggleDarkMode } = useUIStore();
 
@@ -27,9 +27,6 @@ const Dashboard = () => {
   useEffect(() => {
     const initData = async () => {
       try {
-        // Check authentication status
-        await checkAuth();
-
         // Fetch plans, savings, and portfolio data in parallel
         await Promise.all([fetchPlans(), fetchSavings(), fetchPortfolio()]);
       } catch (error) {
@@ -42,11 +39,8 @@ const Dashboard = () => {
   }, []); // Empty dependency array means this runs once on mount
 
   return (
-    <div
-      className={`p-6 ${
-        darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
-      }`}
-    >
+    <MainLayout>
+      <Head title="Dashboard" />
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Dashboard</h1>
@@ -87,7 +81,7 @@ const Dashboard = () => {
                 >
                   <h2 className="text-lg font-semibold mb-2">Total Savings</h2>
                   <p className="text-3xl font-bold text-blue-600">
-                    ₦{portfolio.totalSavings.toLocaleString()}
+                    ₦{portfolio.lifetime.toLocaleString()}
                   </p>
                 </div>
 
@@ -98,7 +92,7 @@ const Dashboard = () => {
                 >
                   <h2 className="text-lg font-semibold mb-2">Wallet Balance</h2>
                   <p className="text-3xl font-bold text-green-600">
-                    ₦{portfolio.walletBalance.toLocaleString()}
+                    ₦{portfolio.net.wallet.toLocaleString()}
                   </p>
                 </div>
 
@@ -111,7 +105,7 @@ const Dashboard = () => {
                     Monthly Savings
                   </h2>
                   <p className="text-3xl font-bold text-purple-600">
-                    ₦{portfolio.stats.monthly.toLocaleString()}
+                    ₦{portfolio.thisMonth.toLocaleString()}
                   </p>
                 </div>
               </div>
@@ -180,7 +174,7 @@ const Dashboard = () => {
           </>
         )}
       </div>
-    </div>
+    </MainLayout>
   );
 };
 

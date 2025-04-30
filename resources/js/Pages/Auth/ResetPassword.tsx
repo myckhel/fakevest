@@ -1,62 +1,62 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Head, Link, router, usePage } from "@inertiajs/react";
 import { Button, Form, Input, Alert, message } from "antd";
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import AuthLayout from "@/Layouts/AuthLayout";
-import useAuthStore from "@/Stores/authStore";
+import { inertiaApi } from "@/utils/inertiaApi";
 
 interface Props {
   token: string;
   email: string;
+  errors: Record<string, string>;
+  status?: string;
 }
 
 const ResetPassword: React.FC = () => {
-  const { resetPassword } = useAuthStore();
-  const { token, email } = usePage<Props>().props;
+  const { token, email, errors, status } = usePage<Props>().props;
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState<string | null>(null);
 
-  const handleSubmit = async (values: {
+  // Display flash messages from server
+  useEffect(() => {
+    if (status) {
+      message.success(status);
+
+      // Redirect to login after successful password reset
+      setTimeout(() => {
+        router.visit("/login");
+      }, 2000);
+    }
+
+    if (Object.keys(errors).length > 0) {
+      Object.values(errors).forEach((error) => {
+        message.error(error);
+      });
+    }
+  }, [errors, status]);
+
+  const handleSubmit = (values: {
     email: string;
     password: string;
     password_confirmation: string;
   }) => {
     setLoading(true);
-    try {
-      const response = await resetPassword({
+
+    // Use inertiaApi utility to ensure proper /api/v1 base path
+    inertiaApi.post(
+      "auth/password/reset",
+      {
         token,
         email: values.email,
         password: values.password,
         password_confirmation: values.password_confirmation,
-      });
-
-      setSuccess(response.message);
-
-      // Redirect to login after 2 seconds
-      setTimeout(() => {
-        router.visit("/login");
-      }, 2000);
-    } catch (error: any) {
-      const errorData = error.response?.data;
-      const errorMessage =
-        errorData?.message || "Failed to reset password. Please try again.";
-
-      // Handle validation errors
-      if (errorData?.errors) {
-        const formErrors = Object.entries(errorData.errors)
-          .map(
-            ([field, messages]: [string, any]) =>
-              `${field}: ${messages.join(", ")}`
-          )
-          .join(". ");
-
-        message.error(formErrors);
-      } else {
-        message.error(errorMessage);
+      },
+      {
+        onFinish: () => {
+          setLoading(false);
+        },
+        preserveScroll: true,
       }
-    } finally {
-      setLoading(false);
-    }
+    );
   };
 
   return (
@@ -66,10 +66,10 @@ const ResetPassword: React.FC = () => {
     >
       <Head title="Reset Password" />
 
-      {success && (
+      {status && (
         <Alert
           message="Success"
-          description={success}
+          description={status}
           type="success"
           showIcon
           className="mb-4"
@@ -89,6 +89,8 @@ const ResetPassword: React.FC = () => {
             { required: true, message: "Please enter your email" },
             { type: "email", message: "Please enter a valid email" },
           ]}
+          validateStatus={errors.email ? "error" : ""}
+          help={errors.email}
         >
           <Input
             prefix={<MailOutlined className="site-form-item-icon" />}
@@ -102,8 +104,10 @@ const ResetPassword: React.FC = () => {
           name="password"
           rules={[
             { required: true, message: "Please enter your new password" },
-            { min: 6, message: "Password must be at least 6 characters" },
+            { min: 8, message: "Password must be at least 8 characters" },
           ]}
+          validateStatus={errors.password ? "error" : ""}
+          help={errors.password}
         >
           <Input.Password
             prefix={<LockOutlined className="site-form-item-icon" />}
@@ -128,6 +132,8 @@ const ResetPassword: React.FC = () => {
               },
             }),
           ]}
+          validateStatus={errors.password_confirmation ? "error" : ""}
+          help={errors.password_confirmation}
         >
           <Input.Password
             prefix={<LockOutlined className="site-form-item-icon" />}
@@ -143,7 +149,7 @@ const ResetPassword: React.FC = () => {
             size="large"
             className="w-full"
             loading={loading}
-            disabled={!!success}
+            disabled={!!status}
           >
             Reset Password
           </Button>

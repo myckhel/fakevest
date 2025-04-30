@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Head, Link } from "@inertiajs/react";
 import {
   Card,
@@ -11,18 +11,13 @@ import {
 } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 import MainLayout from "@/Layouts/MainLayout";
-import useAuthStore, { useAuthUser, useAuthLoading } from "@/Stores/authStore";
+import { useAuthUser, useAuthLoading } from "@/Stores/authStore";
 
 const { Title } = Typography;
 
 const ProfileView: React.FC = () => {
-  const { checkAuth } = useAuthStore();
   const user = useAuthUser();
   const isLoading = useAuthLoading();
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
 
   if (isLoading || !user) {
     return (

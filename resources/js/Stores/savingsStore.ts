@@ -68,7 +68,7 @@ const useSavingsStore = create<SavingsState>()(
       fetchSavings: async () => {
         set({ isLoading: true });
         try {
-          const savings = await API.savings.getSavings();
+          const { data: savings } = await API.savings.getSavings();
           set({
             savings,
             isLoading: false,

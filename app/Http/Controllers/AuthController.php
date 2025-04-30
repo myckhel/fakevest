@@ -317,18 +317,26 @@ class AuthController extends Controller
         return $this->sendLockoutResponse($request);
       }
 
-      if (!Hash::check($password, $user->password)) {
-        // user surpasses their maximum number of attempts they will get locked out.
-        $this->incrementLoginAttempts($request);
+      if (!$request->wantsJson()) {
+        if (auth('web')->attempt($request->only(['password', 'email']))) {
+          // proceed
+        } else {
+          return redirect()->back()->withErrors(['message' => 'credentials does not match']);
+        }
+      } else {
+        if (!Hash::check($password, $user->password)) {
+          // user surpasses their maximum number of attempts they will get locked out.
+          $this->incrementLoginAttempts($request);
 
-        return response()->json(
-          [
-            $this->username() => [trans('auth.failed')],
-            'message' => 'credentials does not match our records',
-            'status'  => false,
-          ],
-          401
-        );
+          return response()->json(
+            [
+              $this->username() => [trans('auth.failed')],
+              'message' => 'credentials does not match our records',
+              'status'  => false,
+            ],
+            401
+          );
+        }
       }
 
       $request->player_id && $user->updatePush(
@@ -343,12 +351,16 @@ class AuthController extends Controller
 
       $token       = $user->grantMeToken();
 
-      return response()->json([
-        'user'        => $user,
-        'token'       => $token['token'],
-        'token_type'  => $token['token_type'],
-        // 'expires_at'  => $token['expires_at'],
-      ]);
+      if (!$request->wantsJson()) {
+        return redirect('/dashboard');
+      } else {
+        return response()->json([
+          'user'        => $user,
+          'token'       => $token['token'],
+          'token_type'  => $token['token_type'],
+          // 'expires_at'  => $token['expires_at'],
+        ]);
+      }
     } else {
       throw ValidationException::withMessages([
         'user' => [trans('passwords.user')],

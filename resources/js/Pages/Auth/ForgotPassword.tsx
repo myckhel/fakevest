@@ -1,28 +1,44 @@
-import React, { useState } from "react";
-import { Head, Link } from "@inertiajs/react";
+import React, { useState, useEffect } from "react";
+import { Head, Link, usePage } from "@inertiajs/react";
 import { Button, Form, Input, Alert, message } from "antd";
 import { MailOutlined } from "@ant-design/icons";
 import AuthLayout from "@/Layouts/AuthLayout";
-import useAuthStore from "@/Stores/authStore";
+import { inertiaApi } from "@/utils/inertiaApi";
+
+interface PageProps {
+  errors: Record<string, string>;
+  status?: string;
+}
 
 const ForgotPassword: React.FC = () => {
-  const { forgotPassword } = useAuthStore();
+  const { errors, status } = usePage<PageProps>().props;
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState<string | null>(null);
 
-  const handleSubmit = async (values: { email: string }) => {
-    setLoading(true);
-    try {
-      const response = await forgotPassword(values.email);
-      setSuccess(response.message);
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message ||
-        "Failed to send reset link. Please try again.";
-      message.error(errorMessage);
-    } finally {
-      setLoading(false);
+  // Display flash messages from server
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      Object.values(errors).forEach((error) => {
+        message.error(error);
+      });
     }
+  }, [errors]);
+
+  const handleSubmit = (values: { email: string }) => {
+    setLoading(true);
+
+    // Use inertiaApi utility to ensure proper /api/v1 base path
+    inertiaApi.post(
+      "auth/password/forgot",
+      {
+        email: values.email,
+      },
+      {
+        onFinish: () => {
+          setLoading(false);
+        },
+        preserveScroll: true,
+      }
+    );
   };
 
   return (
@@ -32,10 +48,10 @@ const ForgotPassword: React.FC = () => {
     >
       <Head title="Forgot Password" />
 
-      {success && (
+      {status && (
         <Alert
           message="Success"
-          description={success}
+          description={status}
           type="success"
           showIcon
           className="mb-4"
@@ -54,6 +70,8 @@ const ForgotPassword: React.FC = () => {
             { required: true, message: "Please enter your email" },
             { type: "email", message: "Please enter a valid email" },
           ]}
+          validateStatus={errors.email ? "error" : ""}
+          help={errors.email}
         >
           <Input
             prefix={<MailOutlined className="site-form-item-icon" />}
@@ -69,7 +87,7 @@ const ForgotPassword: React.FC = () => {
             size="large"
             className="w-full"
             loading={loading}
-            disabled={!!success}
+            disabled={!!status}
           >
             Send Reset Link
           </Button>

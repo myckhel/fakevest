@@ -23,8 +23,8 @@ import {
 } from "@ant-design/icons";
 import MainLayout from "@/Layouts/MainLayout";
 import useAuthStore, { useAuthUser, useAuthLoading } from "@/Stores/authStore";
-import moment from "moment";
 import type { RcFile, UploadFile } from "antd/es/upload/interface";
+import dayjs from "dayjs";
 
 const { TabPane } = Tabs;
 const { TextArea } = Input;
@@ -43,14 +43,9 @@ const ProfileEdit: React.FC = () => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [avatar, setAvatar] = useState<File | null>(null);
 
-  const { checkAuth, updateProfile, updateAvatar, changePassword } =
-    useAuthStore();
+  const { updateProfile, updateAvatar, changePassword } = useAuthStore();
   const user = useAuthUser();
   const isLoading = useAuthLoading();
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
 
   useEffect(() => {
     if (user?.avatar?.url) {
@@ -209,7 +204,7 @@ const ProfileEdit: React.FC = () => {
                   username: user.username,
                   phone: user.phone,
                   gender: user.gender,
-                  dob: user.dob ? moment(user.dob) : undefined,
+                  dob: user.dob ? dayjs(user.dob) : undefined,
                   address: user.address,
                   next_of_kin: user.next_of_kin,
                 }}
@@ -258,7 +253,7 @@ const ProfileEdit: React.FC = () => {
                     label="Phone Number"
                     rules={[
                       {
-                        pattern: /^\d{10,11}$/,
+                        pattern: /^\d{10,13}$/,
                         message: "Please enter a valid phone number",
                       },
                     ]}

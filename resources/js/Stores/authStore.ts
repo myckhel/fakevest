@@ -1,21 +1,24 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { devtools } from "zustand/middleware";
-import axios from "axios";
+import { router } from "@inertiajs/react";
 import API from "../api";
 import { LoginCredentials, RegisterData, User } from "../api/auth";
+import { inertiaApi } from "@/utils/inertiaApi";
 
 interface AuthState {
   // State
   user: User | null;
-  token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+
+  // Direct state setter for external updates (e.g. from Inertia shared data)
+  set: (partial: Partial<Omit<AuthState, "set">>) => void;
 
   // Actions
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (userData: RegisterData, avatar?: File) => Promise<void>;
-  logout: () => Promise<void>;
+  logout: () => void;
   checkAuth: () => Promise<void>;
   updateProfile: (data: Partial<User>) => Promise<void>;
   updateAvatar: (file: File) => Promise<void>;
@@ -51,26 +54,27 @@ const useAuthStore = create<AuthState>()(
       (set, get) => ({
         // Initial state
         user: null,
-        token: null,
         isAuthenticated: false,
         isLoading: false,
+
+        // Direct state setter for external updates
+        set: (partial) => set(partial),
 
         // Actions
         login: async (credentials) => {
           set({ isLoading: true });
           try {
             const response = await API.auth.login(credentials);
-            const { user, token } = response;
-
-            // Update axios default headers
-            axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+            const { user } = response;
 
             set({
               user,
-              token,
               isAuthenticated: true,
               isLoading: false,
             });
+
+            // Use Inertia to navigate to dashboard after login
+            router.visit("/dashboard");
           } catch (error) {
             set({ isLoading: false });
             throw error;
@@ -81,65 +85,55 @@ const useAuthStore = create<AuthState>()(
           set({ isLoading: true });
           try {
             const response = await API.auth.register(userData, avatar);
-            const { user, token } = response;
-
-            // Update axios default headers
-            axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+            const { user } = response;
 
             set({
               user,
-              token,
               isAuthenticated: true,
               isLoading: false,
             });
+
+            // Use Inertia to navigate to dashboard or email verification page
+            router.visit("/dashboard");
           } catch (error) {
             set({ isLoading: false });
             throw error;
           }
         },
 
-        logout: async () => {
+        logout: () => {
           set({ isLoading: true });
-          try {
-            await API.auth.logout();
 
-            // Reset axios default headers
-            delete axios.defaults.headers.common.Authorization;
-
-            set({
-              user: null,
-              token: null,
-              isAuthenticated: false,
-              isLoading: false,
-            });
-          } catch (error) {
-            set({ isLoading: false });
-            throw error;
-          }
+          // Use inertiaApi to ensure proper API base path
+          inertiaApi.get(
+            "logout",
+            {},
+            {
+              onFinish: () => {
+                set({
+                  user: null,
+                  isAuthenticated: false,
+                  isLoading: false,
+                });
+              },
+              preserveState: false,
+              preserveScroll: false,
+            }
+          );
         },
 
         checkAuth: async () => {
-          const token = get().token;
-          if (!token) return;
-
-          // Update axios default headers
-          axios.defaults.headers.common.Authorization = `Bearer ${token}`;
-
           set({ isLoading: true });
           try {
             const user = await API.auth.whoami();
             set({
               user,
-              isAuthenticated: true,
+              isAuthenticated: !!user,
               isLoading: false,
             });
           } catch (error) {
-            // If token is invalid, reset authorization
-            delete axios.defaults.headers.common.Authorization;
-
             set({
               user: null,
-              token: null,
               isAuthenticated: false,
               isLoading: false,
             });
@@ -193,17 +187,16 @@ const useAuthStore = create<AuthState>()(
           set({ isLoading: true });
           try {
             const response = await API.auth.socialLoginCallback(provider, code);
-            const { user, token } = response;
-
-            // Update axios default headers
-            axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+            const { user } = response;
 
             set({
               user,
-              token,
               isAuthenticated: true,
               isLoading: false,
             });
+
+            // Use Inertia to navigate to dashboard after successful social login
+            router.visit("/dashboard");
           } catch (error) {
             set({ isLoading: false });
             throw error;
@@ -249,9 +242,17 @@ const useAuthStore = create<AuthState>()(
         resendEmailVerification: async () => {
           set({ isLoading: true });
           try {
-            const response = await API.auth.resendEmailVerification();
-            set({ isLoading: false });
-            return response;
+            // Use inertiaApi to ensure proper API base path
+            inertiaApi.post(
+              "auth/email/verification-notification",
+              {},
+              {
+                onFinish: () => {
+                  set({ isLoading: false });
+                },
+              }
+            );
+            return { status: "Verification link sent!" };
           } catch (error) {
             set({ isLoading: false });
             throw error;
@@ -278,7 +279,6 @@ const useAuthStore = create<AuthState>()(
         name: "auth-storage", // localStorage key
         storage: createJSONStorage(() => localStorage),
         partialize: (state) => ({
-          token: state.token,
           user: state.user,
           isAuthenticated: state.isAuthenticated,
         }),

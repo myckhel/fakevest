@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Head, Link, router } from "@inertiajs/react";
+import React, { useState, useEffect } from "react";
+import { Head, Link, router, usePage } from "@inertiajs/react";
 import { Button, Form, Input, Divider, message } from "antd";
 import {
   LockOutlined,
@@ -10,9 +10,17 @@ import {
 } from "@ant-design/icons";
 import AuthLayout from "@/Layouts/AuthLayout";
 import useAuthStore from "@/Stores/authStore";
+import { inertiaApi } from "@/utils/inertiaApi";
+import axios from "axios";
+
+interface PageProps {
+  errors: Record<string, string>;
+  status?: string;
+}
 
 const Login: React.FC = () => {
-  const { login, getSocialLoginUrl } = useAuthStore();
+  const { errors, status } = usePage<PageProps>().props;
+  const { getSocialLoginUrl } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<{
     google: boolean;
@@ -24,24 +32,45 @@ const Login: React.FC = () => {
     github: false,
   });
 
-  const handleLogin = async (values: { email: string; password: string }) => {
-    setLoading(true);
-    try {
-      await login({
-        email: values.email,
-        password: values.password,
-        device_type: "web",
-        device_name: navigator.userAgent,
-      });
-
-      router.visit("/dashboard");
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to log in. Please try again.";
-      message.error(errorMessage);
-    } finally {
-      setLoading(false);
+  // Display flash messages from server
+  useEffect(() => {
+    if (status) {
+      message.success(status);
     }
+
+    // Display validation errors
+    if (Object.keys(errors).length > 0) {
+      Object.values(errors).forEach((error) => {
+        message.error(error);
+      });
+    }
+  }, [errors, status]);
+
+  const handleLogin = (values: {
+    email: string;
+    password: string;
+    remember?: boolean;
+  }) => {
+    setLoading(true);
+    axios.get("/sanctum/csrf-cookie").then(() => {
+      // Login...
+      // For web pages (not API), we use direct routes
+      inertiaApi.post(
+        "login",
+        {
+          email: values.email,
+          password: values.password,
+          remember: values.remember || false,
+        },
+        {
+          onFinish: () => {
+            setLoading(false);
+          },
+          preserveScroll: true,
+          preserveState: true,
+        }
+      );
+    });
   };
 
   const handleSocialLogin = async (
@@ -76,6 +105,8 @@ const Login: React.FC = () => {
             { required: true, message: "Please enter your email" },
             { type: "email", message: "Please enter a valid email" },
           ]}
+          validateStatus={errors.email ? "error" : ""}
+          help={errors.email}
         >
           <Input
             prefix={<MailOutlined className="site-form-item-icon" />}
@@ -87,6 +118,8 @@ const Login: React.FC = () => {
         <Form.Item
           name="password"
           rules={[{ required: true, message: "Please enter your password" }]}
+          validateStatus={errors.password ? "error" : ""}
+          help={errors.password}
         >
           <Input.Password
             prefix={<LockOutlined className="site-form-item-icon" />}
@@ -95,14 +128,22 @@ const Login: React.FC = () => {
           />
         </Form.Item>
 
-        <div className="flex items-center justify-between">
-          <Link
-            href="/forgot-password"
-            className="text-sm font-medium text-blue-600 hover:underline"
-          >
-            Forgot your password?
-          </Link>
-        </div>
+        <Form.Item name="remember" valuePropName="checked">
+          <div className="flex items-center justify-between">
+            <div>
+              <input type="checkbox" id="remember" className="mr-2" />
+              <label htmlFor="remember" className="text-sm text-gray-600">
+                Remember me
+              </label>
+            </div>
+            <Link
+              href="/forgot-password"
+              className="text-sm font-medium text-blue-600 hover:underline"
+            >
+              Forgot your password?
+            </Link>
+          </div>
+        </Form.Item>
 
         <Form.Item>
           <Button

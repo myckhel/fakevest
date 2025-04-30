@@ -6,20 +6,11 @@ const httpClient = axios.create({
   baseURL: "/api/v1",
   headers: {
     "Content-Type": "application/json",
+    "X-Requested-With": "XMLHttpRequest",
   },
+  withCredentials: true, // Enable sending cookies with requests
+  withXSRFToken: true, // Enable CSRF token handling
 });
-
-// Handle request interceptor for auth tokens
-httpClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
 
 // Handle response interceptor for common error handling
 httpClient.interceptors.response.use(
@@ -27,8 +18,7 @@ httpClient.interceptors.response.use(
   (error: AxiosError) => {
     // Handle authentication errors
     if (error.response?.status === 401) {
-      localStorage.removeItem("token");
-      // inertia visit to login page
+      // Navigate to login page using Inertia
       router.visit("/login", {
         method: "get",
         preserveState: false,
@@ -36,7 +26,6 @@ httpClient.interceptors.response.use(
         replace: true,
         data: {},
       });
-      // window.location.href = '/login';
     }
 
     return Promise.reject(error);
