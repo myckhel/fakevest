@@ -1,208 +1,160 @@
 import React, { useState } from "react";
-import { Link } from "@inertiajs/react";
-import { Card, Form, Input, Button, Checkbox, Divider } from "antd";
+import { Head, Link, router } from "@inertiajs/react";
+import { Button, Form, Input, Divider, message } from "antd";
 import {
-  UserOutlined,
   LockOutlined,
-  GoogleOutlined,
+  MailOutlined,
   GithubOutlined,
+  GoogleOutlined,
   FacebookOutlined,
 } from "@ant-design/icons";
-import useAuthStore, { useAuthLoading } from "@/Stores/authStore";
-import useUIStore from "@/Stores/uiStore";
+import AuthLayout from "@/Layouts/AuthLayout";
+import useAuthStore from "@/Stores/authStore";
 
 const Login: React.FC = () => {
-  // Use selector hooks for targeted re-renders
-  const isLoading = useAuthLoading();
-  const darkMode = useUIStore((state) => state.darkMode);
-
-  // Access actions directly from the store
   const { login, getSocialLoginUrl } = useAuthStore();
-  const { showToast } = useUIStore();
-
-  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<{
-    [key: string]: boolean;
+    google: boolean;
+    facebook: boolean;
+    github: boolean;
   }>({
     google: false,
-    github: false,
     facebook: false,
+    github: false,
   });
 
-  // Handle login form submission
-  const handleLogin = async (values: {
-    email: string;
-    password: string;
-    remember: boolean;
-  }) => {
+  const handleLogin = async (values: { email: string; password: string }) => {
+    setLoading(true);
     try {
       await login({
         email: values.email,
         password: values.password,
-        remember: values.remember,
+        device_type: "web",
+        device_name: navigator.userAgent,
       });
-      // Redirect will happen automatically via the login action
-    } catch (error) {
-      console.error("Login failed:", error);
-      showToast("Invalid email or password. Please try again.", "error");
+
+      router.visit("/dashboard");
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to log in. Please try again.";
+      message.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Handle social login
-  const handleSocialAuth = async (
+  const handleSocialLogin = async (
     provider: "google" | "github" | "facebook"
   ) => {
+    setSocialLoading({ ...socialLoading, [provider]: true });
+
     try {
-      setSocialLoading({ ...socialLoading, [provider]: true });
-
-      // Get the OAuth URL for the provider
       const url = await getSocialLoginUrl(provider);
-
-      // Redirect to OAuth provider
-      window.location.href = url;
+      router.visit(url);
     } catch (error) {
-      console.error(`${provider} login failed:`, error);
-      showToast(
-        `Failed to connect with ${
-          provider.charAt(0).toUpperCase() + provider.slice(1)
-        }.`,
-        "error"
-      );
+      message.error(`Failed to initialize ${provider} login`);
+    } finally {
       setSocialLoading({ ...socialLoading, [provider]: false });
     }
   };
 
   return (
-    <div
-      className={`min-h-screen flex items-center justify-center p-6 ${
-        darkMode ? "bg-gray-900" : "bg-gray-100"
-      }`}
-    >
-      <Card
-        className={`w-full max-w-md ${
-          darkMode ? "bg-gray-800 text-white" : "bg-white"
-        }`}
-        title={
-          <div className="text-center">
-            <h1
-              className={`text-2xl font-bold ${
-                darkMode ? "text-white" : "text-gray-800"
-              }`}
-            >
-              Login to FakeVest
-            </h1>
-            <p
-              className={`text-sm ${
-                darkMode ? "text-gray-300" : "text-gray-600"
-              }`}
-            >
-              Enter your credentials to access your account
-            </p>
-          </div>
-        }
+    <AuthLayout title="Sign In" description="Welcome back to FakeVest">
+      <Head title="Login" />
+
+      <Form
+        name="login"
+        layout="vertical"
+        className="mt-8 space-y-6"
+        onFinish={handleLogin}
+        initialValues={{ remember: true }}
       >
-        <Form
-          form={form}
-          name="login"
-          initialValues={{ remember: true }}
-          onFinish={handleLogin}
-          layout="vertical"
+        <Form.Item
+          name="email"
+          rules={[
+            { required: true, message: "Please enter your email" },
+            { type: "email", message: "Please enter a valid email" },
+          ]}
         >
-          <Form.Item
-            name="email"
-            rules={[
-              { required: true, message: "Please enter your email" },
-              { type: "email", message: "Please enter a valid email address" },
-            ]}
+          <Input
+            prefix={<MailOutlined className="site-form-item-icon" />}
+            placeholder="Email"
+            size="large"
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="password"
+          rules={[{ required: true, message: "Please enter your password" }]}
+        >
+          <Input.Password
+            prefix={<LockOutlined className="site-form-item-icon" />}
+            placeholder="Password"
+            size="large"
+          />
+        </Form.Item>
+
+        <div className="flex items-center justify-between">
+          <Link
+            href="/forgot-password"
+            className="text-sm font-medium text-blue-600 hover:underline"
           >
-            <Input prefix={<UserOutlined />} placeholder="Email" size="large" />
-          </Form.Item>
+            Forgot your password?
+          </Link>
+        </div>
 
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: "Please enter your password" }]}
+        <Form.Item>
+          <Button
+            type="primary"
+            htmlType="submit"
+            size="large"
+            className="w-full"
+            loading={loading}
           >
-            <Input.Password
-              prefix={<LockOutlined />}
-              placeholder="Password"
-              size="large"
-            />
-          </Form.Item>
+            Sign In
+          </Button>
+        </Form.Item>
 
-          <Form.Item>
-            <div className="flex justify-between items-center">
-              <Form.Item name="remember" valuePropName="checked" noStyle>
-                <Checkbox>Remember me</Checkbox>
-              </Form.Item>
-              <Link
-                href="/forgot-password"
-                className="text-blue-500 hover:underline"
-              >
-                Forgot password?
-              </Link>
-            </div>
-          </Form.Item>
+        <Divider>Or sign in with</Divider>
 
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              size="large"
-              block
-              loading={isLoading}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              Log in
-            </Button>
-          </Form.Item>
+        <div className="flex justify-center space-x-4">
+          <Button
+            type="default"
+            icon={<GoogleOutlined />}
+            onClick={() => handleSocialLogin("google")}
+            loading={socialLoading.google}
+          >
+            Google
+          </Button>
+          <Button
+            type="default"
+            icon={<FacebookOutlined />}
+            onClick={() => handleSocialLogin("facebook")}
+            loading={socialLoading.facebook}
+          >
+            Facebook
+          </Button>
+          <Button
+            type="default"
+            icon={<GithubOutlined />}
+            onClick={() => handleSocialLogin("github")}
+            loading={socialLoading.github}
+          >
+            GitHub
+          </Button>
+        </div>
 
-          <div className="text-center">
-            <p className={darkMode ? "text-gray-300" : "text-gray-600"}>
-              Don't have an account?{" "}
-              <Link href="/register" className="text-blue-500 hover:underline">
-                Register now
-              </Link>
-            </p>
-          </div>
-
-          <Divider className={darkMode ? "border-gray-700" : "border-gray-200"}>
-            <span className={darkMode ? "text-gray-400" : "text-gray-500"}>
-              Or login with
-            </span>
-          </Divider>
-
-          <div className="grid grid-cols-3 gap-4">
-            <Button
-              icon={<GoogleOutlined />}
-              size="large"
-              onClick={() => handleSocialAuth("google")}
-              loading={socialLoading.google}
-              className={darkMode ? "hover:bg-gray-700" : ""}
-            >
-              Google
-            </Button>
-            <Button
-              icon={<GithubOutlined />}
-              size="large"
-              onClick={() => handleSocialAuth("github")}
-              loading={socialLoading.github}
-              className={darkMode ? "hover:bg-gray-700" : ""}
-            >
-              GitHub
-            </Button>
-            <Button
-              icon={<FacebookOutlined />}
-              size="large"
-              onClick={() => handleSocialAuth("facebook")}
-              loading={socialLoading.facebook}
-              className={darkMode ? "hover:bg-gray-700" : ""}
-            >
-              Facebook
-            </Button>
-          </div>
-        </Form>
-      </Card>
-    </div>
+        <div className="text-center mt-4">
+          <p>
+            Don't have an account?{" "}
+            <Link href="/register" className="text-blue-600 hover:underline">
+              Sign up
+            </Link>
+          </p>
+        </div>
+      </Form>
+    </AuthLayout>
   );
 };
 

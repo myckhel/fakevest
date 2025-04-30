@@ -40,6 +40,8 @@ interface AuthState {
     password: string;
     password_confirmation: string;
   }) => Promise<{ message: string; status: boolean }>;
+  resendEmailVerification: () => Promise<{ status: string }>;
+  verifyEmail: (id: string, hash: string) => Promise<{ status: string }>;
 }
 
 // Create the store with persistence and devtools
@@ -243,6 +245,34 @@ const useAuthStore = create<AuthState>()(
             throw error;
           }
         },
+
+        resendEmailVerification: async () => {
+          set({ isLoading: true });
+          try {
+            const response = await API.auth.resendEmailVerification();
+            set({ isLoading: false });
+            return response;
+          } catch (error) {
+            set({ isLoading: false });
+            throw error;
+          }
+        },
+
+        verifyEmail: async (id, hash) => {
+          set({ isLoading: true });
+          try {
+            const response = await API.auth.verifyEmail(id, hash);
+
+            // If verification is successful, refresh user data
+            await get().checkAuth();
+
+            set({ isLoading: false });
+            return response;
+          } catch (error) {
+            set({ isLoading: false });
+            throw error;
+          }
+        },
       }),
       {
         name: "auth-storage", // localStorage key
@@ -265,3 +295,5 @@ export const useAuthUser = () => useAuthStore((state) => state.user);
 export const useIsAuthenticated = () =>
   useAuthStore((state) => state.isAuthenticated);
 export const useAuthLoading = () => useAuthStore((state) => state.isLoading);
+export const useIsEmailVerified = () =>
+  useAuthStore((state) => (state.user?.email_verified_at ? true : false));
