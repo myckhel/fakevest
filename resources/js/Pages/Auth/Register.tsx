@@ -65,13 +65,20 @@ const Register: React.FC = () => {
     return false;
   };
 
-  const handleRegister = (values: any) => {
+  const handleRegister = (values: {
+    fullname: string;
+    email?: string;
+    phone?: string;
+    username?: string;
+    password: string;
+    confirm: string;
+  }) => {
     setLoading(true);
 
     // Use FormData to handle file uploads with Inertia
     const formData = new FormData();
     formData.append("fullname", values.fullname);
-    formData.append("email", values.email);
+    formData.append("email", values.email || "");
     if (values.phone) formData.append("phone", values.phone);
     if (values.username) formData.append("username", values.username);
     formData.append("password", values.password);
@@ -82,7 +89,7 @@ const Register: React.FC = () => {
     }
 
     // Use inertiaApi to properly handle API routes with the /api/v1 prefix
-    inertiaApi.post("auth/register", formData, {
+    inertiaApi.post("register", formData, {
       onFinish: () => {
         setLoading(false);
       },

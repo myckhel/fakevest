@@ -215,7 +215,7 @@ class AuthController extends Controller
    * Handle a registration request for the application.
    *
    * @param  \Illuminate\Http\Request  $request
-   * @return \Illuminate\Http\JsonResponse
+   * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
    */
   public function register(Request $request)
   {
@@ -223,7 +223,7 @@ class AuthController extends Controller
       'username'            => "unique:users",
       'phone'               => [Rule::requiredIf(!$request->email), "digits_between:10,20"],
       'email'               => [Rule::requiredIf(!$request->phone), "email", "unique:users,email"],
-      'password'            => 'required|min:6',
+      'password'            => 'required|min:6|confirmed',
       'fullname'            => 'required|min:6',
       'avatar'              => 'image',
       'player_id'           => '',
@@ -258,15 +258,24 @@ class AuthController extends Controller
       // $user->save();
     }
 
-    $token       = $user->grantMeToken();
+    // Handle API requests with token response
+    if ($request->wantsJson()) {
+      $token = $user->grantMeToken();
 
-    return response()->json([
-      'message'     => 'Successfully registered!',
-      'user'        => $user,
-      'token'       => $token['token'],
-      'token_type'  => $token['token_type'],
-      // 'expires_at'  => $token['expires_at'],
-    ], 201);
+      return response()->json([
+        'message'     => 'Successfully registered!',
+        'user'        => $user,
+        'token'       => $token['token'],
+        'token_type'  => $token['token_type'],
+      ], 201);
+    }
+
+    // Handle Inertia/web-based registrations
+    auth('web')->login($user);
+
+    return redirect()->intended(
+      route('dashboard')
+    )->with('status', 'Registration successful! Welcome to Fakevest.');
   }
 
   /**
