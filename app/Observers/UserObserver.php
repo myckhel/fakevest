@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Events\Auth\UserRegistered;
 use App\Jobs\User\CreateCustomer;
 use App\Models\User;
 
@@ -18,6 +19,9 @@ class UserObserver
     $user->balance;
     $user->createWallet(['name' => 'dollar']);
     CreateCustomer::dispatch($user);
+    
+    // Dispatch event to trigger email verification
+    event(new UserRegistered($user));
   }
 
   /**

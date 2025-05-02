@@ -251,19 +251,14 @@ class AuthController extends Controller
       ])
     );
 
-    try {
-      // $user->notify(new SignupActivate($user));
-    } catch (\Exception $e) {
-      // $user->active = 1;
-      // $user->save();
-    }
+    // Email verification is now handled by UserObserver -> UserRegistered event -> SendEmailVerificationListener
 
     // Handle API requests with token response
     if ($request->wantsJson()) {
       $token = $user->grantMeToken();
 
       return response()->json([
-        'message'     => 'Successfully registered!',
+        'message'     => 'Successfully registered! Please check your email to verify your account.',
         'user'        => $user,
         'token'       => $token['token'],
         'token_type'  => $token['token_type'],
@@ -274,8 +269,8 @@ class AuthController extends Controller
     auth('web')->login($user);
 
     return redirect()->intended(
-      route('dashboard')
-    )->with('status', 'Registration successful! Welcome to Fakevest.');
+      route('verification.notice')
+    )->with('status', 'Registration successful! Please check your email to verify your account.');
   }
 
   /**
