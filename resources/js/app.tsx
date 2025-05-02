@@ -2,7 +2,7 @@ import "../css/app.css";
 import "./bootstrap";
 import "@ant-design/v5-patch-for-react-19";
 
-import React, { useEffect, useMemo } from "react";
+import React from "react";
 import { createInertiaApp } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { createRoot, hydrateRoot } from "react-dom/client";
@@ -10,7 +10,6 @@ import { ThemeProvider } from "./theme";
 import { StyleProvider } from "@ant-design/cssinjs";
 import { ConfigProvider } from "antd";
 import Toast from "./Components/Toast";
-import useAuthStore from "./Stores/authStore";
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
@@ -40,35 +39,12 @@ createInertiaApp({
       document.documentElement.classList.add("dark");
     }
 
-    // Create a wrapper component to sync the auth store with Inertia's shared data
-    const AppWithAuth = (componentProps: any) => {
-      // Get the setter function from auth store
-      const set = useAuthStore().set;
-
-      const user = useMemo(
-        () => componentProps?.initialPage?.props?.auth?.user,
-        [componentProps?.initialPage?.props?.auth?.user]
-      );
-
-      // Sync the auth store with the shared Inertia auth user data
-      useEffect(() => {
-        if (user) {
-          set({
-            user,
-            isAuthenticated: !!user,
-          });
-        }
-      }, [user, set]);
-
-      return <App {...componentProps} />;
-    };
-
     // Wrap with StyleProvider for better styles rendering in React 19
     const AppWithTheme = () => (
       <StyleProvider hashPriority="high">
         <ThemeProvider>
           <ConfigProvider theme={theme}>
-            <AppWithAuth {...props} />
+            <App {...props} />
             <Toast />
           </ConfigProvider>
         </ThemeProvider>

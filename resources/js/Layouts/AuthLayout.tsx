@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "@inertiajs/react";
 import { useDarkMode } from "@/Stores/uiStore";
 import { ConfigProvider, theme } from "antd";
+import useAuthSync from "@/Hooks/useAuthSync";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -14,6 +15,9 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
   title,
   description,
 }) => {
+  // Sync auth state with Inertia props
+  useAuthSync();
+
   const darkMode = useDarkMode();
   const { defaultAlgorithm, darkAlgorithm } = theme;
 

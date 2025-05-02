@@ -3,8 +3,12 @@ import { Link } from "@inertiajs/react";
 import { useAuthUser, useIsAuthenticated } from "@/Stores/authStore";
 import useAuthStore from "@/Stores/authStore";
 import useUIStore, { useDarkMode, useSidebarState } from "@/Stores/uiStore";
+import useAuthSync from "@/Hooks/useAuthSync";
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Sync auth state with Inertia props
+  useAuthSync();
+
   // Use selector hooks for targeted re-renders
   const user = useAuthUser();
   const isAuthenticated = useIsAuthenticated();
