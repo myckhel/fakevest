@@ -109,18 +109,6 @@ resources/js/
 
 #### API & Services
 - Centralize external API logic inside `/Apis/` or custom hooks (`/Hooks`)
-- Example:
-  ```ts
-  // Apis/savings.ts
-  const SavingsAPI = {
-  /**
-   * Get all available saving plans
-   */
-  getPlans: (): Promise<SavingPlan[]> => {
-    return Http.get('/plans');
-  },
-  }
-  ```
 
 ---
 
