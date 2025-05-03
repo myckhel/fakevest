@@ -1,28 +1,19 @@
-import React, { ReactNode, useEffect } from 'react';
-import { StyleProvider } from '@ant-design/cssinjs';
-import AntDesignProvider from './AntDesignProvider';
+import React, { ReactNode } from "react";
+import { StyleProvider } from "@ant-design/cssinjs";
+import AntDesignProvider from "./AntDesignProvider";
+import { useDarkMode } from "../Stores/uiStore";
 
 interface ThemeProviderProps {
   children: ReactNode;
-  darkMode?: boolean;
 }
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children, darkMode = false }) => {
-  // Update theme when darkMode prop changes
-  useEffect(() => {
-    // Apply dark mode class to HTML for Tailwind dark mode
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [darkMode]);
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
+  // Get dark mode from global store
+  const darkMode = useDarkMode();
 
   return (
     <StyleProvider hashPriority="high">
-      <AntDesignProvider darkMode={darkMode}>
-        {children}
-      </AntDesignProvider>
+      <AntDesignProvider darkMode={darkMode}>{children}</AntDesignProvider>
     </StyleProvider>
   );
 };

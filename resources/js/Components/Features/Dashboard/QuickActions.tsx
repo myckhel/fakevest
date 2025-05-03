@@ -8,11 +8,11 @@ import {
   HistoryOutlined,
   UserOutlined,
 } from "@ant-design/icons";
+import { useDarkMode } from "@/Stores/uiStore";
 
 type QuickActionsProps = {
   onTransfer: () => void;
   onWithdraw: () => void;
-  darkMode?: boolean;
 };
 
 /**
@@ -21,7 +21,6 @@ type QuickActionsProps = {
 const QuickActions: React.FC<QuickActionsProps> = ({
   onTransfer,
   onWithdraw,
-  darkMode = false,
 }) => {
   const actions = [
     {
@@ -64,7 +63,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({
           <span>Quick Actions</span>
         </div>
       }
-      className={`shadow mb-6 ${darkMode ? "bg-gray-800" : "bg-white"}`}
+      className="shadow mb-6 bg-white dark:bg-gray-800"
       bordered={false}
     >
       <Row gutter={[16, 16]}>

@@ -6,14 +6,24 @@ import {
   ArrowUpOutlined,
   ArrowDownOutlined,
 } from "@ant-design/icons";
-import { formatCurrency, formatDateTime } from "@/Utils/formatters";
-import useTransactionStore from "@/Stores/transactionStore";
+import { formatCurrency, formatDateTime } from "../../../Utils/formatters";
+import useTransactionStore from "../../../Stores/transactionStore";
+import { useDarkMode } from "../../../Stores/uiStore"; // Import the dark mode hook
+
+interface Transaction {
+  id: number;
+  uuid: string;
+  type: string;
+  amount: number;
+  created_at: string;
+  status: string;
+  [key: string]: any; // For any other properties
+}
 
 type TransactionsListProps = {
   title?: string;
   emptyText?: string;
   limit?: number;
-  darkMode?: boolean;
   showViewAll?: boolean;
   type?: "all" | "transfers" | string;
 };
@@ -26,10 +36,12 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
   title = "Recent Transactions",
   emptyText = "No recent transactions",
   limit = 5,
-  darkMode = false,
   showViewAll = true,
   type = "all",
 }) => {
+  // Get dark mode state from the global store
+  const darkMode = useDarkMode();
+
   // Get transaction data with selector to minimize re-renders
   const {
     recentTransactions,
@@ -48,23 +60,23 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
     }
   }, [type, limit]);
 
-  const limitedTransactions =
+  const limitedTransactions: Transaction[] =
     (type === "transfers" ? transfers : recentTransactions) || [];
 
   return (
     <Card
       title={
         <div className="flex items-center gap-2">
-          <HistoryOutlined className="text-blue-600" />
+          <HistoryOutlined className="text-blue-600 dark:text-blue-400" />
           <span>{title}</span>
         </div>
       }
-      className={`shadow ${darkMode ? "bg-gray-800" : "bg-white"}`}
+      className={`shadow bg-white dark:bg-gray-800 dark:text-gray-200`}
       bordered={false}
       extra={
         showViewAll && (
           <Link href={type === "transfers" ? "/transfers" : "/transactions"}>
-            <Button type="text" size="small">
+            <Button type="text" size="small" className="dark:text-gray-300">
               View All
             </Button>
           </Link>
@@ -79,8 +91,8 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
         <List
           itemLayout="horizontal"
           dataSource={limitedTransactions}
-          renderItem={(transaction) => (
-            <List.Item>
+          renderItem={(transaction: Transaction) => (
+            <List.Item className="dark:border-gray-700">
               <List.Item.Meta
                 avatar={
                   <Avatar
@@ -99,7 +111,7 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
                   />
                 }
                 title={
-                  <div className="flex justify-between">
+                  <div className="flex justify-between dark:text-gray-200">
                     <span>
                       {transaction.type?.charAt(0).toUpperCase() +
                         transaction.type?.slice(1)}
@@ -117,7 +129,7 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
                   </div>
                 }
                 description={
-                  <div className="flex justify-between text-xs">
+                  <div className="flex justify-between text-xs dark:text-gray-400">
                     <span>Ref: {transaction.uuid?.substring(0, 8)}...</span>
                     <span>{formatDateTime(transaction.created_at)}</span>
                   </div>
@@ -127,7 +139,7 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
           )}
         />
       ) : (
-        <Empty description={emptyText} />
+        <Empty description={emptyText} className="dark:text-gray-400" />
       )}
     </Card>
   );

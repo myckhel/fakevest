@@ -14,9 +14,9 @@ import { formatCurrency } from "@/Utils/formatters";
 import { usePortfolioStats } from "@/Hooks/usePortfolioStats";
 import useSavingsStore from "@/Stores/savingsStore";
 import useWalletStore from "@/Stores/walletStore";
+import { useDarkMode } from "@/Stores/uiStore";
 
 type SummaryCardsProps = {
-  darkMode: boolean;
   onTransfer: () => void;
   onWithdraw: () => void;
 };
@@ -26,10 +26,12 @@ type SummaryCardsProps = {
  * Encapsulates the data fetching logic for portfolio and wallet data
  */
 const SummaryCards: React.FC<SummaryCardsProps> = ({
-  darkMode,
   onTransfer,
   onWithdraw,
 }) => {
+  // Get dark mode from global store
+  const darkMode = useDarkMode();
+
   // Get store data and actions
   const { portfolio, fetchPortfolio, isPortfolioLoading } = useSavingsStore();
 
@@ -60,7 +62,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
       {/* Total Savings Card */}
       <Col xs={24} sm={12} md={6}>
         <Card
-          className={`h-full shadow ${darkMode ? "bg-gray-800" : "bg-white"}`}
+          className="h-full shadow bg-white dark:bg-gray-800"
           bordered={false}
         >
           <Statistic
@@ -92,7 +94,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
       {/* Wallet Balance */}
       <Col xs={24} sm={12} md={6}>
         <Card
-          className={`h-full shadow ${darkMode ? "bg-gray-800" : "bg-white"}`}
+          className="h-full shadow bg-white dark:bg-gray-800"
           bordered={false}
           actions={[
             <Button
@@ -142,7 +144,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
       {/* Monthly Savings */}
       <Col xs={24} sm={12} md={6}>
         <Card
-          className={`h-full shadow ${darkMode ? "bg-gray-800" : "bg-white"}`}
+          className="h-full shadow bg-white dark:bg-gray-800"
           bordered={false}
         >
           <Statistic
@@ -171,7 +173,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
       {/* Weekly Activity */}
       <Col xs={24} sm={12} md={6}>
         <Card
-          className={`h-full shadow ${darkMode ? "bg-gray-800" : "bg-white"}`}
+          className="h-full shadow bg-white dark:bg-gray-800"
           bordered={false}
         >
           <Statistic

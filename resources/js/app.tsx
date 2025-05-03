@@ -10,6 +10,7 @@ import { ThemeProvider } from "./theme";
 import { StyleProvider } from "@ant-design/cssinjs";
 import { ConfigProvider } from "antd";
 import Toast from "./Components/Toast";
+import DarkModeManager from "./Components/Features/DarkMode/DarkModeManager";
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
@@ -44,6 +45,7 @@ createInertiaApp({
       <StyleProvider hashPriority="high">
         <ThemeProvider>
           <ConfigProvider theme={theme}>
+            <DarkModeManager />
             <App {...props} />
             <Toast />
           </ConfigProvider>

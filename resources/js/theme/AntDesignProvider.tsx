@@ -1,23 +1,23 @@
-import React, { ReactNode } from 'react';
-import { ConfigProvider, App } from 'antd';
-import { themeConfig, darkThemeConfig } from './themeConfig';
+import React, { ReactNode } from "react";
+import { ConfigProvider, App } from "antd";
+import { themeConfig, darkThemeConfig } from "./themeConfig";
+import { useDarkMode } from "../Stores/uiStore";
 
 interface AntDesignProviderProps {
   children: ReactNode;
-  darkMode?: boolean;
 }
 
 /**
  * AntDesignProvider wraps the application with Ant Design's ConfigProvider
  * Configured specifically for React 19 compatibility
  */
-const AntDesignProvider: React.FC<AntDesignProviderProps> = ({ 
-  children, 
-  darkMode = false 
-}) => {
+const AntDesignProvider: React.FC<AntDesignProviderProps> = ({ children }) => {
+  // Get dark mode directly from global store
+  const darkMode = useDarkMode();
+
   // Use the appropriate theme based on dark mode setting
   const currentTheme = darkMode ? darkThemeConfig : themeConfig;
-  
+
   return (
     <ConfigProvider
       theme={currentTheme}
@@ -34,9 +34,7 @@ const AntDesignProvider: React.FC<AntDesignProviderProps> = ({
         scrollToFirstError: true,
       }}
     >
-      <App>
-        {children}
-      </App>
+      <App>{children}</App>
     </ConfigProvider>
   );
 };

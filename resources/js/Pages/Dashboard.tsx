@@ -41,7 +41,6 @@ const Dashboard = () => {
     <>
       {/* Summary Cards - now fetches its own data */}
       <SummaryCards
-        darkMode={darkMode}
         onTransfer={handleOpenTransferModal}
         onWithdraw={handleOpenWithdrawModal}
       />
@@ -50,23 +49,16 @@ const Dashboard = () => {
       <QuickActions
         onTransfer={handleOpenTransferModal}
         onWithdraw={handleOpenWithdrawModal}
-        darkMode={darkMode}
       />
 
       {/* Recent Activity - now fetches its own data */}
       <Row gutter={[16, 16]} className="mb-6">
         <Col xs={24} md={12}>
-          <TransactionsList
-            darkMode={darkMode}
-            title="Recent Transactions"
-            limit={5}
-            type="all"
-          />
+          <TransactionsList title="Recent Transactions" limit={5} type="all" />
         </Col>
 
         <Col xs={24} md={12}>
           <TransactionsList
-            darkMode={darkMode}
             title="Recent Transfers"
             emptyText="No recent transfers"
             type="transfers"
@@ -82,7 +74,7 @@ const Dashboard = () => {
             <span>Your Savings Plans</span>
           </div>
         }
-        className={`shadow ${darkMode ? "bg-gray-800" : "bg-white"}`}
+        className="shadow bg-white dark:bg-gray-800"
         bordered={false}
         extra={
           <Link href="/savings/new">
@@ -99,33 +91,16 @@ const Dashboard = () => {
 
   // Transactions tab content
   const renderTransactionsTab = () => (
-    <Card
-      className={`shadow ${darkMode ? "bg-gray-800" : "bg-white"}`}
-      bordered={false}
-    >
+    <Card className="shadow bg-white dark:bg-gray-800" bordered={false}>
       <Tabs defaultActiveKey="all">
         <TabPane tab="All Transactions" key="all">
-          <TransactionsList
-            darkMode={darkMode}
-            showViewAll={false}
-            limit={10}
-          />
+          <TransactionsList showViewAll={false} limit={10} />
         </TabPane>
         <TabPane tab="Deposits" key="deposits">
-          <TransactionsList
-            darkMode={darkMode}
-            showViewAll={false}
-            limit={10}
-            type="deposits"
-          />
+          <TransactionsList showViewAll={false} limit={10} type="deposits" />
         </TabPane>
         <TabPane tab="Withdrawals" key="withdrawals">
-          <TransactionsList
-            darkMode={darkMode}
-            showViewAll={false}
-            limit={10}
-            type="withdrawals"
-          />
+          <TransactionsList showViewAll={false} limit={10} type="withdrawals" />
         </TabPane>
       </Tabs>
     </Card>
@@ -135,16 +110,12 @@ const Dashboard = () => {
   const renderWalletsTab = () => (
     <>
       {/* Wallet content is rendered in its own tab */}
-      <Card
-        className={`shadow ${darkMode ? "bg-gray-800" : "bg-white"}`}
-        bordered={false}
-      >
+      <Card className="shadow bg-white dark:bg-gray-800" bordered={false}>
         <Tabs defaultActiveKey="naira">
           <TabPane tab="Naira Wallet" key="naira">
             {/* We could create a WalletDetails component that fetches its own data */}
             <div className="py-4">
               <TransactionsList
-                darkMode={darkMode}
                 title="Naira Wallet Transactions"
                 showViewAll={false}
                 limit={10}
@@ -155,7 +126,6 @@ const Dashboard = () => {
           <TabPane tab="Dollar Wallet" key="dollar">
             <div className="py-4">
               <TransactionsList
-                darkMode={darkMode}
                 title="Dollar Wallet Transactions"
                 showViewAll={false}
                 limit={10}
@@ -195,7 +165,7 @@ const Dashboard = () => {
         {/* Main Navigation Tabs */}
         <Card
           bordered={false}
-          className={`shadow-sm mb-6 ${darkMode ? "bg-gray-800" : "bg-white"}`}
+          className="shadow-sm mb-6 bg-white dark:bg-gray-800"
           bodyStyle={{ padding: 0 }}
         >
           <Tabs
