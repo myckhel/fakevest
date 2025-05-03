@@ -10,15 +10,20 @@ import {
   Row,
   Col,
   Statistic,
+  Tooltip,
 } from "antd";
 import {
   WalletOutlined,
   BankOutlined,
   CreditCardOutlined,
   PlusOutlined,
+  LockOutlined,
+  UnlockOutlined,
 } from "@ant-design/icons";
 import TransferMoneyModal from "@/Components/Features/Transfers/TransferMoneyModal";
 import WithdrawFundsModal from "@/Components/Features/Withdrawals/WithdrawFundsModal";
+import ManagePinModal from "@/Components/Features/PIN/ManagePinModal";
+import useAuthStore from "@/Stores/authStore";
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -27,12 +32,20 @@ const { TabPane } = Tabs;
  * Wallets page that shows user's wallets and financial accounts
  */
 const Wallets = () => {
+  // Use auth store to get user
+  const { user } = useAuthStore();
+  const hasPin = user?.has_pin;
+
   // Local state for UI management
   const [isTransferModalVisible, setIsTransferModalVisible] = useState(false);
   const [isWithdrawModalVisible, setIsWithdrawModalVisible] = useState(false);
   const [isAddCardModalVisible, setIsAddCardModalVisible] = useState(false);
   const [isAddBankAccountModalVisible, setIsAddBankAccountModalVisible] =
     useState(false);
+  const [isManagePinModalVisible, setIsManagePinModalVisible] = useState(false);
+  const [pinManagementMode, setPinManagementMode] = useState<
+    "create" | "update"
+  >("create");
 
   // Handle modal visibility
   const handleOpenTransferModal = () => setIsTransferModalVisible(true);
@@ -45,6 +58,18 @@ const Wallets = () => {
     setIsAddBankAccountModalVisible(true);
   const handleCloseAddBankAccountModal = () =>
     setIsAddBankAccountModalVisible(false);
+
+  const handleOpenCreatePinModal = () => {
+    setPinManagementMode("create");
+    setIsManagePinModalVisible(true);
+  };
+
+  const handleOpenUpdatePinModal = () => {
+    setPinManagementMode("update");
+    setIsManagePinModalVisible(true);
+  };
+
+  const handleClosePinModal = () => setIsManagePinModalVisible(false);
 
   // Example wallet data
   const walletData = {
@@ -139,6 +164,41 @@ const Wallets = () => {
           </Row>
         </Card>
 
+        {/* Security Settings */}
+        <Card
+          className="mb-6 shadow bg-white dark:bg-gray-800"
+          title={
+            <div className="flex items-center gap-2">
+              <LockOutlined className="text-blue-600" />
+              <span>Security Settings</span>
+            </div>
+          }
+        >
+          <Row gutter={[24, 24]}>
+            <Col xs={24}>
+              <div className="flex justify-between items-center">
+                <div>
+                  <Title level={5}>Transaction PIN</Title>
+                  <Text type="secondary">
+                    {hasPin
+                      ? "Your transaction PIN is used to authorize money transfers and withdrawals."
+                      : "Set up a transaction PIN to secure your transfers and withdrawals."}
+                  </Text>
+                </div>
+                <Button
+                  type="primary"
+                  icon={hasPin ? <UnlockOutlined /> : <LockOutlined />}
+                  onClick={
+                    hasPin ? handleOpenUpdatePinModal : handleOpenCreatePinModal
+                  }
+                >
+                  {hasPin ? "Update PIN" : "Create PIN"}
+                </Button>
+              </div>
+            </Col>
+          </Row>
+        </Card>
+
         {/* Payment Methods */}
         <Card
           className="shadow bg-white dark:bg-gray-800"
@@ -152,15 +212,6 @@ const Wallets = () => {
                 </span>
               }
               key="bankAccounts"
-              extra={
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  onClick={handleOpenAddBankAccountModal}
-                >
-                  Add Bank Account
-                </Button>
-              }
             >
               {bankAccounts.length > 0 ? (
                 <div className="space-y-4">
@@ -211,6 +262,18 @@ const Wallets = () => {
                       Add Bank Account
                     </Button>
                   </div>
+                </div>
+              )}
+
+              {bankAccounts.length > 0 && (
+                <div className="mt-4">
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onClick={handleOpenAddBankAccountModal}
+                  >
+                    Add Bank Account
+                  </Button>
                 </div>
               )}
             </TabPane>
@@ -270,15 +333,18 @@ const Wallets = () => {
                   </div>
                 </div>
               )}
-              <div className="mt-4">
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  onClick={handleOpenAddCardModal}
-                >
-                  Add Card
-                </Button>
-              </div>
+
+              {cards.length > 0 && (
+                <div className="mt-4">
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onClick={handleOpenAddCardModal}
+                  >
+                    Add Card
+                  </Button>
+                </div>
+              )}
             </TabPane>
           </Tabs>
         </Card>
@@ -292,6 +358,12 @@ const Wallets = () => {
         <WithdrawFundsModal
           visible={isWithdrawModalVisible}
           onClose={handleCloseWithdrawModal}
+        />
+
+        <ManagePinModal
+          visible={isManagePinModalVisible}
+          onClose={handleClosePinModal}
+          mode={pinManagementMode}
         />
 
         {/* TODO: Implement AddCardModal and AddBankAccountModal components */}

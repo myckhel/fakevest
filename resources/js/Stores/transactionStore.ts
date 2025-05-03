@@ -6,6 +6,7 @@ import {
   Transfer,
   TransactionFilter,
   TransferData,
+  TransactionResponse,
 } from "../Apis/transactions";
 
 interface TransactionState {
@@ -81,14 +82,15 @@ const useTransactionStore = create<TransactionState>()(
               perPage: response.per_page,
               total: response.total,
             },
+            isLoading: false,
           });
         } catch (err: any) {
           console.error("Error fetching transactions:", err);
           set({
+            isLoading: false,
             error: err.response?.data?.message || "Error fetching transactions",
           });
-        } finally {
-          set({ isLoading: false });
+          throw err;
         }
       },
 
@@ -96,16 +98,19 @@ const useTransactionStore = create<TransactionState>()(
         try {
           set({ isLoading: true, error: null });
           const response = await API.transactions.getRecentTransactions(limit);
-          set({ recentTransactions: response.data });
+          set({
+            recentTransactions: response.data,
+            isLoading: false,
+          });
         } catch (err: any) {
           console.error("Error fetching recent transactions:", err);
           set({
+            isLoading: false,
             error:
               err.response?.data?.message ||
               "Error fetching recent transactions",
           });
-        } finally {
-          set({ isLoading: false });
+          throw err;
         }
       },
 
@@ -113,14 +118,17 @@ const useTransactionStore = create<TransactionState>()(
         try {
           set({ isLoading: true, error: null });
           const transfers = await API.transactions.getTransfers();
-          set({ transfers });
+          set({
+            transfers,
+            isLoading: false,
+          });
         } catch (err: any) {
           console.error("Error fetching transfers:", err);
           set({
+            isLoading: false,
             error: err.response?.data?.message || "Error fetching transfers",
           });
-        } finally {
-          set({ isLoading: false });
+          throw err;
         }
       },
 
@@ -128,16 +136,19 @@ const useTransactionStore = create<TransactionState>()(
         try {
           set({ isLoading: true, error: null });
           const transaction = await API.transactions.getTransaction(id);
-          set({ currentTransaction: transaction });
+          set({
+            currentTransaction: transaction,
+            isLoading: false,
+          });
         } catch (err: any) {
           console.error("Error fetching transaction details:", err);
           set({
+            isLoading: false,
             error:
               err.response?.data?.message ||
               "Error fetching transaction details",
           });
-        } finally {
-          set({ isLoading: false });
+          throw err;
         }
       },
 
@@ -145,15 +156,18 @@ const useTransactionStore = create<TransactionState>()(
         try {
           set({ isLoading: true, error: null });
           const transfer = await API.transactions.getTransfer(id);
-          set({ currentTransfer: transfer });
+          set({
+            currentTransfer: transfer,
+            isLoading: false,
+          });
         } catch (err: any) {
           console.error("Error fetching transfer details:", err);
           set({
+            isLoading: false,
             error:
               err.response?.data?.message || "Error fetching transfer details",
           });
-        } finally {
-          set({ isLoading: false });
+          throw err;
         }
       },
 
@@ -166,15 +180,15 @@ const useTransactionStore = create<TransactionState>()(
           await get().fetchTransfers();
           await get().fetchRecentTransactions(5);
 
+          set({ isLoading: false });
           return response;
         } catch (err: any) {
           console.error("Error creating transfer:", err);
           set({
+            isLoading: false,
             error: err.response?.data?.message || "Error creating transfer",
           });
           throw err;
-        } finally {
-          set({ isLoading: false });
         }
       },
 
@@ -191,18 +205,22 @@ const useTransactionStore = create<TransactionState>()(
             15,
             filters
           );
-          set({ transactions: response.data });
+
+          set({
+            transactions: response.data,
+            isLoading: false,
+          });
+
           return response;
         } catch (err: any) {
           console.error("Error fetching transactions by date range:", err);
           set({
+            isLoading: false,
             error:
               err.response?.data?.message ||
               "Error fetching transactions by date range",
           });
           throw err;
-        } finally {
-          set({ isLoading: false });
         }
       },
 
@@ -215,18 +233,22 @@ const useTransactionStore = create<TransactionState>()(
             15,
             filters
           );
-          set({ transactions: response.data });
+
+          set({
+            transactions: response.data,
+            isLoading: false,
+          });
+
           return response;
         } catch (err: any) {
           console.error("Error fetching transactions by type:", err);
           set({
+            isLoading: false,
             error:
               err.response?.data?.message ||
               "Error fetching transactions by type",
           });
           throw err;
-        } finally {
-          set({ isLoading: false });
         }
       },
 
@@ -234,17 +256,17 @@ const useTransactionStore = create<TransactionState>()(
         try {
           set({ isLoading: true, error: null });
           const response = await API.transactions.getTransactionSummary();
+          set({ isLoading: false });
           return response;
         } catch (err: any) {
           console.error("Error fetching transaction summary:", err);
           set({
+            isLoading: false,
             error:
               err.response?.data?.message ||
               "Error fetching transaction summary",
           });
           throw err;
-        } finally {
-          set({ isLoading: false });
         }
       },
     }),

@@ -8,13 +8,21 @@ import {
   Select,
   Typography,
   Alert,
+  Steps,
 } from "antd";
-import { CheckCircleOutlined } from "@ant-design/icons";
+import {
+  CheckCircleOutlined,
+  WalletOutlined,
+  SafetyCertificateOutlined,
+} from "@ant-design/icons";
 import useWalletStore from "@/Stores/walletStore";
 import useUIStore from "@/Stores/uiStore";
+import TransactionPin from "../PIN/TransactionPin";
+import useAuthStore from "@/Stores/authStore";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
+const { Step } = Steps;
 
 type WithdrawFundsModalProps = {
   visible: boolean;
@@ -31,18 +39,26 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
   const [withdrawSuccess, setWithdrawSuccess] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [withdrawDetails, setWithdrawDetails] = useState<any>(null);
 
   const { withdrawFunds } = useWalletStore();
   const { showToast } = useUIStore();
+  const { user } = useAuthStore();
 
-  const handleWithdraw = async (values: any) => {
+  const handleWithdrawDetailsSubmit = (values: any) => {
+    setWithdrawDetails(values);
+    setCurrentStep(1);
+  };
+
+  const handlePinSuccess = async (pin: string) => {
     try {
       setIsLoading(true);
       await withdrawFunds({
-        amount: values.amount,
+        amount: withdrawDetails.amount,
         wallet_name: "naira",
-        account_id: values.accountId,
-        pin: values.pin,
+        account_id: withdrawDetails.accountId,
+        pin: pin,
       });
 
       setWithdrawSuccess(true);
@@ -51,8 +67,10 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({
       }, 2000);
 
       showToast("Withdrawal initiated successfully", "success");
-    } catch (error) {
-      showToast("Withdrawal failed. Please try again.", "error");
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || "Withdrawal failed. Please try again.";
+      showToast(errorMessage, "error");
     } finally {
       setIsLoading(false);
     }
@@ -60,9 +78,90 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({
 
   const handleClose = () => {
     setWithdrawSuccess(false);
+    setCurrentStep(0);
+    setWithdrawDetails(null);
     form.resetFields();
     onClose();
   };
+
+  const handleBack = () => {
+    setCurrentStep(0);
+  };
+
+  const renderSteps = () => (
+    <Steps
+      current={currentStep}
+      className="mb-6"
+      items={[
+        {
+          title: "Details",
+          icon: <WalletOutlined />,
+        },
+        {
+          title: "Authorization",
+          icon: <SafetyCertificateOutlined />,
+        },
+      ]}
+    />
+  );
+
+  const renderWithdrawForm = () => (
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={handleWithdrawDetailsSubmit}
+      requiredMark={false}
+      preserve={false}
+    >
+      <Alert
+        message="Withdrawal Information"
+        description="Withdrawals are processed within 24 hours during business days."
+        type="info"
+        showIcon
+        className="mb-4"
+      />
+
+      <Form.Item
+        name="accountId"
+        label="Account"
+        rules={[{ required: true, message: "Please select account" }]}
+      >
+        <Select placeholder="Select bank account">
+          <Option value={1}>Access Bank - 012345678</Option>
+          <Option value={2}>GTBank - 987654321</Option>
+          <Option value="new">+ Add New Account</Option>
+        </Select>
+      </Form.Item>
+
+      <Form.Item
+        name="amount"
+        label="Amount"
+        rules={[
+          { required: true, message: "Please enter amount" },
+          {
+            type: "number",
+            min: 1000,
+            message: "Minimum withdrawal is ₦1,000",
+          },
+        ]}
+      >
+        <InputNumber
+          style={{ width: "100%" }}
+          formatter={(value) =>
+            `₦ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          }
+          parser={(value) => value!.replace(/₦\s?|(,*)/g, "")}
+          placeholder="Enter amount"
+        />
+      </Form.Item>
+
+      <Form.Item>
+        <Button type="primary" htmlType="submit" block>
+          Continue
+        </Button>
+      </Form.Item>
+    </Form>
+  );
 
   return (
     <Modal
@@ -81,72 +180,42 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({
           <Text>Your withdrawal request is being processed.</Text>
         </div>
       ) : (
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleWithdraw}
-          requiredMark={false}
-          preserve={false}
-        >
-          <Alert
-            message="Withdrawal Information"
-            description="Withdrawals are processed within 24 hours during business days."
-            type="info"
-            showIcon
-            className="mb-4"
-          />
+        <>
+          {renderSteps()}
 
-          <Form.Item
-            name="accountId"
-            label="Account"
-            rules={[{ required: true, message: "Please select account" }]}
-          >
-            <Select placeholder="Select bank account">
-              <Option value={1}>Access Bank - 012345678</Option>
-              <Option value={2}>GTBank - 987654321</Option>
-              <Option value="new">+ Add New Account</Option>
-            </Select>
-          </Form.Item>
+          {currentStep === 0 && renderWithdrawForm()}
 
-          <Form.Item
-            name="amount"
-            label="Amount"
-            rules={[
-              { required: true, message: "Please enter amount" },
-              {
-                type: "number",
-                min: 1000,
-                message: "Minimum withdrawal is ₦1,000",
-              },
-            ]}
-          >
-            <InputNumber
-              style={{ width: "100%" }}
-              formatter={(value) =>
-                `₦ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-              }
-              parser={(value) => value!.replace(/₦\s?|(,*)/g, "")}
-              placeholder="Enter amount"
-            />
-          </Form.Item>
+          {currentStep === 1 && (
+            <>
+              <div className="mb-4">
+                <Text strong>Withdrawal Summary</Text>
+                <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded mt-2">
+                  <div className="flex justify-between mb-1">
+                    <Text>Account:</Text>
+                    <Text strong>
+                      {withdrawDetails?.accountId === 1
+                        ? "Access Bank - 012345678"
+                        : withdrawDetails?.accountId === 2
+                        ? "GTBank - 987654321"
+                        : withdrawDetails?.accountId}
+                    </Text>
+                  </div>
+                  <div className="flex justify-between mb-1">
+                    <Text>Amount:</Text>
+                    <Text strong>
+                      ₦{withdrawDetails?.amount?.toLocaleString()}
+                    </Text>
+                  </div>
+                </div>
+              </div>
 
-          <Form.Item
-            name="pin"
-            label="Transaction PIN"
-            rules={[
-              { required: true, message: "Please enter your PIN" },
-              { len: 4, message: "PIN must be 4 digits" },
-            ]}
-          >
-            <Input.Password placeholder="Enter 4-digit PIN" maxLength={4} />
-          </Form.Item>
-
-          <Form.Item>
-            <Button type="primary" htmlType="submit" block loading={isLoading}>
-              Withdraw Funds
-            </Button>
-          </Form.Item>
-        </Form>
+              <TransactionPin
+                onSuccess={handlePinSuccess}
+                onCancel={handleBack}
+              />
+            </>
+          )}
+        </>
       )}
     </Modal>
   );

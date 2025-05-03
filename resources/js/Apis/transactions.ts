@@ -45,11 +45,12 @@ export type TransactionFilter = {
 };
 
 export type TransferData = {
-  to_id?: string;
-  to_username?: string;
-  amount: number;
-  desc?: string;
-  pin?: string;
+  username?: string; // Username of recipient (when transferring to another user)
+  wallet_id: number; // ID of the source wallet
+  amount: number; // Amount to transfer
+  to_wallet_id?: number; // ID of destination wallet (when transferring between own wallets)
+  pin: string; // Transaction PIN required for authorization
+  description?: string; // Optional description for the transfer
 };
 
 export type TransactionResponse = {

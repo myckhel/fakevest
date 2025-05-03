@@ -82,6 +82,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('/user-challenges', UserChallengeController::class);
     Route::apiResource('/verifications', VerificationController::class);
     Route::apiResource('/wallet-interests', WalletInterestController::class)->only(['index']);
+    Route::apiResource('/wallets', WalletController::class)->only(['index']);
 
     // Challenge related routes
     Route::get('/challenges', [ChallengeController::class, 'index']);

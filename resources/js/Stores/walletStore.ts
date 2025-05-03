@@ -1,43 +1,14 @@
 import { create } from "zustand";
-import axios from "axios";
 import { devtools } from "zustand/middleware";
-
-type Wallet = {
-  id: number;
-  holder_type: string;
-  holder_id: number;
-  name: string;
-  slug: string;
-  uuid: string;
-  description: string | null;
-  meta: Record<string, any>;
-  balance: string;
-  decimal_places: number;
-  created_at: string;
-  updated_at: string;
-  holder?: any;
-};
-
-type WalletStatistics = {
-  totalBalance: number;
-  totalDeposits: number;
-  totalWithdrawals: number;
-  growthRate: number;
-  transactionCount: number;
-  topWallet?: Wallet;
-  recentActivity: Array<any>;
-};
-
-type BankAccount = {
-  id: number;
-  user_id: number;
-  bank_name: string;
-  account_name: string;
-  account_number: string;
-  is_default: boolean;
-  created_at: string;
-  updated_at: string;
-};
+import API from "../Apis";
+import {
+  Wallet,
+  BankAccount,
+  WalletStatistics,
+  WithdrawData,
+  DepositData,
+  WalletTransferData,
+} from "../Apis/wallet";
 
 interface WalletState {
   // State
@@ -54,18 +25,8 @@ interface WalletState {
   fetchDollarWallet: () => Promise<void>;
   fetchAllWallets: () => Promise<void>;
   fetchWalletById: (walletId: number) => Promise<Wallet>;
-  withdrawFunds: (data: {
-    amount: number;
-    wallet_name: string;
-    account_id?: number;
-    pin: string;
-  }) => Promise<void>;
-  depositFunds: (data: {
-    amount: number;
-    wallet_name: string;
-    payment_method: string;
-    reference?: string;
-  }) => Promise<any>;
+  withdrawFunds: (data: WithdrawData) => Promise<any>;
+  depositFunds: (data: DepositData) => Promise<any>;
   fetchInterests: () => Promise<any[]>;
   acceptInterest: (interestId: number) => Promise<void>;
   fetchWalletTransactions: (
@@ -83,11 +44,7 @@ interface WalletState {
   ) => Promise<BankAccount>;
   deleteBankAccount: (accountId: number) => Promise<void>;
   setDefaultBankAccount: (accountId: number) => Promise<void>;
-  transferBetweenWallets: (data: {
-    from_wallet_id: number;
-    to_wallet_id: number;
-    amount: number;
-  }) => Promise<any>;
+  transferBetweenWallets: (data: WalletTransferData) => Promise<any>;
 }
 
 const useWalletStore = create<WalletState>()(
@@ -106,74 +63,80 @@ const useWalletStore = create<WalletState>()(
       fetchNairaWallet: async () => {
         try {
           set({ isLoading: true, error: null });
-          const response = await axios.get("/api/v1/wallets/naira");
-          set({ nairaWallet: response.data });
+          const nairaWallet = await API.wallet.getNairaWallet();
+          set({
+            nairaWallet,
+            isLoading: false,
+          });
         } catch (err: any) {
           console.error("Error fetching naira wallet:", err);
           set({
+            isLoading: false,
             error: err.response?.data?.message || "Error fetching naira wallet",
           });
-        } finally {
-          set({ isLoading: false });
+          throw err;
         }
       },
 
       fetchDollarWallet: async () => {
         try {
           set({ isLoading: true, error: null });
-          const response = await axios.get("/api/v1/wallets/dollar");
-          set({ dollarWallet: response.data });
+          const dollarWallet = await API.wallet.getDollarWallet();
+          set({
+            dollarWallet,
+            isLoading: false,
+          });
         } catch (err: any) {
           console.error("Error fetching dollar wallet:", err);
           set({
+            isLoading: false,
             error:
               err.response?.data?.message || "Error fetching dollar wallet",
           });
-        } finally {
-          set({ isLoading: false });
+          throw err;
         }
       },
 
       fetchAllWallets: async () => {
         try {
           set({ isLoading: true, error: null });
-          const response = await axios.get("/api/v1/wallets");
-          set({ wallets: response.data });
+          const { data } = await API.wallet.getAllWallets();
+          set({
+            wallets: data,
+            isLoading: false,
+          });
         } catch (err: any) {
           console.error("Error fetching wallets:", err);
           set({
+            isLoading: false,
             error: err.response?.data?.message || "Error fetching wallets",
           });
-        } finally {
-          set({ isLoading: false });
+          throw err;
         }
       },
 
       fetchWalletById: async (walletId: number) => {
         try {
           set({ isLoading: true, error: null });
-          const response = await axios.get(`/api/v1/wallets/${walletId}`);
-          return response.data;
+          const wallet = await API.wallet.getWalletById(walletId);
+          set({ isLoading: false });
+          return wallet;
         } catch (err: any) {
           console.error(`Error fetching wallet with ID ${walletId}:`, err);
           set({
+            isLoading: false,
             error:
               err.response?.data?.message ||
               `Error fetching wallet with ID ${walletId}`,
           });
           throw err;
-        } finally {
-          set({ isLoading: false });
         }
       },
 
-      withdrawFunds: async (data) => {
+      withdrawFunds: async (data: WithdrawData) => {
         try {
           set({ isLoading: true, error: null });
-          const response = await axios.post(
-            `/api/v1/wallets/${data.wallet_name}/withdraw`,
-            data
-          );
+          const response = await API.wallet.withdrawFunds(data);
 
           // Refresh wallet data after withdrawal
           if (data.wallet_name === "naira") {
@@ -182,25 +145,22 @@ const useWalletStore = create<WalletState>()(
             await get().fetchDollarWallet();
           }
 
-          return response.data;
+          set({ isLoading: false });
+          return response;
         } catch (err: any) {
           console.error("Error withdrawing funds:", err);
           set({
+            isLoading: false,
             error: err.response?.data?.message || "Error withdrawing funds",
           });
           throw err;
-        } finally {
-          set({ isLoading: false });
         }
       },
 
-      depositFunds: async (data) => {
+      depositFunds: async (data: DepositData) => {
         try {
           set({ isLoading: true, error: null });
-          const response = await axios.post(
-            `/api/v1/wallets/${data.wallet_name}/deposit`,
-            data
-          );
+          const response = await API.wallet.depositFunds(data);
 
           // Refresh wallet data after deposit
           if (data.wallet_name === "naira") {
@@ -209,50 +169,51 @@ const useWalletStore = create<WalletState>()(
             await get().fetchDollarWallet();
           }
 
-          return response.data;
+          set({ isLoading: false });
+          return response;
         } catch (err: any) {
           console.error("Error depositing funds:", err);
           set({
+            isLoading: false,
             error: err.response?.data?.message || "Error depositing funds",
           });
           throw err;
-        } finally {
-          set({ isLoading: false });
         }
       },
 
       fetchInterests: async () => {
         try {
           set({ isLoading: true, error: null });
-          const response = await axios.get("/api/v1/wallets/interests");
-          return response.data;
+          const interests = await API.wallet.getInterests();
+          set({ isLoading: false });
+          return interests;
         } catch (err: any) {
           console.error("Error fetching interests:", err);
           set({
+            isLoading: false,
             error: err.response?.data?.message || "Error fetching interests",
           });
           return [];
-        } finally {
-          set({ isLoading: false });
         }
       },
 
       acceptInterest: async (interestId: number) => {
         try {
           set({ isLoading: true, error: null });
-          await axios.post(`/api/v1/wallets/interests/${interestId}/accept`);
+          await API.wallet.acceptInterest(interestId);
 
           // Refresh wallet data after accepting interest
           await get().fetchNairaWallet();
           await get().fetchDollarWallet();
+
+          set({ isLoading: false });
         } catch (err: any) {
           console.error("Error accepting interest:", err);
           set({
+            isLoading: false,
             error: err.response?.data?.message || "Error accepting interest",
           });
           throw err;
-        } finally {
-          set({ isLoading: false });
         }
       },
 
@@ -263,136 +224,144 @@ const useWalletStore = create<WalletState>()(
       ) => {
         try {
           set({ isLoading: true, error: null });
-          const response = await axios.get(
-            `/api/v1/wallets/${walletId}/transactions?page=${page}&per_page=${perPage}`
+          const transactions = await API.wallet.getWalletTransactions(
+            walletId,
+            page,
+            perPage
           );
-          return response.data;
+          set({ isLoading: false });
+          return transactions;
         } catch (err: any) {
           console.error(
             `Error fetching transactions for wallet ${walletId}:`,
             err
           );
           set({
+            isLoading: false,
             error:
               err.response?.data?.message ||
               `Error fetching transactions for wallet ${walletId}`,
           });
           throw err;
-        } finally {
-          set({ isLoading: false });
         }
       },
 
       fetchWalletStatistics: async () => {
         try {
           set({ isLoading: true, error: null });
-          const response = await axios.get("/api/v1/wallets/statistics");
-          set({ walletStatistics: response.data });
+          const statistics = await API.wallet.getWalletStatistics();
+          set({
+            walletStatistics: statistics,
+            isLoading: false,
+          });
         } catch (err: any) {
           console.error("Error fetching wallet statistics:", err);
           set({
+            isLoading: false,
             error:
               err.response?.data?.message || "Error fetching wallet statistics",
           });
-        } finally {
-          set({ isLoading: false });
+          throw err;
         }
       },
 
       fetchBankAccounts: async () => {
         try {
           set({ isLoading: true, error: null });
-          const response = await axios.get("/api/v1/bank-accounts");
-          set({ bankAccounts: response.data });
+          const bankAccounts = await API.wallet.getBankAccounts();
+          set({
+            bankAccounts,
+            isLoading: false,
+          });
         } catch (err: any) {
           console.error("Error fetching bank accounts:", err);
           set({
+            isLoading: false,
             error:
               err.response?.data?.message || "Error fetching bank accounts",
           });
-        } finally {
-          set({ isLoading: false });
+          throw err;
         }
       },
 
       addBankAccount: async (bankAccount) => {
         try {
           set({ isLoading: true, error: null });
-          const response = await axios.post(
-            "/api/v1/bank-accounts",
-            bankAccount
-          );
+          const newAccount = await API.wallet.addBankAccount(bankAccount);
           await get().fetchBankAccounts();
-          return response.data;
+          set({ isLoading: false });
+          return newAccount;
         } catch (err: any) {
           console.error("Error adding bank account:", err);
           set({
+            isLoading: false,
             error: err.response?.data?.message || "Error adding bank account",
           });
           throw err;
-        } finally {
-          set({ isLoading: false });
         }
       },
 
       deleteBankAccount: async (accountId: number) => {
         try {
           set({ isLoading: true, error: null });
-          await axios.delete(`/api/v1/bank-accounts/${accountId}`);
+          await API.wallet.deleteBankAccount(accountId);
           await get().fetchBankAccounts();
+          set({ isLoading: false });
         } catch (err: any) {
           console.error(
             `Error deleting bank account with ID ${accountId}:`,
             err
           );
           set({
+            isLoading: false,
             error:
               err.response?.data?.message ||
               `Error deleting bank account with ID ${accountId}`,
           });
           throw err;
-        } finally {
-          set({ isLoading: false });
         }
       },
 
       setDefaultBankAccount: async (accountId: number) => {
         try {
           set({ isLoading: true, error: null });
-          await axios.put(`/api/v1/bank-accounts/${accountId}/default`);
+          await API.wallet.setDefaultBankAccount(accountId);
           await get().fetchBankAccounts();
+          set({ isLoading: false });
         } catch (err: any) {
           console.error(
             `Error setting bank account with ID ${accountId} as default:`,
             err
           );
           set({
+            isLoading: false,
             error:
               err.response?.data?.message ||
               `Error setting bank account with ID ${accountId} as default`,
           });
           throw err;
-        } finally {
-          set({ isLoading: false });
         }
       },
 
-      transferBetweenWallets: async (data) => {
+      transferBetweenWallets: async (data: WalletTransferData) => {
         try {
           set({ isLoading: true, error: null });
-          const response = await axios.post("/api/v1/wallets/transfer", data);
+          const response = await API.wallet.transferBetweenWallets(data);
+
+          // Refresh wallet data after transfer
           await get().fetchAllWallets();
-          return response.data;
+
+          set({ isLoading: false });
+          return response;
         } catch (err: any) {
           console.error("Error transferring between wallets:", err);
           set({
+            isLoading: false,
             error:
               err.response?.data?.message ||
               "Error transferring between wallets",
           });
           throw err;
-        } finally {
-          set({ isLoading: false });
         }
       },
     }),

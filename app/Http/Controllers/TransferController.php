@@ -37,8 +37,8 @@ class TransferController extends Controller
     return Transfer
       ::orderBy($orderBy ?? 'id', $order ?? 'desc')
       ->where(function ($query) use ($user) {
-        $query->where('from_user_id', $user->id)
-          ->orWhere('to_user_id', $user->id);
+        $query->where('from_id', $user->id)
+          ->orWhere('to_id', $user->id);
       })
       ->paginate($pageSize);
   }

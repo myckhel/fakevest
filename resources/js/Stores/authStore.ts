@@ -20,6 +20,7 @@ interface AuthState {
   register: (userData: RegisterData, avatar?: File) => Promise<void>;
   logout: () => void;
   checkAuth: () => Promise<void>;
+  refreshUser: () => Promise<User | null>; // Added for PIN updates
   updateProfile: (data: Partial<User>) => Promise<void>;
   updateAvatar: (file: File) => Promise<void>;
   getSocialLoginUrl: (
@@ -134,6 +135,18 @@ const useAuthStore = create<AuthState>()(
               isAuthenticated: false,
               isLoading: false,
             });
+          }
+        },
+
+        // Added for PIN management - refresh user data without full page reload
+        refreshUser: async () => {
+          try {
+            const user = await API.auth.whoami();
+            set({ user });
+            return user;
+          } catch (error) {
+            console.error("Failed to refresh user data:", error);
+            return null;
           }
         },
 
@@ -294,3 +307,5 @@ export const useIsAuthenticated = () =>
 export const useAuthLoading = () => useAuthStore((state) => state.isLoading);
 export const useIsEmailVerified = () =>
   useAuthStore((state) => (state.user?.email_verified_at ? true : false));
+export const useHasPin = () =>
+  useAuthStore((state) => (state.user?.has_pin ? true : false));
