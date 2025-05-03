@@ -1,12 +1,12 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import API from "../api";
+import API from "../Apis";
 import {
   Transaction,
   Transfer,
   TransactionFilter,
   TransferData,
-} from "../api/transactions";
+} from "../Apis/transactions";
 
 interface TransactionState {
   // State

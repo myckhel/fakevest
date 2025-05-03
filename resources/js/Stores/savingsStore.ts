@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import API from "../api";
+import API from "../Apis";
 import {
   Saving,
   SavingPlan,
@@ -9,8 +9,8 @@ import {
   AutoSaveSetting,
   SavingStatistics,
   SavingChallenge,
-} from "../api/savings";
-import { Portfolio } from "../api/user";
+} from "../Apis/savings";
+import { Portfolio } from "../Apis/user";
 
 interface SavingsState {
   // State

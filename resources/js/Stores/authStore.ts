@@ -2,8 +2,8 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { devtools } from "zustand/middleware";
 import { router } from "@inertiajs/react";
-import API from "../api";
-import { LoginCredentials, RegisterData, User } from "../api/auth";
+import API from "../Apis";
+import { LoginCredentials, RegisterData, User } from "../Apis/auth";
 import { inertiaApi } from "@/utils/inertiaApi";
 
 interface AuthState {
