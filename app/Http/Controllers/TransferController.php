@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Middleware\PinRequired;
 use App\Models\Transfer;
 use App\Models\User;
 use App\Models\Wallet;
+use Bavix\Wallet\Exceptions\BalanceIsEmpty;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -12,7 +14,7 @@ class TransferController extends Controller
 {
   function __construct()
   {
-    $this->middleware(['auth.pin'], ['only' => 'store']);
+    $this->middleware([PinRequired::class], ['only' => 'store']);
   }
   /**
    * Display a listing of the resource.
@@ -34,6 +36,10 @@ class TransferController extends Controller
 
     return Transfer
       ::orderBy($orderBy ?? 'id', $order ?? 'desc')
+      ->where(function ($query) use ($user) {
+        $query->where('from_user_id', $user->id)
+          ->orWhere('to_user_id', $user->id);
+      })
       ->paginate($pageSize);
   }
 
@@ -50,11 +56,15 @@ class TransferController extends Controller
       'wallet_id'     => 'required|int',
       'amount'        => 'required|numeric',
       'to_wallet_id'  => 'int',
+      'pin'           => 'required|digits_between:4,8',
     ]);
     $user     = $request->user();
     $to_wallet_id = $request->to_wallet_id;
     $wallet_id    = $request->wallet_id;
     $username     = $request->username;
+
+    // The PIN validation is handled by PinRequired middleware
+    // which will abort with a 403 if pin is incorrect
 
     $otherUser = ($to_wallet_id && !$username) ? null : User::whereUsername($username)->firstOrFail();
     $wallets = Wallet::belongsToUser($user)->whereIn('id', [$wallet_id, $to_wallet_id])->get();
@@ -63,8 +73,8 @@ class TransferController extends Controller
       abort(404, "Wallet Not Found");
     }
 
-    $fromWallet = $wallets->first(fn ($w) => $w->id == $wallet_id);
-    $toWallet   = $username ? null : $wallets->first(fn ($w) => $w->id == $to_wallet_id);
+    $fromWallet = $wallets->first(fn($w) => $w->id == $wallet_id);
+    $toWallet   = $username ? null : $wallets->first(fn($w) => $w->id == $to_wallet_id);
 
     try {
       return $fromWallet->transfer($otherUser ?? $toWallet, $request->amount, ['desc' => $otherUser ? "Transfer from $user->username to $otherUser->username" : "Transfer between wallets"]);

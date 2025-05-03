@@ -16,6 +16,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\WalletInterestController;
+use App\Http\Middleware\PinRequired;
 use Binkode\Paystack\Http\Controllers\HookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -56,7 +57,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/whoami', [AuthController::class, 'whoami']);
     Route::get('/logout', [AuthController::class, 'logout']);
     Route::post('/email/verification-notification', [AuthController::class, 'resend'])->name('verification.send');
-    Route::post('wallets/withdraw',       [WalletController::class, 'withdraw'])->middleware(['auth.pin']);
+    Route::post('wallets/withdraw',       [WalletController::class, 'withdraw'])->middleware([PinRequired::class]);
     Route::get('wallets/dollar',          [WalletController::class, 'viewDollar']);
     Route::get('wallets/balance',         [WalletController::class, 'totalSavings']);
     Route::get('wallets/naira',           [WalletController::class, 'viewNaira']);

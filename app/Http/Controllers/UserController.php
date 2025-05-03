@@ -44,46 +44,80 @@ class UserController extends Controller
     $user = $request->user();
 
     $request->validate([
-      'pin'     => 'required|digits_between:4,8',
+      'pin' => 'required|digits_between:4,8',
     ]);
 
     $pin = (int) $request->pin;
 
     if (isset($user->pin)) {
       if (((int) $user->pin) != $pin) {
-        abort(403, "Pin incorrect");
+        return response()->json([
+          'message' => 'PIN incorrect',
+          'status' => false
+        ], 403);
       }
     } else {
-      return ['message' => 'No Existing Pin Set', 'status' => false];
+      return response()->json([
+        'message' => 'No PIN has been set for this account',
+        'status' => false,
+        'has_pin' => false
+      ], 403);
     }
 
-    return ['message' => 'Pin Correct', 'status' => true];
+    return [
+      'message' => 'PIN verified successfully',
+      'status' => true,
+      'has_pin' => true
+    ];
   }
 
   function updatePin(Request $request)
   {
     $user = $request->user();
 
-    $request->validate([
-      'pin'     => 'required|digits_between:4,8',
-      'old_pin' => ['digits_between:4,8', Rule::requiredIf($user->pin)],
-    ]);
-
-    $pin = (int) $request->pin;
-    $old_pin = (int) $request->old_pin;
-
+    // Validation rules differ if setting PIN for first time versus updating existing
     if (isset($user->pin)) {
+      $request->validate([
+        'pin' => 'required|digits_between:4,8',
+        'old_pin' => 'required|digits_between:4,8',
+        'confirm_pin' => 'required|same:pin',
+      ]);
+
+      $pin = (int) $request->pin;
+      $old_pin = (int) $request->old_pin;
+
       if (((int) $user->pin) != $old_pin) {
-        abort(403, "Old pin incorrect");
-      } elseif (((int) $user->pin) == $pin) {
-        abort(403, "You cannot set old pin");
+        return response()->json([
+          'message' => 'Old PIN is incorrect',
+          'status' => false
+        ], 403);
       }
+
+      if (((int) $user->pin) == $pin) {
+        return response()->json([
+          'message' => 'New PIN cannot be the same as your current PIN',
+          'status' => false
+        ], 422);
+      }
+    } else {
+      // First time setting a PIN
+      $request->validate([
+        'pin' => 'required|digits_between:4,8',
+        'confirm_pin' => 'required|same:pin',
+      ]);
+
+      $pin = (int) $request->pin;
     }
 
     $user->update(['pin' => $pin]);
 
-    return ['message' => 'Pin Updated Successfully', 'status' => true];
+    return [
+      'message' => isset($user->pin) ? 'PIN updated successfully' : 'PIN created successfully',
+      'status' => true,
+      'has_pin' => true
+    ];
   }
+
   /**
    * Get portfolio of the auth user.
    *
