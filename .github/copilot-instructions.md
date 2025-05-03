@@ -68,7 +68,7 @@ resources/js/
 - Use `usePage<T>()` for typed Inertia props
 - Use **Zustand only** for **shared global UI state** (e.g., auth, modals, sidebar)
 - Prefer **local component state** for isolated feature behavior
-- Scope API calls, form states, and side effects within feature components
+- Scope API calls or data fetching, form states, and side effects within feature components
 
 #### Feature Component Encapsulation
 - Abstract full workflows in domain-based components:
@@ -94,7 +94,6 @@ resources/js/
 ### Performance
 - Use `useCallback`, `useMemo`, and `React.memo` to reduce re-renders
 - Use Zustand **selectors** to limit subscriptions
-- Code-split using `lazy()` and `Suspense`
 - Virtualize long lists with `react-virtual`
 - Avoid prop drilling and anonymous functions in JSX
 
@@ -135,6 +134,7 @@ resources/js/
 ### Theming
 - Set AntD **primary color** to `#3b8cb7`
 - Use AntD's `ConfigProvider` at root level for consistent theming
+- Use tailwindcss dark mode features without manually accesing dark mode variable
 
 ---
 
