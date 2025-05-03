@@ -10,6 +10,10 @@ use Illuminate\Validation\Rule;
 
 class TransferController extends Controller
 {
+  function __construct()
+  {
+    $this->middleware(['auth.pin'], ['only' => 'store']);
+  }
   /**
    * Display a listing of the resource.
    *

@@ -56,6 +56,11 @@ Route::prefix('v1')->group(function () {
     Route::get('/whoami', [AuthController::class, 'whoami']);
     Route::get('/logout', [AuthController::class, 'logout']);
     Route::post('/email/verification-notification', [AuthController::class, 'resend'])->name('verification.send');
+    Route::post('wallets/withdraw',       [WalletController::class, 'withdraw'])->middleware(['auth.pin']);
+    Route::get('wallets/dollar',          [WalletController::class, 'viewDollar']);
+    Route::get('wallets/balance',         [WalletController::class, 'totalSavings']);
+    Route::get('wallets/naira',           [WalletController::class, 'viewNaira']);
+    Route::post('wallet_interests/{walletInterest}/accept', [WalletInterestController::class, 'accept']);
 
     // User profile
     Route::put('/users/password', [UserController::class, 'changePassword']);

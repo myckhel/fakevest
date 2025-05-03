@@ -71,16 +71,28 @@ class SavingController extends Controller
       'title',
     ]);
 
+    $payment_option_id = $request->payment_option_id;
+    $wallet_id = $request->wallet_id;
+
     $plan = Plan::findOrFail($request->plan_id);
 
     if (!$plan->minDays) {
       $data['interval'] = $request->interval;
     }
 
-    $saving = $user->savings()->create($data + ($request->payment_option_id
-      ? ['metas' => ['payment_option_id' => (int) $request->payment_option_id]]
-      : []
-    ));
+    if ($payment_option_id) {
+      $user->paymentOptions()->findOrFail($payment_option_id);
+    } elseif ($wallet_id) {
+      $user->wallets()->whereName('naira')->findOrfail($wallet_id);
+    }
+
+    $metas = ($payment_option_id
+      ? ['metas' => ['payment_option_id' => (int) $payment_option_id]]
+      : ($wallet_id ? ['metas' => ['wallet_id' => (int) $wallet_id]] : []
+      )
+    );
+
+    $saving = $user->savings()->create($data + $metas);
 
     $saving->saveImage($request->avatar, 'avatar');
 

@@ -5,9 +5,46 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Verification;
 use Illuminate\Http\Request;
+use App\Traits\Api;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
+
+class ApiB extends Api
+{
+  function __construct($config)
+  {
+    parent::__construct($config);
+  }
+
+  function beforeRequest()
+  {
+    $now = now();
+
+    if (isset($this->config->bearer) && Carbon::parse(Cache::get('qoreid-expiresAt'))->isAfter($now)) {
+    } elseif (!isset($this->config->bearer) && Cache::get('qoreid-bearer')) {
+      $this->config->bearer = Cache::get('qoreid-bearer');
+      $this->config->expiresAt = Cache::get('qoreid-expiresAt');
+      $this->config->tokenType = Cache::get('qoreid-tokenType');
+    } else {
+      $res = $this->post('token', ['clientId' => $this->config->clientId, 'secret' => $this->config->secret]);
+      $at = Carbon::now()->addMinutes($res['expiresIn'])->toISOString();
+      $this->config->bearer = $res['accessToken'];
+      $this->config->expiresAt = $at;
+      $this->config->tokenType = $res['tokenType'];
+
+      Cache::put('qoreid-bearer', $res['accessToken']);
+      Cache::put('qoreid-expiresAt', $at);
+      Cache::put('qoreid-tokenType', $res['tokenType']);
+    };
+  }
+}
 
 class VerificationController extends Controller
 {
+  public function __construct()
+  {
+    $this->api = new ApiB(['url' => 'https://api.qoreid.com/v1', 'clientId' => config('coreid.clientId'), 'secret' => config('coreid.secret')]);
+  }
   /**
    * Display a listing of the resource.
    *
@@ -43,11 +80,42 @@ class VerificationController extends Controller
    */
   public function store(Request $request)
   {
-    $request->validate([]);
+    $request->validate([
+      'type' => 'required|in:vnin,dl,vin'
+    ]);
     $user     = $request->user();
 
+    $number = $request->number;
+
+    $endpoint = null;
+    $payload = [];
+
+    switch ($request->type) {
+      case 'nin':
+        $endpoint = 'ng/identities/virtual-nin';
+        $names = explode(' ', $user->fullname);
+        $payload['firstname'] = $names[0];
+        $payload['lastname'] = $names[1];
+        break;
+      case 'dl':
+        $endpoint = 'ng/identities/drivers-license';
+        $names = explode(' ', $user->fullname);
+        $payload['firstname'] = $names[0];
+        $payload['lastname'] = $names[1];
+        break;
+      case 'vin':
+        $endpoint = 'ng/identities/vin';
+        $names = explode(' ', $user->fullname);
+        $payload['firstname'] = $names[0];
+        $payload['lastname'] = $names[1];
+        $payload['dob'] = $user->dob;
+        break;
+    }
+
+    $res = $this->api->post("$endpoint/$number", $payload);
+
     $verification = $user->verifications()
-      ->create($request->only(['type', 'metas']));
+      ->create($request->only(['type', 'metas']) + ['status' => $res['status']['status']]);
 
     $verification
       ->addMultipleMediaFromRequest(['files'])

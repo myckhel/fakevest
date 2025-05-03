@@ -9,8 +9,10 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\OneSignal\OneSignalChannel;
+use NotificationChannels\OneSignal\OneSignalMessage;
 
-class Funded extends Notification
+class Funded extends Notification implements ShouldQueue
 {
   use Queueable;
   public $desc, $saving_id, $amount;
@@ -35,7 +37,26 @@ class Funded extends Notification
    */
   public function via($notifiable)
   {
-    return ['database'];
+    $channels = ['database'];
+
+    if ($notifiable->has_notifications) {
+      $channels[] = OneSignalChannel::class;
+    }
+
+    return $channels;
+  }
+
+  public function toOneSignal($notifiable)
+  {
+    $subject = "Saving Funded";
+
+    return OneSignalMessage::create()
+      ->setSubject($subject)
+      ->setBody(trans('notice.savings._funded', ['desc' => $this->desc, 'amount' => $this->amount]))
+      ->setGroup($this->saving_id, ['en' => $subject])
+      ->setData('saving_id',  $this->saving_id)
+      ->setData("type",             'savings.funded')
+      ->setParameter('thread_id',   $this->saving_id);
   }
 
   /**

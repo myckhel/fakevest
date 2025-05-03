@@ -11,7 +11,7 @@ use Illuminate\Notifications\Notification;
 use NotificationChannels\OneSignal\OneSignalChannel;
 use NotificationChannels\OneSignal\OneSignalMessage;
 
-class Joined extends Notification
+class Joined extends Notification implements ShouldQueue
 {
   use Queueable;
 
@@ -39,7 +39,7 @@ class Joined extends Notification
   {
     $channels = ['database'];
 
-    if ($notifiable->push_notification) {
+    if ($notifiable->has_notifications) {
       $channels[] = OneSignalChannel::class;
     }
 

@@ -17,7 +17,7 @@ return new class extends Migration
       $table->id();
       $table->bigInteger('user_id')->foreignId('users')->onDelete('cascade');
       $table->string('type')->default('pending');
-      $table->enum('status', ['pending', 'verified', 'rejected'])->default('pending')->index();
+      $table->string('status')->default('pending')->index();
       $table->json('metas')->nullable();
       $table->timestamps();
     });

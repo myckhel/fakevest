@@ -10,7 +10,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\OneSignal\OneSignalMessage;
 
-class Won extends Notification
+class Won extends Notification implements ShouldQueue
 {
   use Queueable;
 
@@ -38,7 +38,7 @@ class Won extends Notification
   {
     $channels = ['database'];
 
-    if ($notifiable->push_notification) {
+    if ($notifiable->has_notifications) {
       $channels[] = OneSignalChannel::class;
     }
 
