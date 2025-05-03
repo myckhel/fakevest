@@ -1,7 +1,8 @@
-import Http from './Http';
-import AuthAPI from './auth';
-import UserAPI from './user';
-import SavingsAPI from './savings';
+import Http from "./Http";
+import AuthAPI from "./auth";
+import UserAPI from "./user";
+import SavingsAPI from "./savings";
+import TransactionsAPI from "./transactions";
 
 // Export all services
 const API = {
@@ -9,6 +10,7 @@ const API = {
   auth: AuthAPI,
   user: UserAPI,
   savings: SavingsAPI,
+  transactions: TransactionsAPI,
 };
 
 export default API;
