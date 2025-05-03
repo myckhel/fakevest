@@ -102,10 +102,10 @@ class UserController extends Controller
     $chart = $transactionQuery->latest()->limit(10)->get('amount')->pluck('amount');
 
     $collect = Wallet::belongsToUser($user)
-      ->whereHas('trans', fn ($q) => $q->whereWithinDay('transactions'))
-      ->withSum(['trans as balance_change' => fn ($q) => $q->whereWithinDay('transactions')], 'amount')
+      ->whereHas('trans', fn($q) => $q->whereWithinDay('transactions'))
+      ->withSum(['trans as balance_change' => fn($q) => $q->whereWithinDay('transactions')], 'amount')
       ->withSum(
-        ['trans as balance_change_percentage' => fn ($q) => $q->whereWithinDay('transactions')],
+        ['trans as balance_change_percentage' => fn($q) => $q->whereWithinDay('transactions')],
         DB::raw(Wallet::$changePercentageSyntax)
       )->get();
 
@@ -132,7 +132,7 @@ class UserController extends Controller
       ->leftJoin('transactions', 'transactions.wallet_id', 'wallets.id')
       ->sum('amount');
 
-    $savingPer = $lifetime ? ($lifetime - $walletLifetime) / $lifetime * 100 : 0;
+    $savingPer = $lifetime ? ($lifetime - $walletLifetime) / $lifetime * 100 : 0; // Savings Rate Percentage
 
     return [
       'lifetime'  => (float) $lifetime,
@@ -169,7 +169,7 @@ class UserController extends Controller
       ->withUrls(['avatar'])
       ->paginate($pageSize);
 
-    $users->each(fn ($user) => $user->withUrls(['avatar']));
+    $users->each(fn($user) => $user->withUrls(['avatar']));
 
     return $users;
   }
@@ -196,7 +196,7 @@ class UserController extends Controller
       ->withUrls(['avatar'])
       ->paginate($pageSize);
 
-    $users->each(fn ($user) => $user->withUrls(['avatar']));
+    $users->each(fn($user) => $user->withUrls(['avatar']));
 
     return $users;
   }
@@ -225,8 +225,8 @@ class UserController extends Controller
   {
     $user = User::when(
       (int) $userIdOrName,
-      fn ($q) => $q->whereId($userIdOrName),
-      fn ($q) => $q->whereUsername($userIdOrName)
+      fn($q) => $q->whereId($userIdOrName),
+      fn($q) => $q->whereUsername($userIdOrName)
     )->firstOrFail();
 
     $this->authorize('view', $user);
