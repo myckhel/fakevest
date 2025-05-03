@@ -115,12 +115,21 @@ class AuthController extends Controller
     }
 
     if ($request->user()->hasVerifiedEmail()) {
-      return new JsonResponse([], 204);
+      if ($request->wantsJson()) {
+        return new JsonResponse([], 204);
+      }
+
+      return redirect()->route('dashboard')->with('status', 'Your email is already verified.');
     }
 
     $request->user()->markEmailAsVerified();
 
-    return new JsonResponse([], 204);
+    if ($request->wantsJson()) {
+      return new JsonResponse(['message' => 'Email successfully verified'], 200);
+    }
+
+    // For web UI requests, redirect to dashboard with a success message
+    return redirect()->route('dashboard')->with('status', 'Thank you for verifying your email address!');
   }
 
   /**
@@ -132,12 +141,20 @@ class AuthController extends Controller
   public function resend(Request $request)
   {
     if ($request->user()->hasVerifiedEmail()) {
-      return new JsonResponse([], 204);
+      if ($request->wantsJson()) {
+        return new JsonResponse([], 204);
+      }
+      return redirect()->route('dashboard')->with('status', 'Your email is already verified.');
     }
 
     $request->user()->sendEmailVerificationNotification();
 
-    return new JsonResponse([], 202);
+    if ($request->wantsJson()) {
+      return new JsonResponse(['message' => 'Verification link sent!'], 202);
+    }
+
+    // For web UI requests, redirect back with success message
+    return back()->with('status', 'A new verification link has been sent to your email address.');
   }
 
   /**
