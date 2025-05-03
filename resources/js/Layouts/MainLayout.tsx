@@ -1,19 +1,53 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "@inertiajs/react";
-import { useAuthUser, useIsAuthenticated } from "@/Stores/authStore";
-import useAuthStore from "@/Stores/authStore";
-import useUIStore, { useDarkMode, useSidebarState } from "@/Stores/uiStore";
-import useAuthSync from "@/Hooks/useAuthSync";
+import {
+  Layout,
+  Menu,
+  Button,
+  Avatar,
+  Dropdown,
+  Badge,
+  Typography,
+  Drawer,
+  Space,
+} from "antd";
+import type { MenuProps } from "antd";
+import {
+  HomeOutlined,
+  DollarOutlined,
+  WalletOutlined,
+  ProfileOutlined,
+  UserOutlined,
+  BellOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  LogoutOutlined,
+  SettingOutlined,
+  BulbOutlined,
+  BulbFilled,
+  BarChartOutlined,
+} from "@ant-design/icons";
+
+// Import Zustand stores
+import useAuthStore from "../Stores/authStore";
+import useUIStore from "../Stores/uiStore";
+import useAuthSync from "../Hooks/useAuthSync";
+
+const { Header, Sider, Content } = Layout;
+const { Text } = Typography;
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Sync auth state with Inertia props
   useAuthSync();
 
-  // Use selector hooks for targeted re-renders
-  const user = useAuthUser();
-  const isAuthenticated = useIsAuthenticated();
-  const darkMode = useDarkMode();
-  const sidebarOpen = useSidebarState();
+  // Get state from stores
+  const user = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const darkMode = useUIStore((state) => state.darkMode);
+  const sidebarOpen = useUIStore((state) => state.sidebarOpen);
+
+  // Mobile drawer state
+  const [mobileDrawerVisible, setMobileDrawerVisible] = useState(false);
 
   // Access actions directly from the store
   const { logout } = useAuthStore();
@@ -27,272 +61,268 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     }
   };
 
+  // Menu items configuration
+  const menuItems = [
+    {
+      key: "/dashboard",
+      icon: <HomeOutlined />,
+      label: <Link href="/dashboard">Dashboard</Link>,
+    },
+    {
+      key: "/savings",
+      icon: <DollarOutlined />,
+      label: <Link href="/savings">Savings</Link>,
+    },
+    {
+      key: "/wallets",
+      icon: <WalletOutlined />,
+      label: <Link href="/wallets">Wallets</Link>,
+    },
+    {
+      key: "/transactions",
+      icon: <BarChartOutlined />,
+      label: <Link href="/transactions">Transactions</Link>,
+    },
+    {
+      key: "/profile",
+      icon: <UserOutlined />,
+      label: <Link href="/profile">Profile</Link>,
+    },
+  ];
+
+  // User dropdown menu items
+  const userMenuItems: MenuProps["items"] = [
+    {
+      key: "1",
+      icon: <UserOutlined />,
+      label: <Link href="/profile">Profile</Link>,
+    },
+    {
+      key: "2",
+      icon: <SettingOutlined />,
+      label: <Link href="/settings">Settings</Link>,
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "3",
+      icon: <LogoutOutlined />,
+      label: "Logout",
+      onClick: handleLogout,
+    },
+  ];
+
+  // Helper function to get user avatar URL
+  const getUserAvatarUrl = () => {
+    if (!user?.avatar) return undefined;
+
+    // Handle if avatar is an object with url property
+    if (typeof user.avatar === "object" && user.avatar !== null) {
+      return user.avatar.url || user.avatar.medium || user.avatar.thumb;
+    }
+
+    // Handle if avatar is already a string
+    if (typeof user.avatar === "string") {
+      return user.avatar;
+    }
+
+    return undefined;
+  };
+
+  // Helper function to get user display name
+  const getUserDisplayName = () => {
+    if (!user) return "";
+
+    // Check which property exists on the user object
+    if (user.fullname) return user.fullname;
+
+    // Use type assertion for potentially undefined properties
+    const userData = user as any;
+    if (userData.email) return userData.email.split("@")[0];
+
+    return "User";
+  };
+
   return (
-    <div
-      className={`min-h-screen flex ${
-        darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
-      }`}
-    >
-      {/* Sidebar */}
-      <div
-        className={`fixed inset-y-0 left-0 z-30 w-64 transform transition-transform duration-300 ease-in-out ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } ${darkMode ? "bg-gray-800" : "bg-white"} shadow-lg md:translate-x-0`}
+    <Layout className={`min-h-screen ${darkMode ? "dark" : ""}`}>
+      {/* Sidebar for desktop */}
+      <Sider
+        trigger={null}
+        collapsible
+        collapsed={!sidebarOpen}
+        collapsedWidth={80}
+        width={250}
+        className="hidden md:block"
+        style={{
+          overflow: "auto",
+          height: "100vh",
+          position: "fixed",
+          left: 0,
+          top: 0,
+          bottom: 0,
+          background: darkMode ? "#1f2937" : "#fff",
+          boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+          zIndex: 999,
+        }}
+        theme={darkMode ? "dark" : "light"}
       >
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-          <Link href="/">
-            <h1
+        <div className="flex items-center justify-center h-16 border-b border-gray-200 dark:border-gray-700">
+          <Link href="/" className="flex items-center gap-2 px-4">
+            {!sidebarOpen ? (
+              <span
+                className={`text-2xl font-bold ${
+                  darkMode ? "text-blue-400" : "text-blue-600"
+                }`}
+              >
+                F
+              </span>
+            ) : (
+              <span
+                className={`text-xl font-bold ${
+                  darkMode ? "text-blue-400" : "text-blue-600"
+                }`}
+              >
+                FakeVest
+              </span>
+            )}
+          </Link>
+        </div>
+        <Menu
+          theme={darkMode ? "dark" : "light"}
+          mode="inline"
+          defaultSelectedKeys={[window.location.pathname]}
+          items={menuItems}
+          className="pt-2"
+        />
+      </Sider>
+
+      {/* Mobile drawer */}
+      <Drawer
+        title={
+          <div className="flex items-center">
+            <span
               className={`text-xl font-bold ${
                 darkMode ? "text-blue-400" : "text-blue-600"
               }`}
             >
               FakeVest
-            </h1>
-          </Link>
-          <button
-            onClick={toggleSidebar}
-            className="md:hidden p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
+            </span>
+          </div>
+        }
+        placement="left"
+        onClose={() => setMobileDrawerVisible(false)}
+        open={mobileDrawerVisible}
+        width={250}
+        bodyStyle={{ padding: 0 }}
+        headerStyle={{
+          borderBottom: `1px solid ${darkMode ? "#334155" : "#e5e7eb"}`,
+          background: darkMode ? "#1f2937" : "#fff",
+          color: darkMode ? "#fff" : "#000",
+        }}
+        className={darkMode ? "dark" : ""}
+      >
+        <Menu
+          theme={darkMode ? "dark" : "light"}
+          mode="inline"
+          defaultSelectedKeys={[window.location.pathname]}
+          items={menuItems}
+          onClick={() => setMobileDrawerVisible(false)}
+        />
+      </Drawer>
 
-        <nav className="p-4">
-          <ul className="space-y-2">
-            <li>
-              <Link
-                href="/dashboard"
-                className={`flex items-center p-2 rounded-md ${
-                  darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"
-                }`}
-              >
-                <svg
-                  className="h-5 w-5 mr-3"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                  />
-                </svg>
-                Dashboard
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/savings"
-                className={`flex items-center p-2 rounded-md ${
-                  darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"
-                }`}
-              >
-                <svg
-                  className="h-5 w-5 mr-3"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                Savings
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/wallets"
-                className={`flex items-center p-2 rounded-md ${
-                  darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"
-                }`}
-              >
-                <svg
-                  className="h-5 w-5 mr-3"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 3h18a2 2 0 012 2v14a2 2 0 01-2 2H3a2 2 0 01-2-2V5a2 2 0 012-2zm12 1v18m0-18h7a1 1 0 011 1v16a1 1 0 01-1 1h-7m-12 0h7a1 1 0 001-1V5a1 1 0 00-1-1H3a1 1 0 00-1 1v14a1 1 0 001 1z"
-                  />
-                </svg>
-                Wallets
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/transactions"
-                className={`flex items-center p-2 rounded-md ${
-                  darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"
-                }`}
-              >
-                <svg
-                  className="h-5 w-5 mr-3"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
-                </svg>
-                Transactions
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/profile"
-                className={`flex items-center p-2 rounded-md ${
-                  darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"
-                }`}
-              >
-                <svg
-                  className="h-5 w-5 mr-3"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-                Profile
-              </Link>
-            </li>
-          </ul>
-        </nav>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col md:ml-64">
+      {/* Main content area */}
+      <Layout
+        className={`md:ml-[80px] ${
+          sidebarOpen ? "md:ml-[250px]" : ""
+        } transition-all duration-300`}
+      >
         {/* Header */}
-        <header
-          className={`h-16 flex items-center justify-between px-6 shadow ${
-            darkMode ? "bg-gray-800" : "bg-white"
-          }`}
+        <Header
+          className="px-4 sm:px-6 flex items-center justify-between h-16 sticky top-0 z-10 shadow-sm"
+          style={{
+            background: darkMode ? "#1f2937" : "#fff",
+            padding: 0,
+          }}
         >
-          <button
-            onClick={toggleSidebar}
-            className="md:hidden p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
-
           <div className="flex items-center">
-            <button
+            {/* Mobile menu button */}
+            <Button
+              type="text"
+              icon={<MenuUnfoldOutlined />}
+              onClick={() => setMobileDrawerVisible(true)}
+              className="md:hidden mr-4"
+              style={{ color: darkMode ? "#fff" : "#000" }}
+            />
+
+            {/* Desktop sidebar toggle */}
+            <Button
+              type="text"
+              icon={sidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+              onClick={toggleSidebar}
+              className="hidden md:block ml-2"
+              style={{ color: darkMode ? "#fff" : "#000" }}
+            />
+          </div>
+
+          {/* Right side controls */}
+          <div className="flex items-center space-x-3 px-4">
+            {/* Dark mode toggle */}
+            <Button
+              type="text"
+              icon={darkMode ? <BulbFilled /> : <BulbOutlined />}
               onClick={toggleDarkMode}
-              className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 mr-4"
-              aria-label="Toggle dark mode"
-            >
-              {darkMode ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                  />
-                </svg>
-              )}
-            </button>
+              title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              style={{ color: darkMode ? "#fff" : "#000" }}
+            />
 
+            {/* Notifications */}
+            <Badge count={5} size="small">
+              <Button
+                type="text"
+                icon={<BellOutlined />}
+                style={{ color: darkMode ? "#fff" : "#000" }}
+              />
+            </Badge>
+
+            {/* User menu */}
             {isAuthenticated && user ? (
-              <div className="relative">
-                <div className="flex items-center">
-                  <img
-                    src={user.avatar || "/assets/default-avatar.png"}
-                    alt="Profile"
-                    className="h-8 w-8 rounded-full object-cover"
+              <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+                <Space className="cursor-pointer">
+                  <Avatar
+                    src={getUserAvatarUrl()}
+                    icon={<UserOutlined />}
+                    size="default"
                   />
-                  <span className="ml-2">{user.fullname}</span>
-                </div>
-
-                <button
-                  onClick={handleLogout}
-                  className={`mt-2 p-2 rounded-md ${
-                    darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"
-                  }`}
-                >
-                  Logout
-                </button>
-              </div>
+                  <Text
+                    className="hidden sm:inline"
+                    style={{ color: darkMode ? "#fff" : "#000" }}
+                  >
+                    {getUserDisplayName()}
+                  </Text>
+                </Space>
+              </Dropdown>
             ) : (
-              <Link
-                href="/login"
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                Login
+              <Link href="/login">
+                <Button type="primary">Login</Button>
               </Link>
             )}
           </div>
-        </header>
+        </Header>
 
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
-      </div>
-    </div>
+        {/* Main content */}
+        <Content
+          className="m-4 p-4 sm:p-6 overflow-auto"
+          style={{
+            background: darkMode ? "#111827" : "#f9fafb",
+            minHeight: "calc(100vh - 64px)",
+            borderRadius: "8px",
+          }}
+        >
+          {children}
+        </Content>
+      </Layout>
+    </Layout>
   );
 };
 
