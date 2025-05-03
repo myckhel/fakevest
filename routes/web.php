@@ -43,6 +43,10 @@ Route::middleware('auth:web')->group(function () {
     Route::get('/dashboard', fn() => Inertia::render('Dashboard'))->name('dashboard');
     Route::get('/profile', fn() => Inertia::render('Profile/View'))->name('profile');
     Route::get('/profile/edit', fn() => Inertia::render('Profile/Edit'))->name('profile.edit');
+
+    // Added new routes for Transactions and Wallets
+    Route::get('/transactions', fn() => Inertia::render('Transactions'))->name('transactions');
+    Route::get('/wallets', fn() => Inertia::render('Wallets'))->name('wallets');
   });
 
   // Logout route

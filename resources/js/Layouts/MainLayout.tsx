@@ -120,6 +120,52 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </li>
             <li>
               <Link
+                href="/wallets"
+                className={`flex items-center p-2 rounded-md ${
+                  darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"
+                }`}
+              >
+                <svg
+                  className="h-5 w-5 mr-3"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 3h18a2 2 0 012 2v14a2 2 0 01-2 2H3a2 2 0 01-2-2V5a2 2 0 012-2zm12 1v18m0-18h7a1 1 0 011 1v16a1 1 0 01-1 1h-7m-12 0h7a1 1 0 001-1V5a1 1 0 00-1-1H3a1 1 0 00-1 1v14a1 1 0 001 1z"
+                  />
+                </svg>
+                Wallets
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/transactions"
+                className={`flex items-center p-2 rounded-md ${
+                  darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"
+                }`}
+              >
+                <svg
+                  className="h-5 w-5 mr-3"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                  />
+                </svg>
+                Transactions
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/profile"
                 className={`flex items-center p-2 rounded-md ${
                   darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"
