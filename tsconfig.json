@@ -10,10 +10,10 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": "./",
     "paths": {
-      "@/*": ["resources/ts/*"],
+      "@/*": ["resources/js/*"],
       "ziggy-js": ["./vendor/tightenco/ziggy"]
     }
   },
-  "include": ["resources/ts/**/*"],
+  "include": ["resources/js/**/*"],
   "exclude": ["node_modules", "public"]
 }
