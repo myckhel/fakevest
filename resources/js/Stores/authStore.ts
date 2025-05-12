@@ -1,7 +1,6 @@
 import { router } from '@inertiajs/react';
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import { devtools } from 'zustand/middleware';
+import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 
 import { inertiaApi } from '@/utils/inertiaApi';
 

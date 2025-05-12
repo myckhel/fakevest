@@ -1,14 +1,14 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import tseslint from 'typescript-eslint'
-import prettierPlugin from 'eslint-plugin-prettier'
-import prettierConfig from 'eslint-config-prettier'
+import js from '@eslint/js';
+import prettierConfig from 'eslint-config-prettier';
+import prettierPlugin from 'eslint-plugin-prettier';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   // Ignoring build artifacts and other directories
-  { 
+  {
     ignores: [
       'dist/**',
       'public/**',
@@ -16,8 +16,8 @@ export default tseslint.config(
       'node_modules/**',
       'bootstrap/cache/**',
       'storage/**',
-      '**/ziggy.js' // Completely ignore ziggy.js as it's generated
-    ] 
+      '**/ziggy.js', // Completely ignore ziggy.js as it's generated
+    ],
   },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
@@ -38,7 +38,7 @@ export default tseslint.config(
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
-      'prettier': prettierPlugin,
+      prettier: prettierPlugin,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
@@ -47,32 +47,41 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true },
       ],
-      'prettier/prettier': ['warn', {
-        singleQuote: true,
-        semi: true,
-        trailingComma: 'all',
-        printWidth: 80,
-        tabWidth: 2
-      }],
+      'prettier/prettier': [
+        'warn',
+        {
+          singleQuote: true,
+          semi: true,
+          trailingComma: 'all',
+          printWidth: 80,
+          tabWidth: 2,
+        },
+      ],
       // Additional TypeScript rules
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': ['warn', { 
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_',
-      }],
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+        },
+      ],
       // For fixing React Hooks dependency issues, we'll enable the exhaustive-deps rule
       'react-hooks/exhaustive-deps': 'warn',
-      
+
       // Keep TypeScript no-explicit-any as a warning, but you can change to 'off' if you want to disable it
       '@typescript-eslint/no-explicit-any': 'warn',
-      
+
       // Ensure variables prefixed with underscore are properly ignored
-      '@typescript-eslint/no-unused-vars': ['warn', { 
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_',
-        caughtErrorsIgnorePattern: '^_',
-        destructuredArrayIgnorePattern: '^_'
-      }],
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
+        },
+      ],
     },
   },
   // Specific rules for React components and TypeScript files
@@ -93,5 +102,5 @@ export default tseslint.config(
         ...globals.jest,
       },
     },
-  }
-)
+  },
+);
