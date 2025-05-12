@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
-import { useDarkMode } from "../../../Stores/uiStore";
+import React, { useEffect } from 'react';
+
+import { useDarkMode } from '../../../Stores/uiStore';
 
 /**
  * This component syncs the dark mode state from Zustand with the HTML element's class list
@@ -11,9 +12,9 @@ const DarkModeManager: React.FC = () => {
   useEffect(() => {
     // Apply dark mode class to HTML for Tailwind dark mode when the darkMode state changes
     if (darkMode) {
-      document.documentElement.classList.add("dark");
+      document.documentElement.classList.add('dark');
     } else {
-      document.documentElement.classList.remove("dark");
+      document.documentElement.classList.remove('dark');
     }
   }, [darkMode]);
 

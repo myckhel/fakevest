@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Row, Col, Card, Statistic, Progress, Button, Spin } from "antd";
+import React, { useEffect } from 'react';
+
 import {
   BankOutlined,
   WalletOutlined,
@@ -9,12 +9,14 @@ import {
   ArrowDownOutlined,
   SendOutlined,
   SwapOutlined,
-} from "@ant-design/icons";
-import { formatCurrency } from "@/Utils/formatters";
-import { usePortfolioStats } from "@/Hooks/usePortfolioStats";
-import useSavingsStore from "@/Stores/savingsStore";
-import useWalletStore from "@/Stores/walletStore";
-import { useDarkMode } from "@/Stores/uiStore";
+} from '@ant-design/icons';
+import { Row, Col, Card, Statistic, Progress, Button, Spin } from 'antd';
+
+import { usePortfolioStats } from '@/Hooks/usePortfolioStats';
+import useSavingsStore from '@/Stores/savingsStore';
+import { useDarkMode } from '@/Stores/uiStore';
+import useWalletStore from '@/Stores/walletStore';
+import { _formatCurrency } from '@/Utils/formatters';
 
 type SummaryCardsProps = {
   onTransfer: () => void;
@@ -73,13 +75,13 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
             }
             value={portfolio.lifetime}
             precision={2}
-            valueStyle={{ color: "#3b8cb7", fontSize: "1.5rem" }}
+            valueStyle={{ color: '#3b8cb7', fontSize: '1.5rem' }}
             prefix="₦"
             formatter={(value) => value.toLocaleString()}
           />
           <div className="mt-2">
             <span
-              className={isPositiveGrowth ? "text-green-500" : "text-red-500"}
+              className={isPositiveGrowth ? 'text-green-500' : 'text-red-500'}
             >
               {isPositiveGrowth ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
               {Math.abs(growthPercentage || 0).toFixed(2)}%
@@ -123,7 +125,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
             }
             value={nairaWallet?.balance || 0}
             precision={2}
-            valueStyle={{ color: "#52c41a", fontSize: "1.5rem" }}
+            valueStyle={{ color: '#52c41a', fontSize: '1.5rem' }}
             prefix="₦"
             formatter={(value) => value.toLocaleString()}
           />
@@ -131,7 +133,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
             <Progress
               percent={Math.min(
                 100,
-                Math.round(parseFloat(nairaWallet?.balance || "0"))
+                Math.round(parseFloat(nairaWallet?.balance || '0')),
               )}
               size="small"
               status="active"
@@ -155,7 +157,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
             }
             value={portfolio.thisMonth}
             precision={2}
-            valueStyle={{ color: "#722ed1", fontSize: "1.5rem" }}
+            valueStyle={{ color: '#722ed1', fontSize: '1.5rem' }}
             prefix="₦"
             formatter={(value) => value.toLocaleString()}
           />
@@ -185,7 +187,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
             }
             value={portfolio.thisWeek}
             precision={2}
-            valueStyle={{ color: "#fa8c16", fontSize: "1.5rem" }}
+            valueStyle={{ color: '#fa8c16', fontSize: '1.5rem' }}
             prefix="₦"
             formatter={(value) => value.toLocaleString()}
           />
@@ -198,10 +200,10 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
                 style={{
                   height: `${Math.max(
                     10,
-                    (value / Math.max(...chartData, 1)) * 40
+                    (value / Math.max(...chartData, 1)) * 40,
                   )}px`,
-                  width: "8px",
-                  backgroundColor: darkMode ? "#d87a16" : "#ffd591",
+                  width: '8px',
+                  backgroundColor: darkMode ? '#d87a16' : '#ffd591',
                 }}
               />
             ))}

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
+
 import { Modal as AntModal, ModalProps as AntModalProps } from 'antd';
+
 import { cn, useThemeToken } from '../../theme';
 
 export interface ModalProps extends Omit<AntModalProps, 'visible'> {
@@ -50,9 +52,7 @@ export const Modal: React.FC<ModalProps> = ({
       maskClosable={true}
       {...props}
     >
-      <div className={cn('', contentClassName)}>
-        {children}
-      </div>
+      <div className={cn('', contentClassName)}>{children}</div>
     </AntModal>
   );
 };

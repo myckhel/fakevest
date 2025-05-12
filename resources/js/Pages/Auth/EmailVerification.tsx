@@ -1,12 +1,14 @@
-import React, { useState } from "react";
-import { Head, Link } from "@inertiajs/react";
-import { Button, Alert, Typography, Card, Space } from "antd";
-import { CheckCircleOutlined, MailOutlined } from "@ant-design/icons";
-import AuthLayout from "@/Layouts/AuthLayout";
-import useAuthStore, { useAuthUser } from "@/Stores/authStore";
-import API from "@/api";
+import React, { useState } from 'react';
 
-const { Title, Paragraph, Text } = Typography;
+import { CheckCircleOutlined, MailOutlined } from '@ant-design/icons';
+import { Head, Link } from '@inertiajs/react';
+import { Alert, Button, Card, Space, Typography } from 'antd';
+
+import API from '@/Apis';
+import AuthLayout from '@/Layouts/AuthLayout';
+import { useAuthUser } from '@/Stores/authStore';
+
+const { Title, Paragraph } = Typography;
 
 const EmailVerification: React.FC = () => {
   const user = useAuthUser();
@@ -23,7 +25,7 @@ const EmailVerification: React.FC = () => {
       setSuccess(true);
     } catch (err: any) {
       setError(
-        err.response?.data?.message || "Failed to resend verification email."
+        err.response?.data?.message || 'Failed to resend verification email.',
       );
     } finally {
       setLoading(false);
@@ -57,7 +59,7 @@ const EmailVerification: React.FC = () => {
       <AuthLayout title="Email Verified">
         <Head title="Email Verified" />
         <div className="text-center py-8">
-          <CheckCircleOutlined style={{ fontSize: "64px", color: "#52c41a" }} />
+          <CheckCircleOutlined style={{ fontSize: '64px', color: '#52c41a' }} />
           <Title level={2} className="mt-4">
             Email Already Verified
           </Title>
@@ -84,7 +86,7 @@ const EmailVerification: React.FC = () => {
 
       <Card className="text-center">
         <MailOutlined
-          style={{ fontSize: "48px", color: "#1890ff", marginBottom: "16px" }}
+          style={{ fontSize: '48px', color: '#1890ff', marginBottom: '16px' }}
         />
 
         <Paragraph>

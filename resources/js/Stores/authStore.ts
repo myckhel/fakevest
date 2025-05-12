@@ -1,10 +1,12 @@
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-import { devtools } from "zustand/middleware";
-import { router } from "@inertiajs/react";
-import API from "../Apis";
-import { LoginCredentials, RegisterData, User } from "../Apis/auth";
-import { inertiaApi } from "@/utils/inertiaApi";
+import { router } from '@inertiajs/react';
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { devtools } from 'zustand/middleware';
+
+import { inertiaApi } from '@/utils/inertiaApi';
+
+import API from '../Apis';
+import { LoginCredentials, RegisterData, User } from '../Apis/auth';
 
 interface AuthState {
   // State
@@ -13,7 +15,7 @@ interface AuthState {
   isLoading: boolean;
 
   // Direct state setter for external updates (e.g. from Inertia shared data)
-  set: (partial: Partial<Omit<AuthState, "set">>) => void;
+  set: (partial: Partial<Omit<AuthState, 'set'>>) => void;
 
   // Actions
   login: (credentials: LoginCredentials) => Promise<void>;
@@ -24,14 +26,14 @@ interface AuthState {
   updateProfile: (data: Partial<User>) => Promise<void>;
   updateAvatar: (file: File) => Promise<void>;
   getSocialLoginUrl: (
-    provider: "google" | "github" | "facebook"
+    provider: 'google' | 'github' | 'facebook',
   ) => Promise<string>;
   handleSocialLogin: (
-    provider: "google" | "github" | "facebook",
-    code: string
+    provider: 'google' | 'github' | 'facebook',
+    code: string,
   ) => Promise<void>;
   forgotPassword: (
-    email: string
+    email: string,
   ) => Promise<{ message: string; status: boolean }>;
   resetPassword: (data: {
     token: string;
@@ -75,7 +77,7 @@ const useAuthStore = create<AuthState>()(
             });
 
             // Use Inertia to navigate to dashboard after login
-            router.visit("/dashboard");
+            router.visit('/dashboard');
           } catch (error) {
             set({ isLoading: false });
             throw error;
@@ -95,7 +97,7 @@ const useAuthStore = create<AuthState>()(
             });
 
             // Use Inertia to navigate to dashboard or email verification page
-            router.visit("/dashboard");
+            router.visit('/dashboard');
           } catch (error) {
             set({ isLoading: false });
             throw error;
@@ -106,8 +108,8 @@ const useAuthStore = create<AuthState>()(
           set({ isLoading: true });
 
           // Use direct Inertia navigation to the logout route
-          router.visit("/logout", {
-            method: "get",
+          router.visit('/logout', {
+            method: 'get',
             onFinish: () => {
               set({
                 user: null,
@@ -129,7 +131,7 @@ const useAuthStore = create<AuthState>()(
               isAuthenticated: !!user,
               isLoading: false,
             });
-          } catch (error) {
+          } catch (_error) {
             set({
               user: null,
               isAuthenticated: false,
@@ -145,14 +147,14 @@ const useAuthStore = create<AuthState>()(
             set({ user });
             return user;
           } catch (error) {
-            console.error("Failed to refresh user data:", error);
+            console.error('Failed to refresh user data:', error);
             return null;
           }
         },
 
         updateProfile: async (data) => {
           const user = get().user;
-          if (!user) throw new Error("User not authenticated");
+          if (!user) throw new Error('User not authenticated');
 
           set({ isLoading: true });
           try {
@@ -169,7 +171,7 @@ const useAuthStore = create<AuthState>()(
 
         updateAvatar: async (file) => {
           const user = get().user;
-          if (!user) throw new Error("User not authenticated");
+          if (!user) throw new Error('User not authenticated');
 
           set({ isLoading: true });
           try {
@@ -185,12 +187,8 @@ const useAuthStore = create<AuthState>()(
         },
 
         getSocialLoginUrl: async (provider) => {
-          try {
-            const response = await API.auth.getSocialLoginUrl(provider);
-            return response.url;
-          } catch (error) {
-            throw error;
-          }
+          const response = await API.auth.getSocialLoginUrl(provider);
+          return response.url;
         },
 
         handleSocialLogin: async (provider, code) => {
@@ -206,7 +204,7 @@ const useAuthStore = create<AuthState>()(
             });
 
             // Use Inertia to navigate to dashboard after successful social login
-            router.visit("/dashboard");
+            router.visit('/dashboard');
           } catch (error) {
             set({ isLoading: false });
             throw error;
@@ -254,15 +252,15 @@ const useAuthStore = create<AuthState>()(
           try {
             // Use inertiaApi to ensure proper API base path
             inertiaApi.post(
-              "auth/email/verification-notification",
+              'auth/email/verification-notification',
               {},
               {
                 onFinish: () => {
                   set({ isLoading: false });
                 },
-              }
+              },
             );
-            return { status: "Verification link sent!" };
+            return { status: 'Verification link sent!' };
           } catch (error) {
             set({ isLoading: false });
             throw error;
@@ -286,16 +284,16 @@ const useAuthStore = create<AuthState>()(
         },
       }),
       {
-        name: "auth-storage", // localStorage key
+        name: 'auth-storage', // localStorage key
         storage: createJSONStorage(() => localStorage),
         partialize: (state) => ({
           user: state.user,
           isAuthenticated: state.isAuthenticated,
         }),
-      }
+      },
     ),
-    { name: "AuthStore" }
-  )
+    { name: 'AuthStore' },
+  ),
 );
 
 export default useAuthStore;

@@ -1,4 +1,4 @@
-import Http from "./Http";
+import Http from './Http';
 
 export type Wallet = {
   id: number;
@@ -64,21 +64,21 @@ const WalletAPI = {
    * Get naira wallet
    */
   getNairaWallet: (): Promise<Wallet> => {
-    return Http.get("/wallets/naira");
+    return Http.get('/wallets/naira');
   },
 
   /**
    * Get dollar wallet
    */
   getDollarWallet: (): Promise<Wallet> => {
-    return Http.get("/wallets/dollar");
+    return Http.get('/wallets/dollar');
   },
 
   /**
    * Get all wallets
    */
   getAllWallets: (): Promise<Wallet[]> => {
-    return Http.get("/wallets");
+    return Http.get('/wallets');
   },
 
   /**
@@ -106,7 +106,7 @@ const WalletAPI = {
    * Get wallet interests
    */
   getInterests: (): Promise<any[]> => {
-    return Http.get("/wallets/interests");
+    return Http.get('/wallets/interests');
   },
 
   /**
@@ -122,10 +122,10 @@ const WalletAPI = {
   getWalletTransactions: (
     walletId: number,
     page = 1,
-    perPage = 15
+    perPage = 15,
   ): Promise<any> => {
     return Http.get(
-      `/wallets/${walletId}/transactions?page=${page}&per_page=${perPage}`
+      `/wallets/${walletId}/transactions?page=${page}&per_page=${perPage}`,
     );
   },
 
@@ -133,14 +133,14 @@ const WalletAPI = {
    * Get wallet statistics
    */
   getWalletStatistics: (): Promise<WalletStatistics> => {
-    return Http.get("/wallets/statistics");
+    return Http.get('/wallets/statistics');
   },
 
   /**
    * Get bank accounts
    */
   getBankAccounts: (): Promise<BankAccount[]> => {
-    return Http.get("/bank-accounts");
+    return Http.get('/bank-accounts');
   },
 
   /**
@@ -149,10 +149,10 @@ const WalletAPI = {
   addBankAccount: (
     bankAccount: Omit<
       BankAccount,
-      "id" | "user_id" | "created_at" | "updated_at"
-    >
+      'id' | 'user_id' | 'created_at' | 'updated_at'
+    >,
   ): Promise<BankAccount> => {
-    return Http.post("/bank-accounts", bankAccount);
+    return Http.post('/bank-accounts', bankAccount);
   },
 
   /**
@@ -173,7 +173,7 @@ const WalletAPI = {
    * Transfer between wallets
    */
   transferBetweenWallets: (data: WalletTransferData): Promise<any> => {
-    return Http.post("/transfers", data);
+    return Http.post('/transfers', data);
   },
 };
 

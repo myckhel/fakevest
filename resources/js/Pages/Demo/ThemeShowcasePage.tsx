@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { Head } from '@inertiajs/react';
+
 import ThemeShowcase from '../../Components/Demo/ThemeShowcase';
 
 const ThemeShowcasePage: React.FC = () => {

@@ -1,5 +1,5 @@
-import Http from './Http';
 import { User } from './auth';
+import Http from './Http';
 
 export interface ProfileUpdateData {
   fullname?: string;
@@ -51,14 +51,18 @@ const UserAPI = {
   updateAvatar: (userId: number, file: File): Promise<User> => {
     const formData = new FormData();
     formData.append('avatar', file);
-    
+
     return Http.upload(`/users/${userId}/avatar`, formData);
   },
 
   /**
    * Update user pin
    */
-  updatePin: (data: { pin: string; old_pin?: string; pin_confirmation?: string }): Promise<{ message: string; status: boolean }> => {
+  updatePin: (data: {
+    pin: string;
+    old_pin?: string;
+    pin_confirmation?: string;
+  }): Promise<{ message: string; status: boolean }> => {
     return Http.put(`/users/pin`, data);
   },
 
@@ -81,7 +85,7 @@ const UserAPI = {
    */
   getRandomUsers: (page: number = 1): Promise<any> => {
     return Http.get(`/users/random?page=${page}`);
-  }
+  },
 };
 
 export default UserAPI;

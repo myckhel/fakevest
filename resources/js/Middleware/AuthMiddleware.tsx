@@ -1,6 +1,8 @@
-import React from "react";
-import { useIsAuthenticated, useIsEmailVerified } from "@/Stores/authStore";
-import { router } from "@inertiajs/react";
+import React from 'react';
+
+import { router } from '@inertiajs/react';
+
+import { useIsAuthenticated, useIsEmailVerified } from '@/Stores/authStore';
 
 interface AuthMiddlewareProps {
   children: React.ReactNode;
@@ -33,12 +35,12 @@ const AuthMiddleware: React.FC<AuthMiddlewareProps> = ({
   }
 
   if (requireAuth && !isAuthenticated) {
-    router.visit("/login");
+    router.visit('/login');
     return null;
   }
 
   if (requireAuth && requireVerified && !isEmailVerified) {
-    router.visit("/email/verify");
+    router.visit('/email/verify');
     return null;
   }
 

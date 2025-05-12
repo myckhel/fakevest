@@ -1,14 +1,16 @@
-import React, { useEffect } from "react";
-import { List, Avatar, Empty, Spin, Card, Button } from "antd";
-import { Link } from "@inertiajs/react";
+import React, { useEffect } from 'react';
+
 import {
   HistoryOutlined,
   ArrowUpOutlined,
   ArrowDownOutlined,
-} from "@ant-design/icons";
-import { formatCurrency, formatDateTime } from "../../../Utils/formatters";
-import useTransactionStore from "../../../Stores/transactionStore";
-import { useDarkMode } from "../../../Stores/uiStore"; // Import the dark mode hook
+} from '@ant-design/icons';
+import { Link } from '@inertiajs/react';
+import { List, Avatar, Empty, Spin, Card, Button } from 'antd';
+
+import useTransactionStore from '../../../Stores/transactionStore';
+import { useDarkMode } from '../../../Stores/uiStore'; // Import the dark mode hook
+import { formatCurrency, formatDateTime } from '../../../Utils/formatters';
 
 interface Transaction {
   id: number;
@@ -25,7 +27,7 @@ type TransactionsListProps = {
   emptyText?: string;
   limit?: number;
   showViewAll?: boolean;
-  type?: "all" | "transfers" | string;
+  type?: 'all' | 'transfers' | string;
 };
 
 /**
@@ -33,14 +35,14 @@ type TransactionsListProps = {
  * Encapsulates data fetching for transactions
  */
 const TransactionsList: React.FC<TransactionsListProps> = ({
-  title = "Recent Transactions",
-  emptyText = "No recent transactions",
+  title = 'Recent Transactions',
+  emptyText = 'No recent transactions',
   limit = 5,
   showViewAll = true,
-  type = "all",
+  type = 'all',
 }) => {
   // Get dark mode state from the global store
-  const darkMode = useDarkMode();
+  const _darkMode = useDarkMode();
 
   // Get transaction data with selector to minimize re-renders
   const {
@@ -53,7 +55,7 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
 
   // Fetch appropriate transaction data when component mounts
   useEffect(() => {
-    if (type === "transfers") {
+    if (type === 'transfers') {
       fetchTransfers();
     } else {
       fetchRecentTransactions(limit);
@@ -61,7 +63,7 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
   }, [type, limit]);
 
   const limitedTransactions: Transaction[] =
-    (type === "transfers" ? transfers : recentTransactions) || [];
+    (type === 'transfers' ? transfers : recentTransactions) || [];
 
   return (
     <Card
@@ -75,7 +77,7 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
       bordered={false}
       extra={
         showViewAll && (
-          <Link href={type === "transfers" ? "/transfers" : "/transactions"}>
+          <Link href={type === 'transfers' ? '/transfers' : '/transactions'}>
             <Button type="text" size="small" className="dark:text-gray-300">
               View All
             </Button>
@@ -97,7 +99,7 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
                 avatar={
                   <Avatar
                     icon={
-                      transaction.type === "deposit" ? (
+                      transaction.type === 'deposit' ? (
                         <ArrowUpOutlined />
                       ) : (
                         <ArrowDownOutlined />
@@ -105,8 +107,8 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
                     }
                     style={{
                       backgroundColor:
-                        transaction.type === "deposit" ? "#52c41a" : "#f5222d",
-                      color: "white",
+                        transaction.type === 'deposit' ? '#52c41a' : '#f5222d',
+                      color: 'white',
                     }}
                   />
                 }
@@ -118,12 +120,12 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
                     </span>
                     <span
                       className={
-                        transaction.type === "deposit"
-                          ? "text-green-500"
-                          : "text-red-500"
+                        transaction.type === 'deposit'
+                          ? 'text-green-500'
+                          : 'text-red-500'
                       }
                     >
-                      {transaction.type === "deposit" ? "+" : "-"}
+                      {transaction.type === 'deposit' ? '+' : '-'}
                       {formatCurrency(Math.abs(transaction.amount))}
                     </span>
                   </div>

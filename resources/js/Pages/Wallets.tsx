@@ -1,29 +1,30 @@
-import React, { useState } from "react";
-import MainLayout from "@/Layouts/MainLayout";
-import { Head } from "@inertiajs/react";
+import { useState } from 'react';
+
 import {
-  Typography,
-  Card,
-  Button,
-  Tabs,
-  Space,
-  Row,
-  Col,
-  Statistic,
-  Tooltip,
-} from "antd";
-import {
-  WalletOutlined,
   BankOutlined,
   CreditCardOutlined,
-  PlusOutlined,
   LockOutlined,
+  PlusOutlined,
   UnlockOutlined,
-} from "@ant-design/icons";
-import TransferMoneyModal from "@/Components/Features/Transfers/TransferMoneyModal";
-import WithdrawFundsModal from "@/Components/Features/Withdrawals/WithdrawFundsModal";
-import ManagePinModal from "@/Components/Features/PIN/ManagePinModal";
-import useAuthStore from "@/Stores/authStore";
+  WalletOutlined,
+} from '@ant-design/icons';
+import { Head } from '@inertiajs/react';
+import {
+  Button,
+  Card,
+  Col,
+  Row,
+  Space,
+  Statistic,
+  Tabs,
+  Typography,
+} from 'antd';
+
+import ManagePinModal from '@/Components/Features/PIN/ManagePinModal';
+import TransferMoneyModal from '@/Components/Features/Transfers/TransferMoneyModal';
+import WithdrawFundsModal from '@/Components/Features/Withdrawals/WithdrawFundsModal';
+import MainLayout from '@/Layouts/MainLayout';
+import useAuthStore from '@/Stores/authStore';
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -39,13 +40,12 @@ const Wallets = () => {
   // Local state for UI management
   const [isTransferModalVisible, setIsTransferModalVisible] = useState(false);
   const [isWithdrawModalVisible, setIsWithdrawModalVisible] = useState(false);
-  const [isAddCardModalVisible, setIsAddCardModalVisible] = useState(false);
-  const [isAddBankAccountModalVisible, setIsAddBankAccountModalVisible] =
-    useState(false);
+  const [, setIsAddCardModalVisible] = useState(false);
+  const [, setIsAddBankAccountModalVisible] = useState(false);
   const [isManagePinModalVisible, setIsManagePinModalVisible] = useState(false);
   const [pinManagementMode, setPinManagementMode] = useState<
-    "create" | "update"
-  >("create");
+    'create' | 'update'
+  >('create');
 
   // Handle modal visibility
   const handleOpenTransferModal = () => setIsTransferModalVisible(true);
@@ -53,19 +53,19 @@ const Wallets = () => {
   const handleOpenWithdrawModal = () => setIsWithdrawModalVisible(true);
   const handleCloseWithdrawModal = () => setIsWithdrawModalVisible(false);
   const handleOpenAddCardModal = () => setIsAddCardModalVisible(true);
-  const handleCloseAddCardModal = () => setIsAddCardModalVisible(false);
+  const _handleCloseAddCardModal = () => setIsAddCardModalVisible(false);
   const handleOpenAddBankAccountModal = () =>
     setIsAddBankAccountModalVisible(true);
-  const handleCloseAddBankAccountModal = () =>
+  const _handleCloseAddBankAccountModal = () =>
     setIsAddBankAccountModalVisible(false);
 
   const handleOpenCreatePinModal = () => {
-    setPinManagementMode("create");
+    setPinManagementMode('create');
     setIsManagePinModalVisible(true);
   };
 
   const handleOpenUpdatePinModal = () => {
-    setPinManagementMode("update");
+    setPinManagementMode('update');
     setIsManagePinModalVisible(true);
   };
 
@@ -80,23 +80,23 @@ const Wallets = () => {
 
   // Example payment methods
   const bankAccounts = [
-    { id: 1, name: "First Bank", accountNumber: "****1234", isDefault: true },
-    { id: 2, name: "UBA", accountNumber: "****5678", isDefault: false },
+    { id: 1, name: 'First Bank', accountNumber: '****1234', isDefault: true },
+    { id: 2, name: 'UBA', accountNumber: '****5678', isDefault: false },
   ];
 
   const cards = [
     {
       id: 1,
-      type: "Visa",
-      cardNumber: "****4321",
-      expiryDate: "06/27",
+      type: 'Visa',
+      cardNumber: '****4321',
+      expiryDate: '06/27',
       isDefault: true,
     },
     {
       id: 2,
-      type: "Mastercard",
-      cardNumber: "****8765",
-      expiryDate: "12/26",
+      type: 'Mastercard',
+      cardNumber: '****8765',
+      expiryDate: '12/26',
       isDefault: false,
     },
   ];
@@ -132,7 +132,7 @@ const Wallets = () => {
                 value={walletData.balance}
                 precision={2}
                 prefix="₦"
-                valueStyle={{ color: "#3b8cb7" }}
+                valueStyle={{ color: '#3b8cb7' }}
               />
               <div className="mt-4">
                 <Space>
@@ -149,7 +149,7 @@ const Wallets = () => {
                 value={walletData.savingsBalance}
                 precision={2}
                 prefix="₦"
-                valueStyle={{ color: "#52c41a" }}
+                valueStyle={{ color: '#52c41a' }}
               />
             </Col>
             <Col xs={24} md={8}>
@@ -158,7 +158,7 @@ const Wallets = () => {
                 value={walletData.investmentBalance}
                 precision={2}
                 prefix="₦"
-                valueStyle={{ color: "#722ed1" }}
+                valueStyle={{ color: '#722ed1' }}
               />
             </Col>
           </Row>
@@ -181,8 +181,8 @@ const Wallets = () => {
                   <Title level={5}>Transaction PIN</Title>
                   <Text type="secondary">
                     {hasPin
-                      ? "Your transaction PIN is used to authorize money transfers and withdrawals."
-                      : "Set up a transaction PIN to secure your transfers and withdrawals."}
+                      ? 'Your transaction PIN is used to authorize money transfers and withdrawals.'
+                      : 'Set up a transaction PIN to secure your transfers and withdrawals.'}
                   </Text>
                 </div>
                 <Button
@@ -192,7 +192,7 @@ const Wallets = () => {
                     hasPin ? handleOpenUpdatePinModal : handleOpenCreatePinModal
                   }
                 >
-                  {hasPin ? "Update PIN" : "Create PIN"}
+                  {hasPin ? 'Update PIN' : 'Create PIN'}
                 </Button>
               </div>
             </Col>

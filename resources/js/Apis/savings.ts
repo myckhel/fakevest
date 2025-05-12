@@ -1,11 +1,11 @@
-import Http from "./Http";
+import Http from './Http';
 
 export interface SavingPlan {
   id: number;
   name: string;
   description: string;
   interest_rate: number;
-  type: "flex" | "lock" | "target";
+  type: 'flex' | 'lock' | 'target';
   min_amount?: number;
   min_duration?: number;
   created_at: string;
@@ -47,7 +47,7 @@ export interface SavingHistoryItem {
   id: number;
   saving_id: number;
   amount: number;
-  type: "deposit" | "withdrawal" | "interest";
+  type: 'deposit' | 'withdrawal' | 'interest';
   created_at: string;
 }
 
@@ -56,7 +56,7 @@ export interface AutoSaveSetting {
   saving_id: number;
   user_id: number;
   amount: number;
-  frequency: "daily" | "weekly" | "monthly";
+  frequency: 'daily' | 'weekly' | 'monthly';
   day_of_week?: number;
   day_of_month?: number;
   active: boolean;
@@ -93,14 +93,14 @@ const SavingsAPI = {
    * Get all available saving plans
    */
   getPlans: (): Promise<SavingPlan[]> => {
-    return Http.get("/plans");
+    return Http.get('/plans');
   },
 
   /**
    * Get all user savings accounts
    */
   getSavings: (): Promise<Saving[]> => {
-    return Http.get("/savings");
+    return Http.get('/savings');
   },
 
   /**
@@ -114,7 +114,7 @@ const SavingsAPI = {
    * Create a new saving account
    */
   createSaving: (data: CreateSavingData): Promise<Saving> => {
-    return Http.post("/savings", data);
+    return Http.post('/savings', data);
   },
 
   /**
@@ -122,7 +122,7 @@ const SavingsAPI = {
    */
   updateSaving: (
     id: number,
-    data: Partial<CreateSavingData>
+    data: Partial<CreateSavingData>,
   ): Promise<Saving> => {
     return Http.put(`/savings/${id}`, data);
   },
@@ -147,7 +147,7 @@ const SavingsAPI = {
   deposit: (
     savingId: number,
     amount: number,
-    pin?: string
+    pin?: string,
   ): Promise<Saving> => {
     const data: any = { amount };
     if (pin) data.pin = pin;
@@ -160,7 +160,7 @@ const SavingsAPI = {
   withdraw: (
     savingId: number,
     amount: number,
-    pin: string
+    pin: string,
   ): Promise<Saving> => {
     return Http.post(`/savings/${savingId}/withdraw`, { amount, pin });
   },
@@ -179,13 +179,13 @@ const SavingsAPI = {
     savingId: number,
     data: Omit<
       AutoSaveSetting,
-      | "id"
-      | "saving_id"
-      | "user_id"
-      | "created_at"
-      | "updated_at"
-      | "next_deduction_date"
-    >
+      | 'id'
+      | 'saving_id'
+      | 'user_id'
+      | 'created_at'
+      | 'updated_at'
+      | 'next_deduction_date'
+    >,
   ): Promise<AutoSaveSetting> => {
     return Http.post(`/savings/${savingId}/auto-save`, data);
   },
@@ -201,14 +201,14 @@ const SavingsAPI = {
    * Get savings statistics
    */
   getSavingsStatistics: (): Promise<SavingStatistics> => {
-    return Http.get("/savings/statistics");
+    return Http.get('/savings/statistics');
   },
 
   /**
    * Get available savings challenges
    */
   getSavingsChallenges: (): Promise<SavingChallenge[]> => {
-    return Http.get("/savings/challenges");
+    return Http.get('/savings/challenges');
   },
 
   /**
@@ -229,14 +229,14 @@ const SavingsAPI = {
    * Get user's active challenges
    */
   getUserChallenges: (): Promise<SavingChallenge[]> => {
-    return Http.get("/savings/user-challenges");
+    return Http.get('/savings/user-challenges');
   },
 
   /**
    * Get savings progress for a specific timeframe
    */
   getSavingsProgress: (
-    timeframe: "weekly" | "monthly" | "yearly" = "monthly"
+    timeframe: 'weekly' | 'monthly' | 'yearly' = 'monthly',
   ): Promise<Array<{ date: string; amount: number }>> => {
     return Http.get(`/savings/progress?timeframe=${timeframe}`);
   },

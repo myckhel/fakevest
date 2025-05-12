@@ -1,11 +1,12 @@
-import React from "react";
-import { Button, Typography, Row, Col, Card, Divider } from "antd";
+import React from 'react';
+
 import {
   BankOutlined,
   LockOutlined,
   RiseOutlined,
   SafetyOutlined,
-} from "@ant-design/icons";
+} from '@ant-design/icons';
+import { Button, Typography, Row, Col, Card, _Divider } from 'antd';
 
 const { Title, Paragraph } = Typography;
 
@@ -45,7 +46,7 @@ const HomePage = () => {
             className="w-full object-cover"
             onError={(e) => {
               e.currentTarget.src =
-                "https://fakeimg.pl/1200x600/?text=Fakevest+Dashboard";
+                'https://fakeimg.pl/1200x600/?text=Fakevest+Dashboard';
             }}
           />
         </div>
@@ -72,7 +73,7 @@ const HomePage = () => {
                 cover={
                   <div className="py-6 bg-blue-50 flex justify-center">
                     <BankOutlined
-                      style={{ fontSize: "3rem", color: "#3b8cb7" }}
+                      style={{ fontSize: '3rem', color: '#3b8cb7' }}
                     />
                   </div>
                 }
@@ -93,7 +94,7 @@ const HomePage = () => {
                 cover={
                   <div className="py-6 bg-blue-50 flex justify-center">
                     <LockOutlined
-                      style={{ fontSize: "3rem", color: "#3b8cb7" }}
+                      style={{ fontSize: '3rem', color: '#3b8cb7' }}
                     />
                   </div>
                 }
@@ -114,7 +115,7 @@ const HomePage = () => {
                 cover={
                   <div className="py-6 bg-blue-50 flex justify-center">
                     <RiseOutlined
-                      style={{ fontSize: "3rem", color: "#3b8cb7" }}
+                      style={{ fontSize: '3rem', color: '#3b8cb7' }}
                     />
                   </div>
                 }

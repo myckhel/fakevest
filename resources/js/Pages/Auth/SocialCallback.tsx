@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { Head, router } from "@inertiajs/react";
-import { Spin, Result } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
-import AuthLayout from "@/Layouts/AuthLayout";
-import useAuthStore from "@/Stores/authStore";
+import React, { useEffect, useState } from 'react';
+
+import { LoadingOutlined } from '@ant-design/icons';
+import { Head, router } from '@inertiajs/react';
+import { Spin, Result } from 'antd';
+
+import AuthLayout from '@/Layouts/AuthLayout';
+import useAuthStore from '@/Stores/authStore';
 
 interface SocialCallbackProps {
-  provider: "google" | "facebook" | "github";
+  provider: 'google' | 'facebook' | 'github';
   code: string;
 }
 
@@ -18,11 +20,11 @@ const SocialCallback: React.FC<SocialCallbackProps> = ({ provider, code }) => {
     const processSocialLogin = async () => {
       try {
         await handleSocialLogin(provider, code);
-        router.visit("/dashboard");
+        router.visit('/dashboard');
       } catch (err: any) {
-        console.error("Social login error:", err);
+        console.error('Social login error:', err);
         setError(
-          err.response?.data?.message || "Failed to complete social login"
+          err.response?.data?.message || 'Failed to complete social login',
         );
       }
     };

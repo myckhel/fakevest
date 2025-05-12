@@ -1,6 +1,7 @@
-import { create } from "zustand";
-import { devtools } from "zustand/middleware";
-import API from "../Apis";
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+
+import API from '../Apis';
 import {
   Saving,
   SavingPlan,
@@ -9,8 +10,8 @@ import {
   AutoSaveSetting,
   SavingStatistics,
   SavingChallenge,
-} from "../Apis/savings";
-import { Portfolio } from "../Apis/user";
+} from '../Apis/savings';
+import { Portfolio } from '../Apis/user';
 
 interface SavingsState {
   // State
@@ -39,25 +40,25 @@ interface SavingsState {
   depositToSaving: (
     savingId: number,
     amount: number,
-    pin?: string
+    pin?: string,
   ) => Promise<void>;
   withdrawFromSaving: (
     savingId: number,
     amount: number,
-    pin: string
+    pin: string,
   ) => Promise<void>;
   fetchAutoSaveSettings: (savingId: number) => Promise<void>;
   createOrUpdateAutoSave: (
     savingId: number,
     data: Omit<
       AutoSaveSetting,
-      | "id"
-      | "saving_id"
-      | "user_id"
-      | "created_at"
-      | "updated_at"
-      | "next_deduction_date"
-    >
+      | 'id'
+      | 'saving_id'
+      | 'user_id'
+      | 'created_at'
+      | 'updated_at'
+      | 'next_deduction_date'
+    >,
   ) => Promise<void>;
   disableAutoSave: (savingId: number) => Promise<void>;
   fetchSavingStatistics: () => Promise<void>;
@@ -66,7 +67,7 @@ interface SavingsState {
   joinChallenge: (challengeId: number) => Promise<void>;
   leaveChallenge: (challengeId: number) => Promise<void>;
   fetchSavingsProgress: (
-    timeframe: "weekly" | "monthly" | "yearly"
+    timeframe: 'weekly' | 'monthly' | 'yearly',
   ) => Promise<void>;
 }
 
@@ -97,10 +98,10 @@ const useSavingsStore = create<SavingsState>()(
             isLoading: false,
           });
         } catch (error: any) {
-          console.error("Error fetching saving plans:", error);
+          console.error('Error fetching saving plans:', error);
           set({
             isLoading: false,
-            error: error.message || "Error fetching saving plans",
+            error: error.message || 'Error fetching saving plans',
           });
           throw error;
         }
@@ -115,10 +116,10 @@ const useSavingsStore = create<SavingsState>()(
             isLoading: false,
           });
         } catch (error: any) {
-          console.error("Error fetching savings:", error);
+          console.error('Error fetching savings:', error);
           set({
             isLoading: false,
-            error: error.message || "Error fetching savings",
+            error: error.message || 'Error fetching savings',
           });
           throw error;
         }
@@ -133,10 +134,10 @@ const useSavingsStore = create<SavingsState>()(
             isLoading: false,
           });
         } catch (error: any) {
-          console.error("Error fetching portfolio:", error);
+          console.error('Error fetching portfolio:', error);
           set({
             isLoading: false,
-            error: error.message || "Error fetching portfolio",
+            error: error.message || 'Error fetching portfolio',
           });
           throw error;
         }
@@ -171,7 +172,7 @@ const useSavingsStore = create<SavingsState>()(
         } catch (error: any) {
           console.error(
             `Error fetching history for saving ${savingId}:`,
-            error
+            error,
           );
           set({
             isLoading: false,
@@ -191,10 +192,10 @@ const useSavingsStore = create<SavingsState>()(
             isLoading: false,
           }));
         } catch (error: any) {
-          console.error("Error creating saving:", error);
+          console.error('Error creating saving:', error);
           set({
             isLoading: false,
-            error: error.message || "Error creating saving",
+            error: error.message || 'Error creating saving',
           });
           throw error;
         }
@@ -206,7 +207,7 @@ const useSavingsStore = create<SavingsState>()(
           const updatedSaving = await API.savings.updateSaving(id, data);
           set((state) => ({
             savings: state.savings.map((saving) =>
-              saving.id === id ? updatedSaving : saving
+              saving.id === id ? updatedSaving : saving,
             ),
             activeSaving:
               state.activeSaving?.id === id
@@ -250,11 +251,11 @@ const useSavingsStore = create<SavingsState>()(
           const updatedSaving = await API.savings.deposit(
             savingId,
             amount,
-            pin
+            pin,
           );
           set((state) => ({
             savings: state.savings.map((saving) =>
-              saving.id === savingId ? updatedSaving : saving
+              saving.id === savingId ? updatedSaving : saving,
             ),
             activeSaving:
               state.activeSaving?.id === savingId
@@ -281,11 +282,11 @@ const useSavingsStore = create<SavingsState>()(
           const updatedSaving = await API.savings.withdraw(
             savingId,
             amount,
-            pin
+            pin,
           );
           set((state) => ({
             savings: state.savings.map((saving) =>
-              saving.id === savingId ? updatedSaving : saving
+              saving.id === savingId ? updatedSaving : saving,
             ),
             activeSaving:
               state.activeSaving?.id === savingId
@@ -317,7 +318,7 @@ const useSavingsStore = create<SavingsState>()(
         } catch (error: any) {
           console.error(
             `Error fetching auto-save settings for saving ${savingId}:`,
-            error
+            error,
           );
           set({
             isLoading: false,
@@ -340,7 +341,7 @@ const useSavingsStore = create<SavingsState>()(
         } catch (error: any) {
           console.error(
             `Error setting auto-save for saving ${savingId}:`,
-            error
+            error,
           );
           set({
             isLoading: false,
@@ -362,7 +363,7 @@ const useSavingsStore = create<SavingsState>()(
         } catch (error: any) {
           console.error(
             `Error disabling auto-save for saving ${savingId}:`,
-            error
+            error,
           );
           set({
             isLoading: false,
@@ -383,10 +384,10 @@ const useSavingsStore = create<SavingsState>()(
             isLoading: false,
           });
         } catch (error: any) {
-          console.error("Error fetching saving statistics:", error);
+          console.error('Error fetching saving statistics:', error);
           set({
             isLoading: false,
-            error: error.message || "Error fetching saving statistics",
+            error: error.message || 'Error fetching saving statistics',
           });
           throw error;
         }
@@ -401,10 +402,10 @@ const useSavingsStore = create<SavingsState>()(
             isLoading: false,
           });
         } catch (error: any) {
-          console.error("Error fetching available challenges:", error);
+          console.error('Error fetching available challenges:', error);
           set({
             isLoading: false,
-            error: error.message || "Error fetching available challenges",
+            error: error.message || 'Error fetching available challenges',
           });
           throw error;
         }
@@ -419,10 +420,10 @@ const useSavingsStore = create<SavingsState>()(
             isLoading: false,
           });
         } catch (error: any) {
-          console.error("Error fetching user challenges:", error);
+          console.error('Error fetching user challenges:', error);
           set({
             isLoading: false,
-            error: error.message || "Error fetching user challenges",
+            error: error.message || 'Error fetching user challenges',
           });
           throw error;
         }
@@ -468,7 +469,7 @@ const useSavingsStore = create<SavingsState>()(
         }
       },
 
-      fetchSavingsProgress: async (timeframe = "monthly") => {
+      fetchSavingsProgress: async (timeframe = 'monthly') => {
         set({ isLoading: true, error: null });
         try {
           const progress = await API.savings.getSavingsProgress(timeframe);
@@ -479,7 +480,7 @@ const useSavingsStore = create<SavingsState>()(
         } catch (error: any) {
           console.error(
             `Error fetching savings progress for ${timeframe} timeframe:`,
-            error
+            error,
           );
           set({
             isLoading: false,
@@ -491,8 +492,8 @@ const useSavingsStore = create<SavingsState>()(
         }
       },
     }),
-    { name: "SavingsStore" }
-  )
+    { name: 'SavingsStore' },
+  ),
 );
 
 export default useSavingsStore;

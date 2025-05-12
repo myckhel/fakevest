@@ -1,10 +1,11 @@
-import React from "react";
-import { Button, ButtonProps } from "antd";
-import { LogoutOutlined } from "@ant-design/icons";
-import { router } from "@inertiajs/react";
+import React from 'react';
 
-interface LogoutButtonProps extends Omit<ButtonProps, "onClick"> {
-  variant?: "button" | "link" | "menu-item";
+import { LogoutOutlined } from '@ant-design/icons';
+import { router } from '@inertiajs/react';
+import { Button, ButtonProps } from 'antd';
+
+interface LogoutButtonProps extends Omit<ButtonProps, 'onClick'> {
+  variant?: 'button' | 'link' | 'menu-item';
   children?: React.ReactNode;
 }
 
@@ -15,33 +16,33 @@ interface LogoutButtonProps extends Omit<ButtonProps, "onClick"> {
  * @param props - Other button props from AntD Button
  */
 const LogoutButton: React.FC<LogoutButtonProps> = ({
-  variant = "button",
+  variant = 'button',
   children,
   ...props
 }) => {
   const handleLogout = (e: React.MouseEvent) => {
     e.preventDefault();
     // Use the router to visit the logout route
-    router.visit("/logout", { method: "get", preserveScroll: false });
+    router.visit('/logout', { method: 'get', preserveScroll: false });
   };
 
-  if (variant === "link") {
+  if (variant === 'link') {
     return (
       <a href="#" onClick={handleLogout} className="flex items-center">
         <LogoutOutlined className="mr-2" />
-        {children || "Logout"}
+        {children || 'Logout'}
       </a>
     );
   }
 
-  if (variant === "menu-item") {
+  if (variant === 'menu-item') {
     return (
       <div
         onClick={handleLogout}
         className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
       >
         <LogoutOutlined className="mr-2" />
-        {children || "Logout"}
+        {children || 'Logout'}
       </div>
     );
   }
@@ -54,7 +55,7 @@ const LogoutButton: React.FC<LogoutButtonProps> = ({
       onClick={handleLogout}
       {...props}
     >
-      {children || "Logout"}
+      {children || 'Logout'}
     </Button>
   );
 };

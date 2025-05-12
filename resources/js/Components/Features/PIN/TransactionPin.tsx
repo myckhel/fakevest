@@ -1,15 +1,17 @@
-import React, { useState } from "react";
-import { Form, Input, Button, Typography, Alert, Space } from "antd";
-import axios from "axios";
-import useUIStore from "@/Stores/uiStore";
-import useAuthStore from "@/Stores/authStore";
+import React, { useState } from 'react';
 
-const { Title, Text } = Typography;
+import { Form, Input, Button, Typography, Alert, Space } from 'antd';
+import axios from 'axios';
+
+import useAuthStore from '@/Stores/authStore';
+import useUIStore from '@/Stores/uiStore';
+
+const { Title, _Text } = Typography;
 
 interface TransactionPinProps {
   onSuccess?: (pin: string) => void;
   onCancel?: () => void;
-  mode?: "verify" | "create" | "update";
+  mode?: 'verify' | 'create' | 'update';
 }
 
 /**
@@ -18,7 +20,7 @@ interface TransactionPinProps {
 const TransactionPin: React.FC<TransactionPinProps> = ({
   onSuccess,
   onCancel,
-  mode = "verify",
+  mode = 'verify',
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -30,47 +32,47 @@ const TransactionPin: React.FC<TransactionPinProps> = ({
 
   // Determine the actual mode based on whether user has a PIN already
   const actualMode =
-    mode === "create" || (!hasPin && mode === "verify") ? "create" : mode;
+    mode === 'create' || (!hasPin && mode === 'verify') ? 'create' : mode;
 
   const handleSubmit = async (values: any) => {
     setLoading(true);
     setError(null);
 
     try {
-      if (actualMode === "verify") {
+      if (actualMode === 'verify') {
         // Verify PIN
-        await axios.post("/api/v1/users/pin", {
+        await axios.post('/api/v1/users/pin', {
           pin: values.pin,
         });
 
-        showToast("PIN verified successfully", "success");
+        showToast('PIN verified successfully', 'success');
         if (onSuccess) onSuccess(values.pin);
-      } else if (actualMode === "create") {
+      } else if (actualMode === 'create') {
         // Create new PIN
-        await axios.put("/api/v1/users/pin", {
+        await axios.put('/api/v1/users/pin', {
           pin: values.pin,
           confirm_pin: values.confirmPin,
         });
 
         await refreshUser();
-        showToast("PIN created successfully", "success");
+        showToast('PIN created successfully', 'success');
         if (onSuccess) onSuccess(values.pin);
-      } else if (actualMode === "update") {
+      } else if (actualMode === 'update') {
         // Update existing PIN
-        await axios.put("/api/v1/users/pin", {
+        await axios.put('/api/v1/users/pin', {
           pin: values.pin,
           old_pin: values.oldPin,
           confirm_pin: values.confirmPin,
         });
 
         await refreshUser();
-        showToast("PIN updated successfully", "success");
+        showToast('PIN updated successfully', 'success');
         if (onSuccess) onSuccess(values.pin);
       }
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message ||
-        "An error occurred while processing your request";
+        'An error occurred while processing your request';
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -78,15 +80,15 @@ const TransactionPin: React.FC<TransactionPinProps> = ({
   };
 
   const renderForm = () => {
-    if (actualMode === "verify") {
+    if (actualMode === 'verify') {
       return (
         <>
           <Form.Item
             name="pin"
             label="Transaction PIN"
             rules={[
-              { required: true, message: "Please enter your transaction PIN" },
-              { len: 4, message: "PIN must be 4 digits" },
+              { required: true, message: 'Please enter your transaction PIN' },
+              { len: 4, message: 'PIN must be 4 digits' },
             ]}
           >
             <Input.Password
@@ -97,15 +99,15 @@ const TransactionPin: React.FC<TransactionPinProps> = ({
           </Form.Item>
         </>
       );
-    } else if (actualMode === "create") {
+    } else if (actualMode === 'create') {
       return (
         <>
           <Form.Item
             name="pin"
             label="New PIN"
             rules={[
-              { required: true, message: "Please enter a PIN" },
-              { len: 4, message: "PIN must be 4 digits" },
+              { required: true, message: 'Please enter a PIN' },
+              { len: 4, message: 'PIN must be 4 digits' },
             ]}
           >
             <Input.Password
@@ -117,15 +119,15 @@ const TransactionPin: React.FC<TransactionPinProps> = ({
           <Form.Item
             name="confirmPin"
             label="Confirm PIN"
-            dependencies={["pin"]}
+            dependencies={['pin']}
             rules={[
-              { required: true, message: "Please confirm your PIN" },
+              { required: true, message: 'Please confirm your PIN' },
               ({ getFieldValue }) => ({
                 validator(_, value) {
-                  if (!value || getFieldValue("pin") === value) {
+                  if (!value || getFieldValue('pin') === value) {
                     return Promise.resolve();
                   }
-                  return Promise.reject(new Error("PINs do not match"));
+                  return Promise.reject(new Error('PINs do not match'));
                 },
               }),
             ]}
@@ -146,8 +148,8 @@ const TransactionPin: React.FC<TransactionPinProps> = ({
             name="oldPin"
             label="Current PIN"
             rules={[
-              { required: true, message: "Please enter your current PIN" },
-              { len: 4, message: "PIN must be 4 digits" },
+              { required: true, message: 'Please enter your current PIN' },
+              { len: 4, message: 'PIN must be 4 digits' },
             ]}
           >
             <Input.Password
@@ -160,8 +162,8 @@ const TransactionPin: React.FC<TransactionPinProps> = ({
             name="pin"
             label="New PIN"
             rules={[
-              { required: true, message: "Please enter a new PIN" },
-              { len: 4, message: "PIN must be 4 digits" },
+              { required: true, message: 'Please enter a new PIN' },
+              { len: 4, message: 'PIN must be 4 digits' },
             ]}
           >
             <Input.Password
@@ -173,15 +175,15 @@ const TransactionPin: React.FC<TransactionPinProps> = ({
           <Form.Item
             name="confirmPin"
             label="Confirm New PIN"
-            dependencies={["pin"]}
+            dependencies={['pin']}
             rules={[
-              { required: true, message: "Please confirm your new PIN" },
+              { required: true, message: 'Please confirm your new PIN' },
               ({ getFieldValue }) => ({
                 validator(_, value) {
-                  if (!value || getFieldValue("pin") === value) {
+                  if (!value || getFieldValue('pin') === value) {
                     return Promise.resolve();
                   }
-                  return Promise.reject(new Error("PINs do not match"));
+                  return Promise.reject(new Error('PINs do not match'));
                 },
               }),
             ]}
@@ -200,12 +202,12 @@ const TransactionPin: React.FC<TransactionPinProps> = ({
   return (
     <div className="transaction-pin">
       <Title level={4} className="mb-4">
-        {actualMode === "verify" && "Enter Transaction PIN"}
-        {actualMode === "create" && "Create Transaction PIN"}
-        {actualMode === "update" && "Update Transaction PIN"}
+        {actualMode === 'verify' && 'Enter Transaction PIN'}
+        {actualMode === 'create' && 'Create Transaction PIN'}
+        {actualMode === 'update' && 'Update Transaction PIN'}
       </Title>
 
-      {!hasPin && mode === "verify" && (
+      {!hasPin && mode === 'verify' && (
         <Alert
           message="PIN Required"
           description="You need to create a transaction PIN to continue."
@@ -237,7 +239,7 @@ const TransactionPin: React.FC<TransactionPinProps> = ({
           <Space className="w-full justify-end">
             {onCancel && <Button onClick={onCancel}>Cancel</Button>}
             <Button type="primary" htmlType="submit" loading={loading}>
-              {actualMode === "verify" ? "Verify" : "Save PIN"}
+              {actualMode === 'verify' ? 'Verify' : 'Save PIN'}
             </Button>
           </Space>
         </Form.Item>

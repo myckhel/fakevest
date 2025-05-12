@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Head, Link, router, usePage } from "@inertiajs/react";
-import { Button, Form, Input, Upload, Divider, message } from "antd";
+import React, { useState, useEffect } from 'react';
+
 import {
   UserOutlined,
   LockOutlined,
@@ -10,11 +9,15 @@ import {
   GithubOutlined,
   GoogleOutlined,
   FacebookOutlined,
-} from "@ant-design/icons";
-import AuthLayout from "@/Layouts/AuthLayout";
-import useAuthStore from "@/Stores/authStore";
-import { inertiaApi } from "@/utils/inertiaApi";
-import type { RcFile, UploadFile } from "antd/es/upload/interface";
+} from '@ant-design/icons';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Button, Form, Input, Upload, Divider, message } from 'antd';
+
+import AuthLayout from '@/Layouts/AuthLayout';
+import useAuthStore from '@/Stores/authStore';
+import { inertiaApi } from '@/utils/inertiaApi';
+
+import type { RcFile, UploadFile } from 'antd/es/upload/interface';
 
 interface PageProps {
   errors: Record<string, string>;
@@ -47,14 +50,14 @@ const Register: React.FC = () => {
   }, [errors, status]);
 
   const beforeUpload = (file: RcFile) => {
-    const isImage = file.type.startsWith("image/");
+    const isImage = file.type.startsWith('image/');
     if (!isImage) {
-      message.error("You can only upload image files!");
+      message.error('You can only upload image files!');
     }
 
     const isLt2M = file.size / 1024 / 1024 < 2;
     if (!isLt2M) {
-      message.error("Image must be smaller than 2MB!");
+      message.error('Image must be smaller than 2MB!');
     }
 
     if (isImage && isLt2M) {
@@ -77,19 +80,19 @@ const Register: React.FC = () => {
 
     // Use FormData to handle file uploads with Inertia
     const formData = new FormData();
-    formData.append("fullname", values.fullname);
-    formData.append("email", values.email || "");
-    if (values.phone) formData.append("phone", values.phone);
-    if (values.username) formData.append("username", values.username);
-    formData.append("password", values.password);
-    formData.append("password_confirmation", values.confirm);
+    formData.append('fullname', values.fullname);
+    formData.append('email', values.email || '');
+    if (values.phone) formData.append('phone', values.phone);
+    if (values.username) formData.append('username', values.username);
+    formData.append('password', values.password);
+    formData.append('password_confirmation', values.confirm);
 
     if (fileList.length > 0 && fileList[0].originFileObj) {
-      formData.append("avatar", fileList[0].originFileObj);
+      formData.append('avatar', fileList[0].originFileObj);
     }
 
     // Use inertiaApi to properly handle API routes with the /api/v1 prefix
-    inertiaApi.post("register", formData, {
+    inertiaApi.post('register', formData, {
       onFinish: () => {
         setLoading(false);
       },
@@ -99,14 +102,14 @@ const Register: React.FC = () => {
   };
 
   const handleSocialLogin = async (
-    provider: "google" | "github" | "facebook"
+    provider: 'google' | 'github' | 'facebook',
   ) => {
     setSocialLoading({ ...socialLoading, [provider]: true });
 
     try {
       const url = await getSocialLoginUrl(provider);
       router.visit(url);
-    } catch (error) {
+    } catch (_error) {
       message.error(`Failed to initialize ${provider} login`);
     } finally {
       setSocialLoading({ ...socialLoading, [provider]: false });
@@ -126,9 +129,9 @@ const Register: React.FC = () => {
         <Form.Item
           name="fullname"
           rules={[
-            { required: true, message: "Please enter your full name", min: 6 },
+            { required: true, message: 'Please enter your full name', min: 6 },
           ]}
-          validateStatus={errors.fullname ? "error" : ""}
+          validateStatus={errors.fullname ? 'error' : ''}
           help={errors.fullname}
         >
           <Input
@@ -141,10 +144,10 @@ const Register: React.FC = () => {
         <Form.Item
           name="email"
           rules={[
-            { required: true, message: "Please enter your email" },
-            { type: "email", message: "Please enter a valid email" },
+            { required: true, message: 'Please enter your email' },
+            { type: 'email', message: 'Please enter a valid email' },
           ]}
-          validateStatus={errors.email ? "error" : ""}
+          validateStatus={errors.email ? 'error' : ''}
           help={errors.email}
         >
           <Input
@@ -159,10 +162,10 @@ const Register: React.FC = () => {
           rules={[
             {
               pattern: /^\d{10,11}$/,
-              message: "Please enter a valid phone number",
+              message: 'Please enter a valid phone number',
             },
           ]}
-          validateStatus={errors.phone ? "error" : ""}
+          validateStatus={errors.phone ? 'error' : ''}
           help={errors.phone}
         >
           <Input
@@ -175,9 +178,9 @@ const Register: React.FC = () => {
         <Form.Item
           name="username"
           rules={[
-            { message: "Username must be at least 3 characters", min: 3 },
+            { message: 'Username must be at least 3 characters', min: 3 },
           ]}
-          validateStatus={errors.username ? "error" : ""}
+          validateStatus={errors.username ? 'error' : ''}
           help={errors.username}
         >
           <Input
@@ -190,10 +193,10 @@ const Register: React.FC = () => {
         <Form.Item
           name="password"
           rules={[
-            { required: true, message: "Please enter your password" },
-            { min: 6, message: "Password must be at least 6 characters" },
+            { required: true, message: 'Please enter your password' },
+            { min: 6, message: 'Password must be at least 6 characters' },
           ]}
-          validateStatus={errors.password ? "error" : ""}
+          validateStatus={errors.password ? 'error' : ''}
           help={errors.password}
         >
           <Input.Password
@@ -205,21 +208,21 @@ const Register: React.FC = () => {
 
         <Form.Item
           name="confirm"
-          dependencies={["password"]}
+          dependencies={['password']}
           rules={[
-            { required: true, message: "Please confirm your password" },
+            { required: true, message: 'Please confirm your password' },
             ({ getFieldValue }) => ({
               validator(_, value) {
-                if (!value || getFieldValue("password") === value) {
+                if (!value || getFieldValue('password') === value) {
                   return Promise.resolve();
                 }
                 return Promise.reject(
-                  new Error("The two passwords do not match")
+                  new Error('The two passwords do not match'),
                 );
               },
             }),
           ]}
-          validateStatus={errors.password_confirmation ? "error" : ""}
+          validateStatus={errors.password_confirmation ? 'error' : ''}
           help={errors.password_confirmation}
         >
           <Input.Password
@@ -232,7 +235,7 @@ const Register: React.FC = () => {
         <Form.Item
           name="avatar"
           label="Profile Picture (optional)"
-          validateStatus={errors.avatar ? "error" : ""}
+          validateStatus={errors.avatar ? 'error' : ''}
           help={errors.avatar}
         >
           <Upload
@@ -266,7 +269,7 @@ const Register: React.FC = () => {
           <Button
             type="default"
             icon={<GoogleOutlined />}
-            onClick={() => handleSocialLogin("google")}
+            onClick={() => handleSocialLogin('google')}
             loading={socialLoading.google}
           >
             Google
@@ -274,7 +277,7 @@ const Register: React.FC = () => {
           <Button
             type="default"
             icon={<FacebookOutlined />}
-            onClick={() => handleSocialLogin("facebook")}
+            onClick={() => handleSocialLogin('facebook')}
             loading={socialLoading.facebook}
           >
             Facebook
@@ -282,7 +285,7 @@ const Register: React.FC = () => {
           <Button
             type="default"
             icon={<GithubOutlined />}
-            onClick={() => handleSocialLogin("github")}
+            onClick={() => handleSocialLogin('github')}
             loading={socialLoading.github}
           >
             GitHub
@@ -291,7 +294,7 @@ const Register: React.FC = () => {
 
         <div className="text-center mt-4">
           <p>
-            Already have an account?{" "}
+            Already have an account?{' '}
             <Link href="/login" className="text-blue-600 hover:underline">
               Sign in
             </Link>

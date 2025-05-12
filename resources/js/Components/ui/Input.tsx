@@ -1,7 +1,9 @@
 import React from 'react';
+
 import { Input as AntInput, InputProps as AntInputProps } from 'antd';
-import { cn, useThemeToken } from '../../theme';
 import { VariantProps, cva } from 'class-variance-authority';
+
+import { cn, useThemeToken } from '../../theme';
 
 const inputVariants = cva(
   'flex rounded-md border border-gray-300 bg-white px-3 py-2 text-base ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
@@ -26,7 +28,7 @@ const inputVariants = cva(
       size: 'default',
       fullWidth: false,
     },
-  }
+  },
 );
 
 export interface InputProps
@@ -36,7 +38,17 @@ export interface InputProps
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, variant = 'default', size = 'default', fullWidth, error, ...props }, ref) => {
+  (
+    {
+      className,
+      variant = 'default',
+      size = 'default',
+      fullWidth,
+      error,
+      ...props
+    },
+    ref,
+  ) => {
     const token = useThemeToken();
 
     // Map our size variants to ant design sizes
@@ -64,15 +76,16 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             width: fullWidth ? '100%' : undefined,
             borderRadius: token.borderRadius,
           }}
-          className={cn(inputVariants({ variant: actualVariant, size, fullWidth }), className)}
+          className={cn(
+            inputVariants({ variant: actualVariant, size, fullWidth }),
+            className,
+          )}
           {...props}
         />
-        {error && (
-          <p className="text-xs text-red-500">{error}</p>
-        )}
+        {error && <p className="text-xs text-red-500">{error}</p>}
       </div>
     );
-  }
+  },
 );
 
 Input.displayName = 'Input';

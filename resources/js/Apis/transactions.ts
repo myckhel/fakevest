@@ -1,11 +1,11 @@
-import Http from "./Http";
+import Http from './Http';
 
 export type Transaction = {
   id: number;
   payable_type: string;
   payable_id: number;
   wallet_id: number;
-  type: "deposit" | "withdraw" | "transfer" | "payment" | "interest" | "fee";
+  type: 'deposit' | 'withdraw' | 'transfer' | 'payment' | 'interest' | 'fee';
   amount: number;
   confirmed: boolean;
   meta: Record<string, any> | null;
@@ -67,7 +67,7 @@ const TransactionsAPI = {
   getTransactions: (
     page = 1,
     perPage = 15,
-    filters?: TransactionFilter
+    filters?: TransactionFilter,
   ): Promise<TransactionResponse> => {
     // Build query parameters
     const params = new URLSearchParams({
@@ -77,16 +77,16 @@ const TransactionsAPI = {
 
     // Add filters if present
     if (filters) {
-      if (filters.type) params.append("type", filters.type);
-      if (filters.dateFrom) params.append("date_from", filters.dateFrom);
-      if (filters.dateTo) params.append("date_to", filters.dateTo);
+      if (filters.type) params.append('type', filters.type);
+      if (filters.dateFrom) params.append('date_from', filters.dateFrom);
+      if (filters.dateTo) params.append('date_to', filters.dateTo);
       if (filters.minAmount)
-        params.append("min_amount", filters.minAmount.toString());
+        params.append('min_amount', filters.minAmount.toString());
       if (filters.maxAmount)
-        params.append("max_amount", filters.maxAmount.toString());
-      if (filters.status) params.append("status", filters.status);
+        params.append('max_amount', filters.maxAmount.toString());
+      if (filters.status) params.append('status', filters.status);
       if (filters.walletId)
-        params.append("wallet_id", filters.walletId.toString());
+        params.append('wallet_id', filters.walletId.toString());
     }
 
     return Http.get(`/transactions?${params.toString()}`);
@@ -110,14 +110,14 @@ const TransactionsAPI = {
    * Get transaction summary statistics
    */
   getTransactionSummary: (): Promise<any> => {
-    return Http.get("/transactions/summary");
+    return Http.get('/transactions/summary');
   },
 
   /**
    * Get all transfers
    */
   getTransfers: (): Promise<Transfer[]> => {
-    return Http.get("/transfers");
+    return Http.get('/transfers');
   },
 
   /**
@@ -131,7 +131,7 @@ const TransactionsAPI = {
    * Create a new transfer
    */
   createTransfer: (data: TransferData): Promise<Transfer> => {
-    return Http.post("/transfers", data);
+    return Http.post('/transfers', data);
   },
 };
 

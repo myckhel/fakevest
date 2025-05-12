@@ -1,7 +1,9 @@
-import React, { useEffect } from "react";
-import { Alert } from "antd";
-import { useToast } from "@/Stores";
-import useUIStore from "@/Stores/uiStore";
+import React, { useEffect } from 'react';
+
+import { Alert } from 'antd';
+
+import { useToast } from '@/Stores';
+import useUIStore from '@/Stores/uiStore';
 
 const Toast: React.FC = () => {
   const toast = useToast();
@@ -30,7 +32,7 @@ const Toast: React.FC = () => {
     <div className="fixed top-5 right-5 z-50 w-80 shadow-lg">
       <Alert
         message={toast.message}
-        type={toast.type || "info"}
+        type={toast.type || 'info'}
         showIcon
         closable
         onClose={hideToast}

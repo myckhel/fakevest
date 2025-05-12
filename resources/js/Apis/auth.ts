@@ -1,4 +1,4 @@
-import Http from "./Http";
+import Http from './Http';
 
 export interface User {
   id: number;
@@ -62,7 +62,7 @@ const AuthAPI = {
    * Login with email and password
    */
   login: (credentials: LoginCredentials): Promise<AuthResponse> => {
-    return Http.post("/login", credentials);
+    return Http.post('/login', credentials);
   },
 
   /**
@@ -70,7 +70,7 @@ const AuthAPI = {
    */
   register: (userData: RegisterData, avatar?: File): Promise<AuthResponse> => {
     if (!avatar) {
-      return Http.post("/register", userData);
+      return Http.post('/register', userData);
     }
 
     const formData = new FormData();
@@ -82,30 +82,30 @@ const AuthAPI = {
     });
 
     // Add avatar if provided
-    formData.append("avatar", avatar);
+    formData.append('avatar', avatar);
 
-    return Http.upload("/register", formData);
+    return Http.upload('/register', formData);
   },
 
   /**
    * Get current authenticated user
    */
   whoami: (): Promise<User> => {
-    return Http.get("/whoami");
+    return Http.get('/whoami');
   },
 
   /**
    * Logout current user
    */
   logout: (): Promise<{ message: string }> => {
-    return Http.get("/logout");
+    return Http.get('/logout');
   },
 
   /**
    * Initiate social login flow
    */
   getSocialLoginUrl: (
-    provider: "google" | "github" | "facebook"
+    provider: 'google' | 'github' | 'facebook',
   ): Promise<SocialLoginResponse> => {
     return Http.get(`/login/${provider}`);
   },
@@ -114,11 +114,11 @@ const AuthAPI = {
    * Complete social login using callback code
    */
   socialLoginCallback: (
-    provider: "google" | "github" | "facebook",
-    code: string
+    provider: 'google' | 'github' | 'facebook',
+    code: string,
   ): Promise<AuthResponse> => {
     return Http.get(
-      `/login/${provider}/callback?code=${encodeURIComponent(code)}`
+      `/login/${provider}/callback?code=${encodeURIComponent(code)}`,
     );
   },
 
@@ -126,9 +126,9 @@ const AuthAPI = {
    * Send password reset link
    */
   forgotPassword: (
-    email: string
+    email: string,
   ): Promise<{ message: string; status: boolean }> => {
-    return Http.post("/password/forgot", { email });
+    return Http.post('/password/forgot', { email });
   },
 
   /**
@@ -140,7 +140,7 @@ const AuthAPI = {
     password: string;
     password_confirmation: string;
   }): Promise<{ message: string; status: boolean }> => {
-    return Http.post("/password/reset", data);
+    return Http.post('/password/reset', data);
   },
 
   /**
@@ -151,14 +151,14 @@ const AuthAPI = {
     password: string;
     password_confirmation: string;
   }): Promise<{ message: string; status: boolean }> => {
-    return Http.put("/users/password", data);
+    return Http.put('/users/password', data);
   },
 
   /**
    * Resend email verification link
    */
   resendEmailVerification: (): Promise<{ status: string }> => {
-    return Http.post("/email/verification-notification");
+    return Http.post('/email/verification-notification');
   },
 
   /**

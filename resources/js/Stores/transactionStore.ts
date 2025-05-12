@@ -1,13 +1,13 @@
-import { create } from "zustand";
-import { devtools } from "zustand/middleware";
-import API from "../Apis";
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+
+import API from '../Apis';
 import {
   Transaction,
-  Transfer,
   TransactionFilter,
+  Transfer,
   TransferData,
-  TransactionResponse,
-} from "../Apis/transactions";
+} from '../Apis/transactions';
 
 interface TransactionState {
   // State
@@ -28,7 +28,7 @@ interface TransactionState {
   fetchTransactions: (
     page?: number,
     perPage?: number,
-    filters?: TransactionFilter
+    filters?: TransactionFilter,
   ) => Promise<void>;
   fetchRecentTransactions: (limit: number) => Promise<void>;
   fetchTransfers: () => Promise<void>;
@@ -37,7 +37,7 @@ interface TransactionState {
   createTransfer: (data: TransferData) => Promise<Transfer>;
   getTransactionsByDateRange: (
     dateFrom: string,
-    dateTo: string
+    dateTo: string,
   ) => Promise<void>;
   getTransactionsByType: (type: string) => Promise<void>;
   getTransactionSummary: () => Promise<any>;
@@ -64,7 +64,7 @@ const useTransactionStore = create<TransactionState>()(
       fetchTransactions: async (
         page = 1,
         perPage = 15,
-        filters?: TransactionFilter
+        filters?: TransactionFilter,
       ) => {
         try {
           set({ isLoading: true, error: null });
@@ -72,7 +72,7 @@ const useTransactionStore = create<TransactionState>()(
           const response = await API.transactions.getTransactions(
             page,
             perPage,
-            filters
+            filters,
           );
 
           set({
@@ -85,10 +85,10 @@ const useTransactionStore = create<TransactionState>()(
             isLoading: false,
           });
         } catch (err: any) {
-          console.error("Error fetching transactions:", err);
+          console.error('Error fetching transactions:', err);
           set({
             isLoading: false,
-            error: err.response?.data?.message || "Error fetching transactions",
+            error: err.response?.data?.message || 'Error fetching transactions',
           });
           throw err;
         }
@@ -103,12 +103,12 @@ const useTransactionStore = create<TransactionState>()(
             isLoading: false,
           });
         } catch (err: any) {
-          console.error("Error fetching recent transactions:", err);
+          console.error('Error fetching recent transactions:', err);
           set({
             isLoading: false,
             error:
               err.response?.data?.message ||
-              "Error fetching recent transactions",
+              'Error fetching recent transactions',
           });
           throw err;
         }
@@ -123,10 +123,10 @@ const useTransactionStore = create<TransactionState>()(
             isLoading: false,
           });
         } catch (err: any) {
-          console.error("Error fetching transfers:", err);
+          console.error('Error fetching transfers:', err);
           set({
             isLoading: false,
-            error: err.response?.data?.message || "Error fetching transfers",
+            error: err.response?.data?.message || 'Error fetching transfers',
           });
           throw err;
         }
@@ -141,12 +141,12 @@ const useTransactionStore = create<TransactionState>()(
             isLoading: false,
           });
         } catch (err: any) {
-          console.error("Error fetching transaction details:", err);
+          console.error('Error fetching transaction details:', err);
           set({
             isLoading: false,
             error:
               err.response?.data?.message ||
-              "Error fetching transaction details",
+              'Error fetching transaction details',
           });
           throw err;
         }
@@ -161,11 +161,11 @@ const useTransactionStore = create<TransactionState>()(
             isLoading: false,
           });
         } catch (err: any) {
-          console.error("Error fetching transfer details:", err);
+          console.error('Error fetching transfer details:', err);
           set({
             isLoading: false,
             error:
-              err.response?.data?.message || "Error fetching transfer details",
+              err.response?.data?.message || 'Error fetching transfer details',
           });
           throw err;
         }
@@ -183,10 +183,10 @@ const useTransactionStore = create<TransactionState>()(
           set({ isLoading: false });
           return response;
         } catch (err: any) {
-          console.error("Error creating transfer:", err);
+          console.error('Error creating transfer:', err);
           set({
             isLoading: false,
-            error: err.response?.data?.message || "Error creating transfer",
+            error: err.response?.data?.message || 'Error creating transfer',
           });
           throw err;
         }
@@ -203,7 +203,7 @@ const useTransactionStore = create<TransactionState>()(
           const response = await API.transactions.getTransactions(
             1,
             15,
-            filters
+            filters,
           );
 
           set({
@@ -213,12 +213,12 @@ const useTransactionStore = create<TransactionState>()(
 
           return response;
         } catch (err: any) {
-          console.error("Error fetching transactions by date range:", err);
+          console.error('Error fetching transactions by date range:', err);
           set({
             isLoading: false,
             error:
               err.response?.data?.message ||
-              "Error fetching transactions by date range",
+              'Error fetching transactions by date range',
           });
           throw err;
         }
@@ -231,7 +231,7 @@ const useTransactionStore = create<TransactionState>()(
           const response = await API.transactions.getTransactions(
             1,
             15,
-            filters
+            filters,
           );
 
           set({
@@ -241,12 +241,12 @@ const useTransactionStore = create<TransactionState>()(
 
           return response;
         } catch (err: any) {
-          console.error("Error fetching transactions by type:", err);
+          console.error('Error fetching transactions by type:', err);
           set({
             isLoading: false,
             error:
               err.response?.data?.message ||
-              "Error fetching transactions by type",
+              'Error fetching transactions by type',
           });
           throw err;
         }
@@ -259,19 +259,19 @@ const useTransactionStore = create<TransactionState>()(
           set({ isLoading: false });
           return response;
         } catch (err: any) {
-          console.error("Error fetching transaction summary:", err);
+          console.error('Error fetching transaction summary:', err);
           set({
             isLoading: false,
             error:
               err.response?.data?.message ||
-              "Error fetching transaction summary",
+              'Error fetching transaction summary',
           });
           throw err;
         }
       },
     }),
-    { name: "transaction-store" }
-  )
+    { name: 'transaction-store' },
+  ),
 );
 
 export default useTransactionStore;

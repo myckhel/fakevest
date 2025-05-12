@@ -1,7 +1,9 @@
 import React from 'react';
+
 import { Button as AntButton, ButtonProps as AntButtonProps } from 'antd';
-import { cn, useThemeToken } from '../../theme';
 import { VariantProps, cva } from 'class-variance-authority';
+
+import { cn, useThemeToken } from '../../theme';
 
 // Define button variants using class-variance-authority (cva)
 // This approach is inspired by shadcn-ui pattern for component styling
@@ -31,7 +33,7 @@ const buttonVariants = cva(
       size: 'default',
       fullWidth: false,
     },
-  }
+  },
 );
 
 // Extend AntD button props with our custom variants

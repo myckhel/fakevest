@@ -1,7 +1,9 @@
 import React from 'react';
+
 import { Avatar as AntAvatar, AvatarProps as AntAvatarProps } from 'antd';
-import { cn, useThemeToken } from '../../theme';
 import { VariantProps, cva } from 'class-variance-authority';
+
+import { cn, useThemeToken } from '../../theme';
 
 const avatarVariants = cva('', {
   variants: {
@@ -33,15 +35,18 @@ export interface AvatarProps
 }
 
 export const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(
-  ({ className, variant = 'default', size = 'default', src, name, ...props }, ref) => {
+  (
+    { className, variant = 'default', size = 'default', src, name, ...props },
+    ref,
+  ) => {
     const token = useThemeToken();
-    
+
     // Get initials from name (if provided)
     const getInitials = () => {
       if (!name) return '';
       return name
         .split(' ')
-        .map(part => part[0])
+        .map((part) => part[0])
         .join('')
         .toUpperCase()
         .substring(0, 2);
@@ -110,7 +115,7 @@ export const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(
         {!src && getInitials()}
       </AntAvatar>
     );
-  }
+  },
 );
 
 Avatar.displayName = 'Avatar';

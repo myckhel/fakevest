@@ -1,14 +1,15 @@
-import { create } from "zustand";
-import { devtools } from "zustand/middleware";
-import API from "../Apis";
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+
+import API from '../Apis';
 import {
-  Wallet,
   BankAccount,
-  WalletStatistics,
-  WithdrawData,
   DepositData,
+  Wallet,
+  WalletStatistics,
   WalletTransferData,
-} from "../Apis/wallet";
+  WithdrawData,
+} from '../Apis/wallet';
 
 interface WalletState {
   // State
@@ -32,15 +33,15 @@ interface WalletState {
   fetchWalletTransactions: (
     walletId: number,
     page?: number,
-    perPage?: number
+    perPage?: number,
   ) => Promise<any>;
   fetchWalletStatistics: () => Promise<void>;
   fetchBankAccounts: () => Promise<void>;
   addBankAccount: (
     bankAccount: Omit<
       BankAccount,
-      "id" | "user_id" | "created_at" | "updated_at"
-    >
+      'id' | 'user_id' | 'created_at' | 'updated_at'
+    >,
   ) => Promise<BankAccount>;
   deleteBankAccount: (accountId: number) => Promise<void>;
   setDefaultBankAccount: (accountId: number) => Promise<void>;
@@ -69,10 +70,10 @@ const useWalletStore = create<WalletState>()(
             isLoading: false,
           });
         } catch (err: any) {
-          console.error("Error fetching naira wallet:", err);
+          console.error('Error fetching naira wallet:', err);
           set({
             isLoading: false,
-            error: err.response?.data?.message || "Error fetching naira wallet",
+            error: err.response?.data?.message || 'Error fetching naira wallet',
           });
           throw err;
         }
@@ -87,11 +88,11 @@ const useWalletStore = create<WalletState>()(
             isLoading: false,
           });
         } catch (err: any) {
-          console.error("Error fetching dollar wallet:", err);
+          console.error('Error fetching dollar wallet:', err);
           set({
             isLoading: false,
             error:
-              err.response?.data?.message || "Error fetching dollar wallet",
+              err.response?.data?.message || 'Error fetching dollar wallet',
           });
           throw err;
         }
@@ -106,10 +107,10 @@ const useWalletStore = create<WalletState>()(
             isLoading: false,
           });
         } catch (err: any) {
-          console.error("Error fetching wallets:", err);
+          console.error('Error fetching wallets:', err);
           set({
             isLoading: false,
-            error: err.response?.data?.message || "Error fetching wallets",
+            error: err.response?.data?.message || 'Error fetching wallets',
           });
           throw err;
         }
@@ -139,19 +140,19 @@ const useWalletStore = create<WalletState>()(
           const response = await API.wallet.withdrawFunds(data);
 
           // Refresh wallet data after withdrawal
-          if (data.wallet_name === "naira") {
+          if (data.wallet_name === 'naira') {
             await get().fetchNairaWallet();
-          } else if (data.wallet_name === "dollar") {
+          } else if (data.wallet_name === 'dollar') {
             await get().fetchDollarWallet();
           }
 
           set({ isLoading: false });
           return response;
         } catch (err: any) {
-          console.error("Error withdrawing funds:", err);
+          console.error('Error withdrawing funds:', err);
           set({
             isLoading: false,
-            error: err.response?.data?.message || "Error withdrawing funds",
+            error: err.response?.data?.message || 'Error withdrawing funds',
           });
           throw err;
         }
@@ -163,19 +164,19 @@ const useWalletStore = create<WalletState>()(
           const response = await API.wallet.depositFunds(data);
 
           // Refresh wallet data after deposit
-          if (data.wallet_name === "naira") {
+          if (data.wallet_name === 'naira') {
             await get().fetchNairaWallet();
-          } else if (data.wallet_name === "dollar") {
+          } else if (data.wallet_name === 'dollar') {
             await get().fetchDollarWallet();
           }
 
           set({ isLoading: false });
           return response;
         } catch (err: any) {
-          console.error("Error depositing funds:", err);
+          console.error('Error depositing funds:', err);
           set({
             isLoading: false,
-            error: err.response?.data?.message || "Error depositing funds",
+            error: err.response?.data?.message || 'Error depositing funds',
           });
           throw err;
         }
@@ -188,10 +189,10 @@ const useWalletStore = create<WalletState>()(
           set({ isLoading: false });
           return interests;
         } catch (err: any) {
-          console.error("Error fetching interests:", err);
+          console.error('Error fetching interests:', err);
           set({
             isLoading: false,
-            error: err.response?.data?.message || "Error fetching interests",
+            error: err.response?.data?.message || 'Error fetching interests',
           });
           return [];
         }
@@ -208,10 +209,10 @@ const useWalletStore = create<WalletState>()(
 
           set({ isLoading: false });
         } catch (err: any) {
-          console.error("Error accepting interest:", err);
+          console.error('Error accepting interest:', err);
           set({
             isLoading: false,
-            error: err.response?.data?.message || "Error accepting interest",
+            error: err.response?.data?.message || 'Error accepting interest',
           });
           throw err;
         }
@@ -220,21 +221,21 @@ const useWalletStore = create<WalletState>()(
       fetchWalletTransactions: async (
         walletId: number,
         page = 1,
-        perPage = 15
+        perPage = 15,
       ) => {
         try {
           set({ isLoading: true, error: null });
           const transactions = await API.wallet.getWalletTransactions(
             walletId,
             page,
-            perPage
+            perPage,
           );
           set({ isLoading: false });
           return transactions;
         } catch (err: any) {
           console.error(
             `Error fetching transactions for wallet ${walletId}:`,
-            err
+            err,
           );
           set({
             isLoading: false,
@@ -255,11 +256,11 @@ const useWalletStore = create<WalletState>()(
             isLoading: false,
           });
         } catch (err: any) {
-          console.error("Error fetching wallet statistics:", err);
+          console.error('Error fetching wallet statistics:', err);
           set({
             isLoading: false,
             error:
-              err.response?.data?.message || "Error fetching wallet statistics",
+              err.response?.data?.message || 'Error fetching wallet statistics',
           });
           throw err;
         }
@@ -274,11 +275,11 @@ const useWalletStore = create<WalletState>()(
             isLoading: false,
           });
         } catch (err: any) {
-          console.error("Error fetching bank accounts:", err);
+          console.error('Error fetching bank accounts:', err);
           set({
             isLoading: false,
             error:
-              err.response?.data?.message || "Error fetching bank accounts",
+              err.response?.data?.message || 'Error fetching bank accounts',
           });
           throw err;
         }
@@ -292,10 +293,10 @@ const useWalletStore = create<WalletState>()(
           set({ isLoading: false });
           return newAccount;
         } catch (err: any) {
-          console.error("Error adding bank account:", err);
+          console.error('Error adding bank account:', err);
           set({
             isLoading: false,
-            error: err.response?.data?.message || "Error adding bank account",
+            error: err.response?.data?.message || 'Error adding bank account',
           });
           throw err;
         }
@@ -310,7 +311,7 @@ const useWalletStore = create<WalletState>()(
         } catch (err: any) {
           console.error(
             `Error deleting bank account with ID ${accountId}:`,
-            err
+            err,
           );
           set({
             isLoading: false,
@@ -331,7 +332,7 @@ const useWalletStore = create<WalletState>()(
         } catch (err: any) {
           console.error(
             `Error setting bank account with ID ${accountId} as default:`,
-            err
+            err,
           );
           set({
             isLoading: false,
@@ -354,19 +355,19 @@ const useWalletStore = create<WalletState>()(
           set({ isLoading: false });
           return response;
         } catch (err: any) {
-          console.error("Error transferring between wallets:", err);
+          console.error('Error transferring between wallets:', err);
           set({
             isLoading: false,
             error:
               err.response?.data?.message ||
-              "Error transferring between wallets",
+              'Error transferring between wallets',
           });
           throw err;
         }
       },
     }),
-    { name: "wallet-store" }
-  )
+    { name: 'wallet-store' },
+  ),
 );
 
 export default useWalletStore;

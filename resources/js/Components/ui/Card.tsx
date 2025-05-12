@@ -1,7 +1,9 @@
 import React from 'react';
+
 import { Card as AntCard, CardProps as AntCardProps } from 'antd';
-import { cn, useThemeToken } from '../../theme';
 import { VariantProps, cva } from 'class-variance-authority';
+
+import { cn, useThemeToken } from '../../theme';
 
 const { Meta } = AntCard;
 
@@ -28,7 +30,7 @@ const cardVariants = cva(
       size: 'default',
       fullWidth: false,
     },
-  }
+  },
 );
 
 export interface CardProps
@@ -40,7 +42,19 @@ export interface CardProps
 }
 
 export const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant = 'default', size = 'default', fullWidth, title, extra, children, ...props }, ref) => {
+  (
+    {
+      className,
+      variant = 'default',
+      size = 'default',
+      fullWidth,
+      title,
+      extra,
+      children,
+      ...props
+    },
+    ref,
+  ) => {
     const token = useThemeToken();
 
     // Map our size to Ant Design sizes
@@ -73,7 +87,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
         {children}
       </AntCard>
     );
-  }
+  },
 );
 
 Card.displayName = 'Card';

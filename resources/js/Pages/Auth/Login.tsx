@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { Head, Link, router, usePage } from "@inertiajs/react";
-import { Button, Form, Input, Divider, message } from "antd";
+import React, { useState, useEffect } from 'react';
+
 import {
   LockOutlined,
   MailOutlined,
   GithubOutlined,
   GoogleOutlined,
   FacebookOutlined,
-} from "@ant-design/icons";
-import AuthLayout from "@/Layouts/AuthLayout";
-import useAuthStore from "@/Stores/authStore";
-import { inertiaApi } from "@/utils/inertiaApi";
-import axios from "axios";
+} from '@ant-design/icons';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Button, Form, Input, Divider, message } from 'antd';
+import axios from 'axios';
+
+import AuthLayout from '@/Layouts/AuthLayout';
+import useAuthStore from '@/Stores/authStore';
+import { inertiaApi } from '@/utils/inertiaApi';
 
 interface PageProps {
   errors: Record<string, string>;
@@ -52,11 +54,11 @@ const Login: React.FC = () => {
     remember?: boolean;
   }) => {
     setLoading(true);
-    axios.get("/sanctum/csrf-cookie").then(() => {
+    axios.get('/sanctum/csrf-cookie').then(() => {
       // Login...
       // For web pages (not API), we use direct routes
       inertiaApi.post(
-        "login",
+        'login',
         {
           email: values.email,
           password: values.password,
@@ -68,20 +70,20 @@ const Login: React.FC = () => {
           },
           preserveScroll: true,
           preserveState: true,
-        }
+        },
       );
     });
   };
 
   const handleSocialLogin = async (
-    provider: "google" | "github" | "facebook"
+    provider: 'google' | 'github' | 'facebook',
   ) => {
     setSocialLoading({ ...socialLoading, [provider]: true });
 
     try {
       const url = await getSocialLoginUrl(provider);
       router.visit(url);
-    } catch (error) {
+    } catch (_error) {
       message.error(`Failed to initialize ${provider} login`);
     } finally {
       setSocialLoading({ ...socialLoading, [provider]: false });
@@ -102,10 +104,10 @@ const Login: React.FC = () => {
         <Form.Item
           name="email"
           rules={[
-            { required: true, message: "Please enter your email" },
-            { type: "email", message: "Please enter a valid email" },
+            { required: true, message: 'Please enter your email' },
+            { type: 'email', message: 'Please enter a valid email' },
           ]}
-          validateStatus={errors.email ? "error" : ""}
+          validateStatus={errors.email ? 'error' : ''}
           help={errors.email}
         >
           <Input
@@ -117,8 +119,8 @@ const Login: React.FC = () => {
 
         <Form.Item
           name="password"
-          rules={[{ required: true, message: "Please enter your password" }]}
-          validateStatus={errors.password ? "error" : ""}
+          rules={[{ required: true, message: 'Please enter your password' }]}
+          validateStatus={errors.password ? 'error' : ''}
           help={errors.password}
         >
           <Input.Password
@@ -163,7 +165,7 @@ const Login: React.FC = () => {
           <Button
             type="default"
             icon={<GoogleOutlined />}
-            onClick={() => handleSocialLogin("google")}
+            onClick={() => handleSocialLogin('google')}
             loading={socialLoading.google}
           >
             Google
@@ -171,7 +173,7 @@ const Login: React.FC = () => {
           <Button
             type="default"
             icon={<FacebookOutlined />}
-            onClick={() => handleSocialLogin("facebook")}
+            onClick={() => handleSocialLogin('facebook')}
             loading={socialLoading.facebook}
           >
             Facebook
@@ -179,7 +181,7 @@ const Login: React.FC = () => {
           <Button
             type="default"
             icon={<GithubOutlined />}
-            onClick={() => handleSocialLogin("github")}
+            onClick={() => handleSocialLogin('github')}
             loading={socialLoading.github}
           >
             GitHub
@@ -188,7 +190,7 @@ const Login: React.FC = () => {
 
         <div className="text-center mt-4">
           <p>
-            Don't have an account?{" "}
+            Don't have an account?{' '}
             <Link href="/register" className="text-blue-600 hover:underline">
               Sign up
             </Link>

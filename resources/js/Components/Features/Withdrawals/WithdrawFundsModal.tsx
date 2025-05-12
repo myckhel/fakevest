@@ -1,28 +1,28 @@
-import React, { useState } from "react";
-import {
-  Modal,
-  Form,
-  Input,
-  InputNumber,
-  Button,
-  Select,
-  Typography,
-  Alert,
-  Steps,
-} from "antd";
+import React, { useState } from 'react';
+
 import {
   CheckCircleOutlined,
-  WalletOutlined,
   SafetyCertificateOutlined,
-} from "@ant-design/icons";
-import useWalletStore from "@/Stores/walletStore";
-import useUIStore from "@/Stores/uiStore";
-import TransactionPin from "../PIN/TransactionPin";
-import useAuthStore from "@/Stores/authStore";
+  WalletOutlined,
+} from '@ant-design/icons';
+import {
+  Alert,
+  Button,
+  Form,
+  InputNumber,
+  Modal,
+  Select,
+  Steps,
+  Typography,
+} from 'antd';
+
+import useUIStore from '@/Stores/uiStore';
+import useWalletStore from '@/Stores/walletStore';
+
+import TransactionPin from '../PIN/TransactionPin';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
-const { Step } = Steps;
 
 type WithdrawFundsModalProps = {
   visible: boolean;
@@ -37,14 +37,13 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({
   onClose,
 }) => {
   const [form] = Form.useForm();
-  const [isLoading, setIsLoading] = useState(false);
+  const [_isLoading, setIsLoading] = useState(false);
   const [withdrawSuccess, setWithdrawSuccess] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [withdrawDetails, setWithdrawDetails] = useState<any>(null);
 
   const { withdrawFunds } = useWalletStore();
   const { showToast } = useUIStore();
-  const { user } = useAuthStore();
 
   const handleWithdrawDetailsSubmit = (values: any) => {
     setWithdrawDetails(values);
@@ -56,7 +55,7 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({
       setIsLoading(true);
       await withdrawFunds({
         amount: withdrawDetails.amount,
-        wallet_name: "naira",
+        wallet_name: 'naira',
         account_id: withdrawDetails.accountId,
         pin: pin,
       });
@@ -66,11 +65,11 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({
         handleClose();
       }, 2000);
 
-      showToast("Withdrawal initiated successfully", "success");
+      showToast('Withdrawal initiated successfully', 'success');
     } catch (error: any) {
       const errorMessage =
-        error.response?.data?.message || "Withdrawal failed. Please try again.";
-      showToast(errorMessage, "error");
+        error.response?.data?.message || 'Withdrawal failed. Please try again.';
+      showToast(errorMessage, 'error');
     } finally {
       setIsLoading(false);
     }
@@ -94,11 +93,11 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({
       className="mb-6"
       items={[
         {
-          title: "Details",
+          title: 'Details',
           icon: <WalletOutlined />,
         },
         {
-          title: "Authorization",
+          title: 'Authorization',
           icon: <SafetyCertificateOutlined />,
         },
       ]}
@@ -124,7 +123,7 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({
       <Form.Item
         name="accountId"
         label="Account"
-        rules={[{ required: true, message: "Please select account" }]}
+        rules={[{ required: true, message: 'Please select account' }]}
       >
         <Select placeholder="Select bank account">
           <Option value={1}>Access Bank - 012345678</Option>
@@ -137,20 +136,20 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({
         name="amount"
         label="Amount"
         rules={[
-          { required: true, message: "Please enter amount" },
+          { required: true, message: 'Please enter amount' },
           {
-            type: "number",
+            type: 'number',
             min: 1000,
-            message: "Minimum withdrawal is ₦1,000",
+            message: 'Minimum withdrawal is ₦1,000',
           },
         ]}
       >
         <InputNumber
-          style={{ width: "100%" }}
+          style={{ width: '100%' }}
           formatter={(value) =>
-            `₦ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            `₦ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
           }
-          parser={(value) => value!.replace(/₦\s?|(,*)/g, "")}
+          parser={(value) => value!.replace(/₦\s?|(,*)/g, '')}
           placeholder="Enter amount"
         />
       </Form.Item>
@@ -173,7 +172,7 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({
     >
       {withdrawSuccess ? (
         <div className="text-center py-8">
-          <CheckCircleOutlined style={{ fontSize: 48, color: "#52c41a" }} />
+          <CheckCircleOutlined style={{ fontSize: 48, color: '#52c41a' }} />
           <Title level={4} className="mt-4">
             Withdrawal Initiated!
           </Title>
@@ -194,10 +193,10 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({
                     <Text>Account:</Text>
                     <Text strong>
                       {withdrawDetails?.accountId === 1
-                        ? "Access Bank - 012345678"
+                        ? 'Access Bank - 012345678'
                         : withdrawDetails?.accountId === 2
-                        ? "GTBank - 987654321"
-                        : withdrawDetails?.accountId}
+                          ? 'GTBank - 987654321'
+                          : withdrawDetails?.accountId}
                     </Text>
                   </div>
                   <div className="flex justify-between mb-1">

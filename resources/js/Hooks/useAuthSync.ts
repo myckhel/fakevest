@@ -1,6 +1,8 @@
-import { useEffect } from "react";
-import { usePage } from "@inertiajs/react";
-import useAuthStore from "@/Stores/authStore";
+import { useEffect } from 'react';
+
+import { usePage } from '@inertiajs/react';
+
+import useAuthStore from '@/Stores/authStore';
 
 /**
  * Hook to sync auth state with Inertia page props during navigation

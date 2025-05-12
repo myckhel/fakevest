@@ -1,14 +1,16 @@
-import React, { useState } from "react";
-import MainLayout from "@/Layouts/MainLayout";
-import { Head } from "@inertiajs/react";
-import { Typography, Tabs, Card, DatePicker, Space, Select } from "antd";
+import React, { useState } from 'react';
+
 import {
   TransactionOutlined,
   SwapOutlined,
   UploadOutlined,
   DownloadOutlined,
-} from "@ant-design/icons";
-import TransactionsList from "@/Components/Features/Transactions/TransactionsList";
+} from '@ant-design/icons';
+import { Head } from '@inertiajs/react';
+import { Typography, Tabs, Card, DatePicker, Space, Select } from 'antd';
+
+import TransactionsList from '@/Components/Features/Transactions/TransactionsList';
+import MainLayout from '@/Layouts/MainLayout';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -23,7 +25,7 @@ const Transactions = () => {
     null,
     null,
   ]);
-  const [transactionType, setTransactionType] = useState<string>("all");
+  const [transactionType, setTransactionType] = useState<string>('all');
 
   // Handle filtering changes
   const handleDateChange = (dates: any) => {
@@ -81,12 +83,12 @@ const Transactions = () => {
                   onChange={handleTypeChange}
                   className="w-full md:w-48"
                   options={[
-                    { value: "all", label: "All Transactions" },
-                    { value: "deposit", label: "Deposits" },
-                    { value: "withdrawal", label: "Withdrawals" },
-                    { value: "transfer", label: "Transfers" },
-                    { value: "savings", label: "Savings" },
-                    { value: "interest", label: "Interest" },
+                    { value: 'all', label: 'All Transactions' },
+                    { value: 'deposit', label: 'Deposits' },
+                    { value: 'withdrawal', label: 'Withdrawals' },
+                    { value: 'transfer', label: 'Transfers' },
+                    { value: 'savings', label: 'Savings' },
+                    { value: 'interest', label: 'Interest' },
                   ]}
                 />
               </div>

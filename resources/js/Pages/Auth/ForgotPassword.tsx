@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { Head, Link, usePage } from "@inertiajs/react";
-import { Button, Form, Input, Alert, message } from "antd";
-import { MailOutlined } from "@ant-design/icons";
-import AuthLayout from "@/Layouts/AuthLayout";
-import { inertiaApi } from "@/utils/inertiaApi";
+import React, { useState, useEffect } from 'react';
+
+import { MailOutlined } from '@ant-design/icons';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { Button, Form, Input, Alert, message } from 'antd';
+
+import AuthLayout from '@/Layouts/AuthLayout';
+import { inertiaApi } from '@/utils/inertiaApi';
 
 interface PageProps {
   errors: Record<string, string>;
@@ -28,7 +30,7 @@ const ForgotPassword: React.FC = () => {
 
     // Use inertiaApi utility to ensure proper /api/v1 base path
     inertiaApi.post(
-      "auth/password/forgot",
+      'auth/password/forgot',
       {
         email: values.email,
       },
@@ -37,7 +39,7 @@ const ForgotPassword: React.FC = () => {
           setLoading(false);
         },
         preserveScroll: true,
-      }
+      },
     );
   };
 
@@ -67,10 +69,10 @@ const ForgotPassword: React.FC = () => {
         <Form.Item
           name="email"
           rules={[
-            { required: true, message: "Please enter your email" },
-            { type: "email", message: "Please enter a valid email" },
+            { required: true, message: 'Please enter your email' },
+            { type: 'email', message: 'Please enter a valid email' },
           ]}
-          validateStatus={errors.email ? "error" : ""}
+          validateStatus={errors.email ? 'error' : ''}
           help={errors.email}
         >
           <Input
@@ -95,7 +97,7 @@ const ForgotPassword: React.FC = () => {
 
         <div className="text-center mt-4">
           <p>
-            Remember your password?{" "}
+            Remember your password?{' '}
             <Link href="/login" className="text-blue-600 hover:underline">
               Sign in
             </Link>

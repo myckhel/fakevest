@@ -1,25 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from 'react';
+
 import {
-  Modal,
+  CheckCircleOutlined,
+  SafetyCertificateOutlined,
+  SendOutlined,
+} from '@ant-design/icons';
+import {
+  Button,
   Form,
   Input,
   InputNumber,
-  Button,
-  Typography,
-  Steps,
+  Modal,
   Select,
-} from "antd";
-import {
-  CheckCircleOutlined,
-  SendOutlined,
-  SafetyCertificateOutlined,
-} from "@ant-design/icons";
-import useTransactionStore from "@/Stores/transactionStore";
-import useWalletStore from "@/Stores/walletStore";
-import useUIStore from "@/Stores/uiStore";
-import useAuthStore from "@/Stores/authStore";
-import { TransferData } from "@/Apis/transactions";
-import TransactionPin from "../PIN/TransactionPin";
+  Steps,
+  Typography,
+} from 'antd';
+
+import { TransferData } from '@/Apis/transactions';
+import useTransactionStore from '@/Stores/transactionStore';
+import useUIStore from '@/Stores/uiStore';
+import useWalletStore from '@/Stores/walletStore';
+
+import TransactionPin from '../PIN/TransactionPin';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -37,16 +39,15 @@ const TransferMoneyModal: React.FC<TransferMoneyModalProps> = ({
   onClose,
 }) => {
   const [form] = Form.useForm();
-  const [isLoading, setIsLoading] = useState(false);
+  const [, setIsLoading] = useState(false);
   const [transferSuccess, setTransferSuccess] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [transferDetails, setTransferDetails] = useState<any>(null);
-  const [transferType, setTransferType] = useState<"user" | "wallet">("user");
+  const [transferType, setTransferType] = useState<'user' | 'wallet'>('user');
 
   const { createTransfer } = useTransactionStore();
   const { fetchAllWallets, wallets } = useWalletStore();
   const { showToast } = useUIStore();
-  const { user } = useAuthStore();
 
   // Fetch wallets on component mount
   useEffect(() => {
@@ -55,9 +56,9 @@ const TransferMoneyModal: React.FC<TransferMoneyModalProps> = ({
     }
   }, [visible]);
 
-  const handleTransferTypeChange = (value: "user" | "wallet") => {
+  const handleTransferTypeChange = (value: 'user' | 'wallet') => {
     setTransferType(value);
-    form.resetFields(["username", "to_wallet_id"]);
+    form.resetFields(['username', 'to_wallet_id']);
   };
 
   const handleTransferDetailsSubmit = (values: any) => {
@@ -78,7 +79,7 @@ const TransferMoneyModal: React.FC<TransferMoneyModalProps> = ({
       };
 
       // Add either username or to_wallet_id based on transfer type
-      if (transferType === "user") {
+      if (transferType === 'user') {
         transferData.username = transferDetails.username;
       } else {
         transferData.to_wallet_id = transferDetails.to_wallet_id;
@@ -92,11 +93,11 @@ const TransferMoneyModal: React.FC<TransferMoneyModalProps> = ({
         handleClose();
       }, 2000);
 
-      showToast("Transfer completed successfully", "success");
+      showToast('Transfer completed successfully', 'success');
     } catch (error: any) {
       const errorMessage =
-        error.response?.data?.message || "Transfer failed. Please try again.";
-      showToast(errorMessage, "error");
+        error.response?.data?.message || 'Transfer failed. Please try again.';
+      showToast(errorMessage, 'error');
     } finally {
       setIsLoading(false);
     }
@@ -120,11 +121,11 @@ const TransferMoneyModal: React.FC<TransferMoneyModalProps> = ({
       className="mb-6"
       items={[
         {
-          title: "Details",
+          title: 'Details',
           icon: <SendOutlined />,
         },
         {
-          title: "Authorization",
+          title: 'Authorization',
           icon: <SafetyCertificateOutlined />,
         },
       ]}
@@ -137,12 +138,12 @@ const TransferMoneyModal: React.FC<TransferMoneyModalProps> = ({
       layout="vertical"
       onFinish={handleTransferDetailsSubmit}
       requiredMark={false}
-      initialValues={{ wallet_id: wallets?.[0]?.id, transferType: "user" }}
+      initialValues={{ wallet_id: wallets?.[0]?.id, transferType: 'user' }}
     >
       <Form.Item
         name="wallet_id"
         label="From Wallet"
-        rules={[{ required: true, message: "Please select source wallet" }]}
+        rules={[{ required: true, message: 'Please select source wallet' }]}
       >
         <Select placeholder="Select wallet">
           {wallets?.map((wallet) => (
@@ -157,7 +158,7 @@ const TransferMoneyModal: React.FC<TransferMoneyModalProps> = ({
       <Form.Item name="transferType" label="Transfer To">
         <Select
           onChange={(value) =>
-            handleTransferTypeChange(value as "user" | "wallet")
+            handleTransferTypeChange(value as 'user' | 'wallet')
           }
         >
           <Option value="user">Another User</Option>
@@ -165,7 +166,7 @@ const TransferMoneyModal: React.FC<TransferMoneyModalProps> = ({
         </Select>
       </Form.Item>
 
-      {transferType === "user" ? (
+      {transferType === 'user' ? (
         <Form.Item
           name="username"
           label="Recipient Username"
@@ -180,12 +181,12 @@ const TransferMoneyModal: React.FC<TransferMoneyModalProps> = ({
           name="to_wallet_id"
           label="Destination Wallet"
           rules={[
-            { required: true, message: "Please select destination wallet" },
+            { required: true, message: 'Please select destination wallet' },
           ]}
         >
           <Select placeholder="Select destination wallet">
             {wallets
-              ?.filter((w) => w.id !== form.getFieldValue("wallet_id"))
+              ?.filter((w) => w.id !== form.getFieldValue('wallet_id'))
               .map((wallet) => (
                 <Option key={wallet.id} value={wallet.id}>
                   {wallet.name.charAt(0).toUpperCase() + wallet.name.slice(1)} -
@@ -200,20 +201,20 @@ const TransferMoneyModal: React.FC<TransferMoneyModalProps> = ({
         name="amount"
         label="Amount"
         rules={[
-          { required: true, message: "Please enter amount" },
+          { required: true, message: 'Please enter amount' },
           {
-            type: "number",
+            type: 'number',
             min: 100,
-            message: "Amount must be at least ₦100",
+            message: 'Amount must be at least ₦100',
           },
         ]}
       >
         <InputNumber
-          style={{ width: "100%" }}
+          style={{ width: '100%' }}
           formatter={(value) =>
-            `₦ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            `₦ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
           }
-          parser={(value) => value!.replace(/₦\s?|(,*)/g, "")}
+          parser={(value) => value!.replace(/₦\s?|(,*)/g, '')}
           placeholder="Enter amount"
         />
       </Form.Item>
@@ -232,10 +233,10 @@ const TransferMoneyModal: React.FC<TransferMoneyModalProps> = ({
 
   const renderTransferSummary = () => {
     const selectedWallet = wallets?.find(
-      (w) => w.id === transferDetails?.wallet_id
+      (w) => w.id === transferDetails?.wallet_id,
     );
     const destinationWallet =
-      transferType === "wallet"
+      transferType === 'wallet'
         ? wallets?.find((w) => w.id === transferDetails?.to_wallet_id)
         : null;
 
@@ -251,21 +252,21 @@ const TransferMoneyModal: React.FC<TransferMoneyModalProps> = ({
                     selectedWallet.name.charAt(0).toUpperCase() +
                     selectedWallet.name.slice(1)
                   } Wallet`
-                : "Selected wallet"}
+                : 'Selected wallet'}
             </Text>
           </div>
 
           <div className="flex justify-between mb-1">
             <Text>To:</Text>
             <Text strong>
-              {transferType === "user"
+              {transferType === 'user'
                 ? transferDetails?.username
                 : destinationWallet
-                ? `${
-                    destinationWallet.name.charAt(0).toUpperCase() +
-                    destinationWallet.name.slice(1)
-                  } Wallet`
-                : "Selected wallet"}
+                  ? `${
+                      destinationWallet.name.charAt(0).toUpperCase() +
+                      destinationWallet.name.slice(1)
+                    } Wallet`
+                  : 'Selected wallet'}
             </Text>
           </div>
 
@@ -295,7 +296,7 @@ const TransferMoneyModal: React.FC<TransferMoneyModalProps> = ({
     >
       {transferSuccess ? (
         <div className="text-center py-8">
-          <CheckCircleOutlined style={{ fontSize: 48, color: "#52c41a" }} />
+          <CheckCircleOutlined style={{ fontSize: 48, color: '#52c41a' }} />
           <Title level={4} className="mt-4">
             Transfer Successful!
           </Title>

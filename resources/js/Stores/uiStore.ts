@@ -1,11 +1,11 @@
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-import { devtools } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { devtools } from 'zustand/middleware';
 
 interface ToastState {
   visible: boolean;
   message: string;
-  type: "success" | "error" | "info" | "warning" | null;
+  type: 'success' | 'error' | 'info' | 'warning' | null;
 }
 
 interface UIState {
@@ -19,7 +19,7 @@ interface UIState {
   toggleDarkMode: () => void;
   showToast: (
     message: string,
-    type: "success" | "error" | "info" | "warning"
+    type: 'success' | 'error' | 'info' | 'warning',
   ) => void;
   hideToast: () => void;
 }
@@ -33,7 +33,7 @@ const useUIStore = create<UIState>()(
         darkMode: false,
         toast: {
           visible: false,
-          message: "",
+          message: '',
           type: null,
         },
 
@@ -47,9 +47,9 @@ const useUIStore = create<UIState>()(
 
           // Apply dark mode class to document
           if (newDarkMode) {
-            document.documentElement.classList.add("dark");
+            document.documentElement.classList.add('dark');
           } else {
-            document.documentElement.classList.remove("dark");
+            document.documentElement.classList.remove('dark');
           }
 
           set({ darkMode: newDarkMode });
@@ -78,22 +78,22 @@ const useUIStore = create<UIState>()(
           set({
             toast: {
               visible: false,
-              message: "",
+              message: '',
               type: null,
             },
           });
         },
       }),
       {
-        name: "ui-storage", // localStorage key
+        name: 'ui-storage', // localStorage key
         storage: createJSONStorage(() => localStorage),
         partialize: (state) => ({
           darkMode: state.darkMode,
         }),
-      }
+      },
     ),
-    { name: "UIStore" }
-  )
+    { name: 'UIStore' },
+  ),
 );
 
 export default useUIStore;

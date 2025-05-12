@@ -1,37 +1,39 @@
-import React, { useState } from "react";
-import { Link } from "@inertiajs/react";
+import React, { useState } from 'react';
+
 import {
-  Layout,
-  Menu,
-  Button,
-  Avatar,
-  Dropdown,
-  Badge,
-  Typography,
-  Drawer,
-  Space,
-} from "antd";
-import type { MenuProps } from "antd";
-import {
-  HomeOutlined,
-  DollarOutlined,
-  WalletOutlined,
-  ProfileOutlined,
-  UserOutlined,
+  BarChartOutlined,
   BellOutlined,
+  BulbFilled,
+  BulbOutlined,
+  DollarOutlined,
+  HomeOutlined,
+  LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  LogoutOutlined,
   SettingOutlined,
-  BulbOutlined,
-  BulbFilled,
-  BarChartOutlined,
-} from "@ant-design/icons";
+  UserOutlined,
+  WalletOutlined,
+} from '@ant-design/icons';
+import { Link } from '@inertiajs/react';
+import {
+  Avatar,
+  Badge,
+  Button,
+  Drawer,
+  Dropdown,
+  Layout,
+  Menu,
+  Space,
+  Typography,
+} from 'antd';
+
+import useAuthSync from '../Hooks/useAuthSync';
+import useAuthStore from '../Stores/authStore';
+import useUIStore from '../Stores/uiStore';
+
+import type { MenuProps } from 'antd';
 
 // Import Zustand stores
-import useAuthStore from "../Stores/authStore";
-import useUIStore from "../Stores/uiStore";
-import useAuthSync from "../Hooks/useAuthSync";
 
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
@@ -57,58 +59,58 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     try {
       await logout();
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error('Logout failed:', error);
     }
   };
 
   // Menu items configuration
   const menuItems = [
     {
-      key: "/dashboard",
+      key: '/dashboard',
       icon: <HomeOutlined />,
       label: <Link href="/dashboard">Dashboard</Link>,
     },
     {
-      key: "/savings",
+      key: '/savings',
       icon: <DollarOutlined />,
       label: <Link href="/savings">Savings</Link>,
     },
     {
-      key: "/wallets",
+      key: '/wallets',
       icon: <WalletOutlined />,
       label: <Link href="/wallets">Wallets</Link>,
     },
     {
-      key: "/transactions",
+      key: '/transactions',
       icon: <BarChartOutlined />,
       label: <Link href="/transactions">Transactions</Link>,
     },
     {
-      key: "/profile",
+      key: '/profile',
       icon: <UserOutlined />,
       label: <Link href="/profile">Profile</Link>,
     },
   ];
 
   // User dropdown menu items
-  const userMenuItems: MenuProps["items"] = [
+  const userMenuItems: MenuProps['items'] = [
     {
-      key: "1",
+      key: '1',
       icon: <UserOutlined />,
       label: <Link href="/profile">Profile</Link>,
     },
     {
-      key: "2",
+      key: '2',
       icon: <SettingOutlined />,
       label: <Link href="/settings">Settings</Link>,
     },
     {
-      type: "divider",
+      type: 'divider',
     },
     {
-      key: "3",
+      key: '3',
       icon: <LogoutOutlined />,
-      label: "Logout",
+      label: 'Logout',
       onClick: handleLogout,
     },
   ];
@@ -118,12 +120,12 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     if (!user?.avatar) return undefined;
 
     // Handle if avatar is an object with url property
-    if (typeof user.avatar === "object" && user.avatar !== null) {
+    if (typeof user.avatar === 'object' && user.avatar !== null) {
       return user.avatar.url || user.avatar.medium || user.avatar.thumb;
     }
 
     // Handle if avatar is already a string
-    if (typeof user.avatar === "string") {
+    if (typeof user.avatar === 'string') {
       return user.avatar;
     }
 
@@ -132,20 +134,20 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   // Helper function to get user display name
   const getUserDisplayName = () => {
-    if (!user) return "";
+    if (!user) return '';
 
     // Check which property exists on the user object
     if (user.fullname) return user.fullname;
 
     // Use type assertion for potentially undefined properties
     const userData = user as any;
-    if (userData.email) return userData.email.split("@")[0];
+    if (userData.email) return userData.email.split('@')[0];
 
-    return "User";
+    return 'User';
   };
 
   return (
-    <Layout className={`min-h-screen ${darkMode ? "dark" : ""}`}>
+    <Layout className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
       {/* Sidebar for desktop */}
       <Sider
         trigger={null}
@@ -155,24 +157,24 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         width={250}
         className="hidden md:block"
         style={{
-          overflow: "auto",
-          height: "100vh",
-          position: "fixed",
+          overflow: 'auto',
+          height: '100vh',
+          position: 'fixed',
           left: 0,
           top: 0,
           bottom: 0,
-          background: darkMode ? "#1f2937" : "#fff",
-          boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+          background: darkMode ? '#1f2937' : '#fff',
+          boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
           zIndex: 999,
         }}
-        theme={darkMode ? "dark" : "light"}
+        theme={darkMode ? 'dark' : 'light'}
       >
         <div className="flex items-center justify-center h-16 border-b border-gray-200 dark:border-gray-700">
           <Link href="/" className="flex items-center gap-2 px-4">
             {!sidebarOpen ? (
               <span
                 className={`text-2xl font-bold ${
-                  darkMode ? "text-blue-400" : "text-blue-600"
+                  darkMode ? 'text-blue-400' : 'text-blue-600'
                 }`}
               >
                 F
@@ -180,7 +182,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             ) : (
               <span
                 className={`text-xl font-bold ${
-                  darkMode ? "text-blue-400" : "text-blue-600"
+                  darkMode ? 'text-blue-400' : 'text-blue-600'
                 }`}
               >
                 FakeVest
@@ -189,7 +191,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </Link>
         </div>
         <Menu
-          theme={darkMode ? "dark" : "light"}
+          theme={darkMode ? 'dark' : 'light'}
           mode="inline"
           defaultSelectedKeys={[window.location.pathname]}
           items={menuItems}
@@ -203,7 +205,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <div className="flex items-center">
             <span
               className={`text-xl font-bold ${
-                darkMode ? "text-blue-400" : "text-blue-600"
+                darkMode ? 'text-blue-400' : 'text-blue-600'
               }`}
             >
               FakeVest
@@ -216,14 +218,14 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         width={250}
         bodyStyle={{ padding: 0 }}
         headerStyle={{
-          borderBottom: `1px solid ${darkMode ? "#334155" : "#e5e7eb"}`,
-          background: darkMode ? "#1f2937" : "#fff",
-          color: darkMode ? "#fff" : "#000",
+          borderBottom: `1px solid ${darkMode ? '#334155' : '#e5e7eb'}`,
+          background: darkMode ? '#1f2937' : '#fff',
+          color: darkMode ? '#fff' : '#000',
         }}
-        className={darkMode ? "dark" : ""}
+        className={darkMode ? 'dark' : ''}
       >
         <Menu
-          theme={darkMode ? "dark" : "light"}
+          theme={darkMode ? 'dark' : 'light'}
           mode="inline"
           defaultSelectedKeys={[window.location.pathname]}
           items={menuItems}
@@ -234,14 +236,14 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       {/* Main content area */}
       <Layout
         className={`md:ml-[80px] ${
-          sidebarOpen ? "md:ml-[250px]" : ""
+          sidebarOpen ? 'md:ml-[250px]' : ''
         } transition-all duration-300`}
       >
         {/* Header */}
         <Header
           className="px-4 sm:px-6 flex items-center justify-between h-16 sticky top-0 z-10 shadow-sm"
           style={{
-            background: darkMode ? "#1f2937" : "#fff",
+            background: darkMode ? '#1f2937' : '#fff',
             padding: 0,
           }}
         >
@@ -252,7 +254,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               icon={<MenuUnfoldOutlined />}
               onClick={() => setMobileDrawerVisible(true)}
               className="md:hidden mr-4"
-              style={{ color: darkMode ? "#fff" : "#000" }}
+              style={{ color: darkMode ? '#fff' : '#000' }}
             />
 
             {/* Desktop sidebar toggle */}
@@ -261,7 +263,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               icon={sidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
               onClick={toggleSidebar}
               className="hidden md:block ml-2"
-              style={{ color: darkMode ? "#fff" : "#000" }}
+              style={{ color: darkMode ? '#fff' : '#000' }}
             />
           </div>
 
@@ -272,8 +274,8 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               type="text"
               icon={darkMode ? <BulbFilled /> : <BulbOutlined />}
               onClick={toggleDarkMode}
-              title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-              style={{ color: darkMode ? "#fff" : "#000" }}
+              title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              style={{ color: darkMode ? '#fff' : '#000' }}
             />
 
             {/* Notifications */}
@@ -281,7 +283,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <Button
                 type="text"
                 icon={<BellOutlined />}
-                style={{ color: darkMode ? "#fff" : "#000" }}
+                style={{ color: darkMode ? '#fff' : '#000' }}
               />
             </Badge>
 
@@ -296,7 +298,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   />
                   <Text
                     className="hidden sm:inline"
-                    style={{ color: darkMode ? "#fff" : "#000" }}
+                    style={{ color: darkMode ? '#fff' : '#000' }}
                   >
                     {getUserDisplayName()}
                   </Text>
@@ -314,9 +316,9 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <Content
           className="m-4 p-4 sm:p-6 overflow-auto"
           style={{
-            background: darkMode ? "#111827" : "#f9fafb",
-            minHeight: "calc(100vh - 64px)",
-            borderRadius: "8px",
+            background: darkMode ? '#111827' : '#f9fafb',
+            minHeight: 'calc(100vh - 64px)',
+            borderRadius: '8px',
           }}
         >
           {children}

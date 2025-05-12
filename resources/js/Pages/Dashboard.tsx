@@ -1,17 +1,18 @@
-import React, { useState } from "react";
-import { useAuthUser, useDarkMode } from "@/Stores";
-import MainLayout from "@/Layouts/MainLayout";
-import { Head, Link } from "@inertiajs/react";
-import { Card, Typography, Button, Space, Row, Col } from "antd";
-import { PieChartOutlined, DollarOutlined } from "@ant-design/icons";
+import { useState } from 'react';
+
+import { DollarOutlined, PieChartOutlined } from '@ant-design/icons';
+import { Head, Link } from '@inertiajs/react';
+import { Button, Card, Col, Row, Space, Typography } from 'antd';
 
 // Import feature components
-import SummaryCards from "@/Components/Features/Dashboard/SummaryCards";
-import QuickActions from "@/Components/Features/Dashboard/QuickActions";
-import SavingsTable from "@/Components/Features/Savings/SavingsTable";
-import TransactionsList from "@/Components/Features/Transactions/TransactionsList";
-import TransferMoneyModal from "@/Components/Features/Transfers/TransferMoneyModal";
-import WithdrawFundsModal from "@/Components/Features/Withdrawals/WithdrawFundsModal";
+import QuickActions from '@/Components/Features/Dashboard/QuickActions';
+import SummaryCards from '@/Components/Features/Dashboard/SummaryCards';
+import SavingsTable from '@/Components/Features/Savings/SavingsTable';
+import TransactionsList from '@/Components/Features/Transactions/TransactionsList';
+import TransferMoneyModal from '@/Components/Features/Transfers/TransferMoneyModal';
+import WithdrawFundsModal from '@/Components/Features/Withdrawals/WithdrawFundsModal';
+import MainLayout from '@/Layouts/MainLayout';
+import { useAuthUser } from '@/Stores';
 
 const { Title, Text } = Typography;
 
@@ -22,7 +23,6 @@ const { Title, Text } = Typography;
 const Dashboard = () => {
   // Get user and theme data from stores
   const user = useAuthUser();
-  const darkMode = useDarkMode();
 
   // Local state for UI management only
   const [isTransferModalVisible, setIsTransferModalVisible] = useState(false);
@@ -45,7 +45,7 @@ const Dashboard = () => {
               Financial Overview
             </Title>
             <Text type="secondary" className="mt-1">
-              Welcome back, {user?.fullname || "User"}
+              Welcome back, {user?.fullname || 'User'}
             </Text>
           </div>
 

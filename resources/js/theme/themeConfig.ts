@@ -1,5 +1,5 @@
-import { theme } from 'antd';
 import { generate } from '@ant-design/colors';
+import { theme } from 'antd';
 
 // Fakevest primary brand color as specified in the coding instructions
 const primaryColor = '#3b8cb7';
@@ -17,7 +17,8 @@ export const themeConfig = {
     colorWarning: '#faad14',
     colorError: '#f5222d',
     colorTextBase: '#1f2937', // TailwindCSS gray-800
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    fontFamily:
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
     borderRadius: 6,
     wireframe: false,
   },

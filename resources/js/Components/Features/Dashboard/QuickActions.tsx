@@ -1,5 +1,5 @@
-import React from "react";
-import { Row, Col, Card } from "antd";
+import React from 'react';
+
 import {
   SendOutlined,
   PlusOutlined,
@@ -7,8 +7,10 @@ import {
   SwapOutlined,
   HistoryOutlined,
   UserOutlined,
-} from "@ant-design/icons";
-import { useDarkMode } from "@/Stores/uiStore";
+} from '@ant-design/icons';
+import { Row, Col, Card } from 'antd';
+
+import { _useDarkMode } from '@/Stores/uiStore';
 
 type QuickActionsProps = {
   onTransfer: () => void;
@@ -24,34 +26,34 @@ const QuickActions: React.FC<QuickActionsProps> = ({
 }) => {
   const actions = [
     {
-      icon: <SendOutlined style={{ fontSize: 24, color: "#1890ff" }} />,
-      title: "Send Money",
+      icon: <SendOutlined style={{ fontSize: 24, color: '#1890ff' }} />,
+      title: 'Send Money',
       onClick: onTransfer,
     },
     {
-      icon: <PlusOutlined style={{ fontSize: 24, color: "#52c41a" }} />,
-      title: "New Savings",
-      href: "/savings/new",
+      icon: <PlusOutlined style={{ fontSize: 24, color: '#52c41a' }} />,
+      title: 'New Savings',
+      href: '/savings/new',
     },
     {
-      icon: <CreditCardOutlined style={{ fontSize: 24, color: "#722ed1" }} />,
-      title: "Add Funds",
-      href: "/deposit",
+      icon: <CreditCardOutlined style={{ fontSize: 24, color: '#722ed1' }} />,
+      title: 'Add Funds',
+      href: '/deposit',
     },
     {
-      icon: <SwapOutlined style={{ fontSize: 24, color: "#fa8c16" }} />,
-      title: "Withdraw",
+      icon: <SwapOutlined style={{ fontSize: 24, color: '#fa8c16' }} />,
+      title: 'Withdraw',
       onClick: onWithdraw,
     },
     {
-      icon: <HistoryOutlined style={{ fontSize: 24, color: "#f5222d" }} />,
-      title: "History",
-      href: "/transactions",
+      icon: <HistoryOutlined style={{ fontSize: 24, color: '#f5222d' }} />,
+      title: 'History',
+      href: '/transactions',
     },
     {
-      icon: <UserOutlined style={{ fontSize: 24, color: "#eb2f96" }} />,
-      title: "Profile",
-      href: "/profile",
+      icon: <UserOutlined style={{ fontSize: 24, color: '#eb2f96' }} />,
+      title: 'Profile',
+      href: '/profile',
     },
   ];
 
@@ -80,7 +82,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({
                   window.location.href = action.href;
                 }
               }}
-              bodyStyle={{ padding: "12px" }}
+              bodyStyle={{ padding: '12px' }}
             >
               {action.icon}
               <div className="mt-2">{action.title}</div>

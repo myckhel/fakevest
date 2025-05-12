@@ -1,17 +1,19 @@
-import React from "react";
-import { Head, Link } from "@inertiajs/react";
-import { Button, Typography, Card, Row, Col, Divider, Space } from "antd";
-import { useIsAuthenticated } from "@/Stores/authStore";
+import React from 'react';
+
 import {
-  UserOutlined,
+  BankOutlined,
+  DollarOutlined,
   LoginOutlined,
   SafetyOutlined,
-  BankOutlined,
   TeamOutlined,
-  DollarOutlined,
-} from "@ant-design/icons";
+  UserOutlined,
+} from '@ant-design/icons';
+import { Head, Link } from '@inertiajs/react';
+import { Button, Card, Col, Divider, Row, Space, Typography } from 'antd';
 
-const { Title, Paragraph, Text } = Typography;
+import { useIsAuthenticated } from '@/Stores/authStore';
+
+const { Title, Paragraph } = Typography;
 
 const Home: React.FC = () => {
   const isAuthenticated = useIsAuthenticated();
@@ -78,7 +80,7 @@ const Home: React.FC = () => {
             <div className="hidden md:block">
               {/* This would be an illustration or app screenshot */}
               <div className="w-80 h-80 rounded-lg bg-blue-500 flex items-center justify-center shadow-lg">
-                <BankOutlined style={{ fontSize: "120px", color: "white" }} />
+                <BankOutlined style={{ fontSize: '120px', color: 'white' }} />
               </div>
             </div>
           </div>

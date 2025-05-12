@@ -1,33 +1,32 @@
 import React from 'react';
+
 import { Select as AntSelect, SelectProps as AntSelectProps } from 'antd';
-import { cn, useThemeToken } from '../../theme';
 import { VariantProps, cva } from 'class-variance-authority';
 
-const selectVariants = cva(
-  'rounded-md text-base bg-white dark:bg-gray-800',
-  {
-    variants: {
-      variant: {
-        default: 'border-gray-300 focus:border-primary-500',
-        error: 'border-red-500 focus:border-red-500',
-        success: 'border-green-500 focus:border-green-500',
-      },
-      size: {
-        default: 'h-10',
-        sm: 'h-8 text-xs',
-        lg: 'h-12 text-lg',
-      },
-      fullWidth: {
-        true: 'w-full',
-      },
+import { cn, useThemeToken } from '../../theme';
+
+const selectVariants = cva('rounded-md text-base bg-white dark:bg-gray-800', {
+  variants: {
+    variant: {
+      default: 'border-gray-300 focus:border-primary-500',
+      error: 'border-red-500 focus:border-red-500',
+      success: 'border-green-500 focus:border-green-500',
     },
-    defaultVariants: {
-      variant: 'default',
-      size: 'default',
-      fullWidth: false,
+    size: {
+      default: 'h-10',
+      sm: 'h-8 text-xs',
+      lg: 'h-12 text-lg',
     },
-  }
-);
+    fullWidth: {
+      true: 'w-full',
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+    size: 'default',
+    fullWidth: false,
+  },
+});
 
 export interface SelectProps<T = any>
   extends Omit<AntSelectProps<T>, 'size'>,
@@ -37,7 +36,18 @@ export interface SelectProps<T = any>
 }
 
 export const Select = React.forwardRef<HTMLDivElement, SelectProps>(
-  ({ className, variant = 'default', size = 'default', fullWidth, error, options = [], ...props }, ref) => {
+  (
+    {
+      className,
+      variant = 'default',
+      size = 'default',
+      fullWidth,
+      error,
+      options = [],
+      ...props
+    },
+    ref,
+  ) => {
     const token = useThemeToken();
 
     // Map our size variants to ant design sizes
@@ -65,17 +75,18 @@ export const Select = React.forwardRef<HTMLDivElement, SelectProps>(
             width: fullWidth ? '100%' : undefined,
             borderRadius: token.borderRadius,
           }}
-          className={cn(selectVariants({ variant: actualVariant, size, fullWidth }), className)}
+          className={cn(
+            selectVariants({ variant: actualVariant, size, fullWidth }),
+            className,
+          )}
           options={options}
           popupMatchSelectWidth={false}
           {...props}
         />
-        {error && (
-          <p className="text-xs text-red-500">{error}</p>
-        )}
+        {error && <p className="text-xs text-red-500">{error}</p>}
       </div>
     );
-  }
+  },
 );
 
 Select.displayName = 'Select';

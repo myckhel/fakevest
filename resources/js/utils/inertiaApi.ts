@@ -1,4 +1,4 @@
-import { router } from "@inertiajs/react";
+import { router } from '@inertiajs/react';
 
 /**
  * Utility functions for handling API requests with Inertia router
@@ -11,14 +11,14 @@ import { router } from "@inertiajs/react";
  * @param options Additional Inertia visit options
  */
 export const apiGet = (endpoint: string, options = {}) => {
-  const url = `/api/v1/${endpoint.replace(/^\//, "")}`;
+  const url = `/api/v1/${endpoint.replace(/^\//, '')}`;
   return router.get(
     url,
     {},
     {
       preserveState: true,
       ...options,
-    }
+    },
   );
 };
 
@@ -29,7 +29,7 @@ export const apiGet = (endpoint: string, options = {}) => {
  * @param options Additional Inertia visit options
  */
 export const apiPost = (endpoint: string, data = {}, options = {}) => {
-  const url = `/api/v1/${endpoint.replace(/^\//, "")}`;
+  const url = `/api/v1/${endpoint.replace(/^\//, '')}`;
   return router.post(url, data, {
     preserveState: true,
     ...options,
@@ -43,7 +43,7 @@ export const apiPost = (endpoint: string, data = {}, options = {}) => {
  * @param options Additional Inertia visit options
  */
 export const apiPut = (endpoint: string, data = {}, options = {}) => {
-  const url = `/api/v1/${endpoint.replace(/^\//, "")}`;
+  const url = `/api/v1/${endpoint.replace(/^\//, '')}`;
   return router.put(url, data, {
     preserveState: true,
     ...options,
@@ -57,7 +57,7 @@ export const apiPut = (endpoint: string, data = {}, options = {}) => {
  * @param options Additional Inertia visit options
  */
 export const apiPatch = (endpoint: string, data = {}, options = {}) => {
-  const url = `/api/v1/${endpoint.replace(/^\//, "")}`;
+  const url = `/api/v1/${endpoint.replace(/^\//, '')}`;
   return router.patch(url, data, {
     preserveState: true,
     ...options,
@@ -70,7 +70,7 @@ export const apiPatch = (endpoint: string, data = {}, options = {}) => {
  * @param options Additional Inertia visit options
  */
 export const apiDelete = (endpoint: string, options = {}) => {
-  const url = `/api/v1/${endpoint.replace(/^\//, "")}`;
+  const url = `/api/v1/${endpoint.replace(/^\//, '')}`;
   return router.delete(url, {
     preserveState: true,
     ...options,

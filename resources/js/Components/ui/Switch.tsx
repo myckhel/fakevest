@@ -1,7 +1,9 @@
 import React from 'react';
+
 import { Switch as AntSwitch, SwitchProps as AntSwitchProps } from 'antd';
-import { cn, useThemeToken } from '../../theme';
 import { VariantProps, cva } from 'class-variance-authority';
+
+import { cn, useThemeToken } from '../../theme';
 
 const switchVariants = cva('', {
   variants: {
@@ -24,7 +26,7 @@ export interface SwitchProps
 
 export const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
   ({ className, size, label, ...props }, ref) => {
-    const token = useThemeToken();
+    const _token = useThemeToken();
 
     // Map our size variants to ant design sizes
     const getAntSwitchSize = () => {
@@ -49,7 +51,7 @@ export const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
         {label && <span className="text-sm">{label}</span>}
       </div>
     );
-  }
+  },
 );
 
 Switch.displayName = 'Switch';

@@ -1,7 +1,9 @@
-import React, { ReactNode } from "react";
-import { StyleProvider } from "@ant-design/cssinjs";
-import AntDesignProvider from "./AntDesignProvider";
-import { useDarkMode } from "../Stores/uiStore";
+import React, { ReactNode } from 'react';
+
+import { StyleProvider } from '@ant-design/cssinjs';
+
+import AntDesignProvider from './AntDesignProvider';
+import { useDarkMode } from '../Stores/uiStore';
 
 interface ThemeProviderProps {
   children: ReactNode;

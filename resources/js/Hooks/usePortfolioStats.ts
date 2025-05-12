@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo } from 'react';
 
 /**
  * Custom hook for calculating portfolio statistics
@@ -8,7 +8,7 @@ export const usePortfolioStats = (portfolio: any) => {
     if (!portfolio || portfolio.lifetime === 0) return 0;
     return Math.min(
       100,
-      Math.round((portfolio.thisMonth / portfolio.lifetime) * 100)
+      Math.round((portfolio.thisMonth / portfolio.lifetime) * 100),
     );
   }, [portfolio]);
 
@@ -16,7 +16,7 @@ export const usePortfolioStats = (portfolio: any) => {
     if (!portfolio || portfolio.thisMonth === 0) return 0;
     return Math.min(
       100,
-      Math.round((portfolio.thisWeek / portfolio.thisMonth) * 100)
+      Math.round((portfolio.thisWeek / portfolio.thisMonth) * 100),
     );
   }, [portfolio]);
 

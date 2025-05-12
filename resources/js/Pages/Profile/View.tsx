@@ -1,5 +1,7 @@
-import React from "react";
-import { Head, Link } from "@inertiajs/react";
+import React from 'react';
+
+import { EditOutlined } from '@ant-design/icons';
+import { Head, Link } from '@inertiajs/react';
 import {
   Card,
   Descriptions,
@@ -8,10 +10,10 @@ import {
   Divider,
   Typography,
   Skeleton,
-} from "antd";
-import { EditOutlined } from "@ant-design/icons";
-import MainLayout from "@/Layouts/MainLayout";
-import { useAuthUser, useAuthLoading } from "@/Stores/authStore";
+} from 'antd';
+
+import MainLayout from '@/Layouts/MainLayout';
+import { useAuthUser, useAuthLoading } from '@/Stores/authStore';
 
 const { Title } = Typography;
 
@@ -52,7 +54,7 @@ const ProfileView: React.FC = () => {
             <div className="flex flex-col items-center mb-6 md:mb-0">
               <Avatar
                 size={120}
-                src={user.avatar?.url || "/assets/default-avatar.png"}
+                src={user.avatar?.url || '/assets/default-avatar.png'}
                 className="mb-4"
               />
               <Typography.Title level={4}>{user.fullname}</Typography.Title>
@@ -76,7 +78,7 @@ const ProfileView: React.FC = () => {
                   {user.email}
                 </Descriptions.Item>
                 <Descriptions.Item label="Phone">
-                  {user.phone || "Not provided"}
+                  {user.phone || 'Not provided'}
                 </Descriptions.Item>
 
                 {user.gender && (
@@ -107,7 +109,7 @@ const ProfileView: React.FC = () => {
                   {new Date(user.created_at).toLocaleDateString()}
                 </Descriptions.Item>
                 <Descriptions.Item label="Email Verified">
-                  {user.email_verified_at ? "Yes" : "No"}
+                  {user.email_verified_at ? 'Yes' : 'No'}
                 </Descriptions.Item>
               </Descriptions>
 

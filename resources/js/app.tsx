@@ -1,23 +1,25 @@
-import "../css/app.css";
-import "./bootstrap";
-import "@ant-design/v5-patch-for-react-19";
+import '../css/app.css';
+import './bootstrap';
+import '@ant-design/v5-patch-for-react-19';
 
-import React from "react";
-import { createInertiaApp } from "@inertiajs/react";
-import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
-import { createRoot, hydrateRoot } from "react-dom/client";
-import { ThemeProvider } from "./theme";
-import { StyleProvider } from "@ant-design/cssinjs";
-import { ConfigProvider } from "antd";
-import Toast from "./Components/Toast";
-import DarkModeManager from "./Components/Features/DarkMode/DarkModeManager";
+import React from 'react';
 
-const appName = import.meta.env.VITE_APP_NAME || "Laravel";
+import { StyleProvider } from '@ant-design/cssinjs';
+import { createInertiaApp } from '@inertiajs/react';
+import { ConfigProvider } from 'antd';
+import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import { createRoot, hydrateRoot } from 'react-dom/client';
+
+import DarkModeManager from './Components/Features/DarkMode/DarkModeManager';
+import Toast from './Components/Toast';
+import { ThemeProvider } from './theme';
+
+const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 // Apply AntD theming
 const theme = {
   token: {
-    colorPrimary: "#3b8cb7",
+    colorPrimary: '#3b8cb7',
     borderRadius: 4,
   },
 };
@@ -27,17 +29,17 @@ createInertiaApp({
   resolve: (name) =>
     resolvePageComponent(
       `./Pages/${name}.tsx`,
-      import.meta.glob("./Pages/**/*.tsx")
+      import.meta.glob('./Pages/**/*.tsx'),
     ),
   setup({ el, App, props }) {
     // Check if user has dark mode enabled
-    const darkMode = localStorage.getItem("ui-storage")
-      ? JSON.parse(localStorage.getItem("ui-storage") || "{}").state?.darkMode
+    const darkMode = localStorage.getItem('ui-storage')
+      ? JSON.parse(localStorage.getItem('ui-storage') || '{}').state?.darkMode
       : false;
 
     // Apply dark mode class if needed
     if (darkMode) {
-      document.documentElement.classList.add("dark");
+      document.documentElement.classList.add('dark');
     }
 
     // Wrap with StyleProvider for better styles rendering in React 19
@@ -63,6 +65,6 @@ createInertiaApp({
     createRoot(el).render(<AppWithTheme />);
   },
   progress: {
-    color: "#3b8cb7", // Using the primary brand color
+    color: '#3b8cb7', // Using the primary brand color
   },
 });

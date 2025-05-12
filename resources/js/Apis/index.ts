@@ -1,9 +1,9 @@
-import Http from "./Http";
-import AuthAPI from "./auth";
-import UserAPI from "./user";
-import SavingsAPI from "./savings";
-import TransactionsAPI from "./transactions";
-import WalletAPI from "./wallet";
+import AuthAPI from './auth';
+import Http from './Http';
+import SavingsAPI from './savings';
+import TransactionsAPI from './transactions';
+import UserAPI from './user';
+import WalletAPI from './wallet';
 
 // Export all services
 const API = {

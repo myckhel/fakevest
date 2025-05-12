@@ -1,5 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { Head, Link, usePage, router } from "@inertiajs/react";
+import React, { useState, useEffect } from 'react';
+
+import {
+  UserOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  HomeOutlined,
+  UploadOutlined,
+  LockOutlined,
+} from '@ant-design/icons';
+import { Head, Link, _usePage, _router } from '@inertiajs/react';
 import {
   Card,
   Tabs,
@@ -12,19 +21,13 @@ import {
   Avatar,
   message,
   Divider,
-} from "antd";
-import {
-  UserOutlined,
-  MailOutlined,
-  PhoneOutlined,
-  HomeOutlined,
-  UploadOutlined,
-  LockOutlined,
-} from "@ant-design/icons";
-import MainLayout from "@/Layouts/MainLayout";
-import useAuthStore, { useAuthUser, useAuthLoading } from "@/Stores/authStore";
-import type { RcFile, UploadFile } from "antd/es/upload/interface";
-import dayjs from "dayjs";
+} from 'antd';
+import dayjs from 'dayjs';
+
+import MainLayout from '@/Layouts/MainLayout';
+import useAuthStore, { useAuthUser, useAuthLoading } from '@/Stores/authStore';
+
+import type { RcFile, UploadFile } from 'antd/es/upload/interface';
 
 const { TabPane } = Tabs;
 const { TextArea } = Input;
@@ -32,7 +35,7 @@ const { Option } = Select;
 
 const ProfileEdit: React.FC = () => {
   const searchParams = new URLSearchParams(window.location.search);
-  const initialTab = searchParams.get("tab") || "profile";
+  const initialTab = searchParams.get('tab') || 'profile';
 
   const [activeTab, setActiveTab] = useState(initialTab);
   const [loading, setLoading] = useState({
@@ -51,9 +54,9 @@ const ProfileEdit: React.FC = () => {
     if (user?.avatar?.url) {
       setFileList([
         {
-          uid: "-1",
-          name: "Current Avatar",
-          status: "done",
+          uid: '-1',
+          name: 'Current Avatar',
+          status: 'done',
           url: user.avatar.url,
         },
       ]);
@@ -75,12 +78,12 @@ const ProfileEdit: React.FC = () => {
     setActiveTab(key);
     // Update URL without refreshing
     const url = new URL(window.location.href);
-    if (key === "profile") {
-      url.searchParams.delete("tab");
+    if (key === 'profile') {
+      url.searchParams.delete('tab');
     } else {
-      url.searchParams.set("tab", key);
+      url.searchParams.set('tab', key);
     }
-    window.history.pushState({}, "", url);
+    window.history.pushState({}, '', url);
   };
 
   const handleProfileUpdate = async (values: any) => {
@@ -91,22 +94,22 @@ const ProfileEdit: React.FC = () => {
         username: values.username,
         phone: values.phone,
         gender: values.gender,
-        dob: values.dob ? values.dob.format("YYYY-MM-DD") : undefined,
+        dob: values.dob ? values.dob.format('YYYY-MM-DD') : undefined,
         address: values.address,
         next_of_kin: values.next_of_kin,
       });
 
-      message.success("Profile updated successfully");
+      message.success('Profile updated successfully');
     } catch (error: any) {
       const errorData = error.response?.data;
       if (errorData?.errors) {
         const formErrors = Object.entries(errorData.errors)
-          .map(([field, msgs]) => `${field}: ${msgs.join(", ")}`)
-          .join(". ");
+          .map(([field, msgs]) => `${field}: ${msgs.join(', ')}`)
+          .join('. ');
 
         message.error(formErrors);
       } else {
-        message.error("Failed to update profile. Please try again.");
+        message.error('Failed to update profile. Please try again.');
       }
     } finally {
       setLoading({ ...loading, profile: false });
@@ -114,14 +117,14 @@ const ProfileEdit: React.FC = () => {
   };
 
   const beforeUpload = (file: RcFile) => {
-    const isImage = file.type.startsWith("image/");
+    const isImage = file.type.startsWith('image/');
     if (!isImage) {
-      message.error("You can only upload image files!");
+      message.error('You can only upload image files!');
     }
 
     const isLt2M = file.size / 1024 / 1024 < 2;
     if (!isLt2M) {
-      message.error("Image must be smaller than 2MB!");
+      message.error('Image must be smaller than 2MB!');
     }
 
     if (isImage && isLt2M) {
@@ -135,16 +138,16 @@ const ProfileEdit: React.FC = () => {
 
   const handleAvatarUpload = async () => {
     if (!avatar) {
-      message.error("Please select an image first");
+      message.error('Please select an image first');
       return;
     }
 
     setLoading({ ...loading, avatar: true });
     try {
       await updateAvatar(avatar);
-      message.success("Avatar updated successfully");
-    } catch (error) {
-      message.error("Failed to upload avatar. Please try again.");
+      message.success('Avatar updated successfully');
+    } catch (_error) {
+      message.error('Failed to upload avatar. Please try again.');
     } finally {
       setLoading({ ...loading, avatar: false });
     }
@@ -159,24 +162,24 @@ const ProfileEdit: React.FC = () => {
         password_confirmation: values.password_confirmation,
       });
 
-      message.success("Password changed successfully");
+      message.success('Password changed successfully');
 
       // Reset form fields
-      values.old_password = "";
-      values.password = "";
-      values.password_confirmation = "";
+      values.old_password = '';
+      values.password = '';
+      values.password_confirmation = '';
     } catch (error: any) {
       const errorData = error.response?.data;
       if (errorData?.errors) {
         const formErrors = Object.entries(errorData.errors)
-          .map(([field, msgs]) => `${field}: ${msgs.join(", ")}`)
-          .join(". ");
+          .map(([field, msgs]) => `${field}: ${msgs.join(', ')}`)
+          .join('. ');
 
         message.error(formErrors);
       } else if (errorData?.message) {
         message.error(errorData.message);
       } else {
-        message.error("Failed to change password. Please try again.");
+        message.error('Failed to change password. Please try again.');
       }
     } finally {
       setLoading({ ...loading, password: false });
@@ -216,9 +219,9 @@ const ProfileEdit: React.FC = () => {
                     rules={[
                       {
                         required: true,
-                        message: "Please enter your full name",
+                        message: 'Please enter your full name',
                       },
-                      { min: 3, message: "Name must be at least 3 characters" },
+                      { min: 3, message: 'Name must be at least 3 characters' },
                     ]}
                   >
                     <Input prefix={<UserOutlined />} placeholder="Full Name" />
@@ -230,7 +233,7 @@ const ProfileEdit: React.FC = () => {
                     rules={[
                       {
                         min: 3,
-                        message: "Username must be at least 3 characters",
+                        message: 'Username must be at least 3 characters',
                       },
                     ]}
                   >
@@ -254,7 +257,7 @@ const ProfileEdit: React.FC = () => {
                     rules={[
                       {
                         pattern: /^\d{10,13}$/,
-                        message: "Please enter a valid phone number",
+                        message: 'Please enter a valid phone number',
                       },
                     ]}
                   >
@@ -315,7 +318,7 @@ const ProfileEdit: React.FC = () => {
                     fileList.length > 0
                       ? fileList[0].url ||
                         URL.createObjectURL(fileList[0] as any)
-                      : "/assets/default-avatar.png"
+                      : '/assets/default-avatar.png'
                   }
                 />
 
@@ -367,11 +370,11 @@ const ProfileEdit: React.FC = () => {
                   rules={[
                     {
                       required: true,
-                      message: "Please enter your current password",
+                      message: 'Please enter your current password',
                     },
                     {
                       min: 6,
-                      message: "Password must be at least 6 characters",
+                      message: 'Password must be at least 6 characters',
                     },
                   ]}
                 >
@@ -387,11 +390,11 @@ const ProfileEdit: React.FC = () => {
                   rules={[
                     {
                       required: true,
-                      message: "Please enter your new password",
+                      message: 'Please enter your new password',
                     },
                     {
                       min: 6,
-                      message: "Password must be at least 6 characters",
+                      message: 'Password must be at least 6 characters',
                     },
                   ]}
                 >
@@ -404,19 +407,19 @@ const ProfileEdit: React.FC = () => {
                 <Form.Item
                   name="password_confirmation"
                   label="Confirm New Password"
-                  dependencies={["password"]}
+                  dependencies={['password']}
                   rules={[
                     {
                       required: true,
-                      message: "Please confirm your new password",
+                      message: 'Please confirm your new password',
                     },
                     ({ getFieldValue }) => ({
                       validator(_, value) {
-                        if (!value || getFieldValue("password") === value) {
+                        if (!value || getFieldValue('password') === value) {
                           return Promise.resolve();
                         }
                         return Promise.reject(
-                          new Error("The two passwords do not match")
+                          new Error('The two passwords do not match'),
                         );
                       },
                     }),

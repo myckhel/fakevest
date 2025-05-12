@@ -1,14 +1,15 @@
-import React, { useEffect } from "react";
-import { Table, Progress, Badge, Button, Empty, Spin } from "antd";
-import { Link } from "@inertiajs/react";
-import { DollarOutlined } from "@ant-design/icons";
+import React, { useEffect } from 'react';
+
+import { Link } from '@inertiajs/react';
+import { Badge, Button, Empty, Progress, Spin, Table } from 'antd';
+
+import useSavingsStore from '@/Stores/savingsStore';
 import {
   formatCurrency,
   formatDate,
   getDaysRemaining,
   getSavingStatus,
-} from "@/Utils/formatters";
-import useSavingsStore from "@/Stores/savingsStore";
+} from '@/Utils/formatters';
 
 type SavingsTableProps = {
   limit?: number;
@@ -32,9 +33,9 @@ const SavingsTable: React.FC<SavingsTableProps> = ({ limit }) => {
 
   const columns = [
     {
-      title: "Description",
-      dataIndex: "desc",
-      key: "desc",
+      title: 'Description',
+      dataIndex: 'desc',
+      key: 'desc',
       render: (text: string, record: any) => (
         <Link href={`/savings/${record.id}`}>
           <span className="font-medium">{text}</span>
@@ -42,56 +43,56 @@ const SavingsTable: React.FC<SavingsTableProps> = ({ limit }) => {
       ),
     },
     {
-      title: "Plan",
-      dataIndex: "plan",
-      key: "plan",
+      title: 'Plan',
+      dataIndex: 'plan',
+      key: 'plan',
       render: (plan: any) => plan?.name,
     },
     {
-      title: "Target",
-      dataIndex: "target",
-      key: "target",
+      title: 'Target',
+      dataIndex: 'target',
+      key: 'target',
       render: (amount: number) => formatCurrency(amount),
     },
     {
-      title: "Balance",
-      dataIndex: "wallet",
-      key: "balance",
+      title: 'Balance',
+      dataIndex: 'wallet',
+      key: 'balance',
       render: (wallet: any) => formatCurrency(wallet?.balance || 0),
     },
     {
-      title: "Progress",
-      key: "progress",
+      title: 'Progress',
+      key: 'progress',
       render: (_: any, record: any) => (
         <Progress
           percent={Math.round(
-            ((record.wallet?.balance || 0) / record.target) * 100
+            ((record.wallet?.balance || 0) / record.target) * 100,
           )}
           size="small"
           status={
             (record.wallet?.balance || 0) >= record.target
-              ? "success"
-              : "active"
+              ? 'success'
+              : 'active'
           }
         />
       ),
     },
     {
-      title: "Maturity",
-      dataIndex: "until",
-      key: "until",
+      title: 'Maturity',
+      dataIndex: 'until',
+      key: 'until',
       render: (date: string) => (
         <span>
           {date && formatDate(date)}
           <div className="text-xs text-gray-500">
-            {date ? getDaysRemaining(date) : "0"} days left
+            {date ? getDaysRemaining(date) : '0'} days left
           </div>
         </span>
       ),
     },
     {
-      title: "Status",
-      key: "status",
+      title: 'Status',
+      key: 'status',
       render: (_: any, record: any) => (
         <Badge
           status={getSavingStatus(record)}
@@ -143,7 +144,7 @@ const SavingsTable: React.FC<SavingsTableProps> = ({ limit }) => {
         onClick: () => {
           window.location.href = `/savings/${record.id}`;
         },
-        style: { cursor: "pointer" },
+        style: { cursor: 'pointer' },
       })}
     />
   );

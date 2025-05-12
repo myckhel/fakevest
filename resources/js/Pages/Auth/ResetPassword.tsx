@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { Head, Link, router, usePage } from "@inertiajs/react";
-import { Button, Form, Input, Alert, message } from "antd";
-import { LockOutlined, MailOutlined } from "@ant-design/icons";
-import AuthLayout from "@/Layouts/AuthLayout";
-import { inertiaApi } from "@/utils/inertiaApi";
+import React, { useState, useEffect } from 'react';
+
+import { LockOutlined, MailOutlined } from '@ant-design/icons';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Button, Form, Input, Alert, message } from 'antd';
+
+import AuthLayout from '@/Layouts/AuthLayout';
+import { inertiaApi } from '@/utils/inertiaApi';
 
 interface Props {
   token: string;
@@ -23,7 +25,7 @@ const ResetPassword: React.FC = () => {
 
       // Redirect to login after successful password reset
       setTimeout(() => {
-        router.visit("/login");
+        router.visit('/login');
       }, 2000);
     }
 
@@ -43,7 +45,7 @@ const ResetPassword: React.FC = () => {
 
     // Use inertiaApi utility to ensure proper /api/v1 base path
     inertiaApi.post(
-      "auth/password/reset",
+      'auth/password/reset',
       {
         token,
         email: values.email,
@@ -55,7 +57,7 @@ const ResetPassword: React.FC = () => {
           setLoading(false);
         },
         preserveScroll: true,
-      }
+      },
     );
   };
 
@@ -86,10 +88,10 @@ const ResetPassword: React.FC = () => {
         <Form.Item
           name="email"
           rules={[
-            { required: true, message: "Please enter your email" },
-            { type: "email", message: "Please enter a valid email" },
+            { required: true, message: 'Please enter your email' },
+            { type: 'email', message: 'Please enter a valid email' },
           ]}
-          validateStatus={errors.email ? "error" : ""}
+          validateStatus={errors.email ? 'error' : ''}
           help={errors.email}
         >
           <Input
@@ -103,10 +105,10 @@ const ResetPassword: React.FC = () => {
         <Form.Item
           name="password"
           rules={[
-            { required: true, message: "Please enter your new password" },
-            { min: 8, message: "Password must be at least 8 characters" },
+            { required: true, message: 'Please enter your new password' },
+            { min: 8, message: 'Password must be at least 8 characters' },
           ]}
-          validateStatus={errors.password ? "error" : ""}
+          validateStatus={errors.password ? 'error' : ''}
           help={errors.password}
         >
           <Input.Password
@@ -118,21 +120,21 @@ const ResetPassword: React.FC = () => {
 
         <Form.Item
           name="password_confirmation"
-          dependencies={["password"]}
+          dependencies={['password']}
           rules={[
-            { required: true, message: "Please confirm your password" },
+            { required: true, message: 'Please confirm your password' },
             ({ getFieldValue }) => ({
               validator(_, value) {
-                if (!value || getFieldValue("password") === value) {
+                if (!value || getFieldValue('password') === value) {
                   return Promise.resolve();
                 }
                 return Promise.reject(
-                  new Error("The two passwords do not match")
+                  new Error('The two passwords do not match'),
                 );
               },
             }),
           ]}
-          validateStatus={errors.password_confirmation ? "error" : ""}
+          validateStatus={errors.password_confirmation ? 'error' : ''}
           help={errors.password_confirmation}
         >
           <Input.Password
@@ -157,7 +159,7 @@ const ResetPassword: React.FC = () => {
 
         <div className="text-center mt-4">
           <p>
-            Remember your password?{" "}
+            Remember your password?{' '}
             <Link href="/login" className="text-blue-600 hover:underline">
               Sign in
             </Link>
