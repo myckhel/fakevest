@@ -1,31 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
-  UserOutlined,
+  HomeOutlined,
+  LockOutlined,
   MailOutlined,
   PhoneOutlined,
-  HomeOutlined,
   UploadOutlined,
-  LockOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
-import { Head, Link, _usePage, _router } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import {
+  Avatar,
+  Button,
   Card,
-  Tabs,
+  DatePicker,
+  Divider,
   Form,
   Input,
-  DatePicker,
   Select,
-  Button,
+  Tabs,
   Upload,
-  Avatar,
   message,
-  Divider,
 } from 'antd';
 import dayjs from 'dayjs';
 
 import MainLayout from '@/Layouts/MainLayout';
-import useAuthStore, { useAuthUser, useAuthLoading } from '@/Stores/authStore';
+import useAuthStore, { useAuthLoading, useAuthUser } from '@/Stores/authStore';
 
 import type { RcFile, UploadFile } from 'antd/es/upload/interface';
 

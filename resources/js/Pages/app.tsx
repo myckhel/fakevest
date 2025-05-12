@@ -1,12 +1,10 @@
-import React from 'react';
-
 import {
   BankOutlined,
   LockOutlined,
   RiseOutlined,
   SafetyOutlined,
 } from '@ant-design/icons';
-import { Button, Typography, Row, Col, Card, _Divider } from 'antd';
+import { Button, Card, Col, Row, Typography } from 'antd';
 
 const { Title, Paragraph } = Typography;
 

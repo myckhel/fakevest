@@ -1,26 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 import {
-  HistoryOutlined,
-  ArrowUpOutlined,
   ArrowDownOutlined,
+  ArrowUpOutlined,
+  HistoryOutlined,
 } from '@ant-design/icons';
 import { Link } from '@inertiajs/react';
-import { List, Avatar, Empty, Spin, Card, Button } from 'antd';
+import { Avatar, Button, Card, Empty, List, Spin } from 'antd';
 
+import { Transaction, Transfer } from '../../../Apis/transactions';
 import useTransactionStore from '../../../Stores/transactionStore';
-import { useDarkMode } from '../../../Stores/uiStore'; // Import the dark mode hook
 import { formatCurrency, formatDateTime } from '../../../Utils/formatters';
-
-interface Transaction {
-  id: number;
-  uuid: string;
-  type: string;
-  amount: number;
-  created_at: string;
-  status: string;
-  [key: string]: any; // For any other properties
-}
 
 type TransactionsListProps = {
   title?: string;
@@ -41,9 +31,6 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
   showViewAll = true,
   type = 'all',
 }) => {
-  // Get dark mode state from the global store
-  const _darkMode = useDarkMode();
-
   // Get transaction data with selector to minimize re-renders
   const {
     recentTransactions,
@@ -52,6 +39,56 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
     fetchRecentTransactions,
     fetchTransfers,
   } = useTransactionStore();
+
+  const renderItem = useCallback(
+    (transaction: Transaction | Transfer) => (
+      <List.Item className="dark:border-gray-700">
+        <List.Item.Meta
+          avatar={
+            <Avatar
+              icon={
+                transaction.type === 'deposit' ? (
+                  <ArrowUpOutlined />
+                ) : (
+                  <ArrowDownOutlined />
+                )
+              }
+              style={{
+                backgroundColor:
+                  transaction.type === 'deposit' ? '#52c41a' : '#f5222d',
+                color: 'white',
+              }}
+            />
+          }
+          title={
+            <div className="flex justify-between dark:text-gray-200">
+              <span>
+                {transaction.type?.charAt(0).toUpperCase() +
+                  transaction.type?.slice(1)}
+              </span>
+              <span
+                className={
+                  transaction.type === 'deposit'
+                    ? 'text-green-500'
+                    : 'text-red-500'
+                }
+              >
+                {transaction.type === 'deposit' ? '+' : '-'}
+                {formatCurrency(Math.abs(transaction.amount))}
+              </span>
+            </div>
+          }
+          description={
+            <div className="flex justify-between text-xs dark:text-gray-400">
+              <span>Ref: {transaction.uuid?.substring(0, 8)}...</span>
+              <span>{formatDateTime(transaction.created_at)}</span>
+            </div>
+          }
+        />
+      </List.Item>
+    ),
+    [],
+  );
 
   // Fetch appropriate transaction data when component mounts
   useEffect(() => {
@@ -62,7 +99,7 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
     }
   }, [type, limit]);
 
-  const limitedTransactions: Transaction[] =
+  const limitedTransactions: Transfer[] | Transaction[] =
     (type === 'transfers' ? transfers : recentTransactions) || [];
 
   return (
@@ -93,52 +130,7 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
         <List
           itemLayout="horizontal"
           dataSource={limitedTransactions}
-          renderItem={(transaction: Transaction) => (
-            <List.Item className="dark:border-gray-700">
-              <List.Item.Meta
-                avatar={
-                  <Avatar
-                    icon={
-                      transaction.type === 'deposit' ? (
-                        <ArrowUpOutlined />
-                      ) : (
-                        <ArrowDownOutlined />
-                      )
-                    }
-                    style={{
-                      backgroundColor:
-                        transaction.type === 'deposit' ? '#52c41a' : '#f5222d',
-                      color: 'white',
-                    }}
-                  />
-                }
-                title={
-                  <div className="flex justify-between dark:text-gray-200">
-                    <span>
-                      {transaction.type?.charAt(0).toUpperCase() +
-                        transaction.type?.slice(1)}
-                    </span>
-                    <span
-                      className={
-                        transaction.type === 'deposit'
-                          ? 'text-green-500'
-                          : 'text-red-500'
-                      }
-                    >
-                      {transaction.type === 'deposit' ? '+' : '-'}
-                      {formatCurrency(Math.abs(transaction.amount))}
-                    </span>
-                  </div>
-                }
-                description={
-                  <div className="flex justify-between text-xs dark:text-gray-400">
-                    <span>Ref: {transaction.uuid?.substring(0, 8)}...</span>
-                    <span>{formatDateTime(transaction.created_at)}</span>
-                  </div>
-                }
-              />
-            </List.Item>
-          )}
+          renderItem={renderItem}
         />
       ) : (
         <Empty description={emptyText} className="dark:text-gray-400" />
