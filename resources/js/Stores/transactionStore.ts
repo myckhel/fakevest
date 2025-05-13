@@ -97,9 +97,11 @@ const useTransactionStore = create<TransactionState>()(
       fetchRecentTransactions: async (limit = 5) => {
         try {
           set({ isLoading: true, error: null });
-          const response = await API.transactions.getRecentTransactions(limit);
+          const { data: response } =
+            await API.transactions.getRecentTransactions(limit);
+
           set({
-            recentTransactions: response.data,
+            recentTransactions: response,
             isLoading: false,
           });
         } catch (err: any) {
@@ -117,7 +119,7 @@ const useTransactionStore = create<TransactionState>()(
       fetchTransfers: async () => {
         try {
           set({ isLoading: true, error: null });
-          const transfers = await API.transactions.getTransfers();
+          const { data: transfers } = await API.transactions.getTransfers();
           set({
             transfers,
             isLoading: false,
@@ -174,14 +176,14 @@ const useTransactionStore = create<TransactionState>()(
       createTransfer: async (data: TransferData) => {
         try {
           set({ isLoading: true, error: null });
-          const response = await API.transactions.createTransfer(data);
+          const transfer = await API.transactions.createTransfer(data);
 
           // Refresh transfers list
           await get().fetchTransfers();
           await get().fetchRecentTransactions(5);
 
           set({ isLoading: false });
-          return response;
+          return transfer;
         } catch (err: any) {
           console.error('Error creating transfer:', err);
           set({

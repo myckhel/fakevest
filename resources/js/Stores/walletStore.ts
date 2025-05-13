@@ -64,7 +64,7 @@ const useWalletStore = create<WalletState>()(
       fetchNairaWallet: async () => {
         try {
           set({ isLoading: true, error: null });
-          const nairaWallet = await API.wallet.getNairaWallet();
+          const { data: nairaWallet } = await API.wallet.getNairaWallet();
           set({
             nairaWallet,
             isLoading: false,
@@ -82,7 +82,7 @@ const useWalletStore = create<WalletState>()(
       fetchDollarWallet: async () => {
         try {
           set({ isLoading: true, error: null });
-          const dollarWallet = await API.wallet.getDollarWallet();
+          const { data: dollarWallet } = await API.wallet.getDollarWallet();
           set({
             dollarWallet,
             isLoading: false,
@@ -250,7 +250,7 @@ const useWalletStore = create<WalletState>()(
       fetchWalletStatistics: async () => {
         try {
           set({ isLoading: true, error: null });
-          const statistics = await API.wallet.getWalletStatistics();
+          const { data: statistics } = await API.wallet.getWalletStatistics();
           set({
             walletStatistics: statistics,
             isLoading: false,
@@ -269,7 +269,7 @@ const useWalletStore = create<WalletState>()(
       fetchBankAccounts: async () => {
         try {
           set({ isLoading: true, error: null });
-          const bankAccounts = await API.wallet.getBankAccounts();
+          const { data: bankAccounts } = await API.wallet.getBankAccounts();
           set({
             bankAccounts,
             isLoading: false,

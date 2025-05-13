@@ -1,3 +1,4 @@
+import { AxiosPromise } from 'axios';
 import Http from './Http';
 
 export type Transaction = {
@@ -116,7 +117,7 @@ const TransactionsAPI = {
   /**
    * Get all transfers
    */
-  getTransfers: (): Promise<Transfer[]> => {
+  getTransfers: (): AxiosPromise<Transfer[]> => {
     return Http.get('/transfers');
   },
 
