@@ -1,22 +1,21 @@
 import React, { useEffect } from 'react';
 
 import {
+  ArrowDownOutlined,
+  ArrowUpOutlined,
   BankOutlined,
-  WalletOutlined,
   CalendarOutlined,
   LineChartOutlined,
-  ArrowUpOutlined,
-  ArrowDownOutlined,
   SendOutlined,
   SwapOutlined,
+  WalletOutlined,
 } from '@ant-design/icons';
-import { Row, Col, Card, Statistic, Progress, Button, Spin } from 'antd';
+import { Button, Card, Col, Progress, Row, Spin, Statistic } from 'antd';
 
 import { usePortfolioStats } from '@/Hooks/usePortfolioStats';
 import useSavingsStore from '@/Stores/savingsStore';
 import { useDarkMode } from '@/Stores/uiStore';
 import useWalletStore from '@/Stores/walletStore';
-import { _formatCurrency } from '@/Utils/formatters';
 
 type SummaryCardsProps = {
   onTransfer: () => void;
@@ -35,9 +34,17 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
   const darkMode = useDarkMode();
 
   // Get store data and actions
-  const { portfolio, fetchPortfolio, isPortfolioLoading } = useSavingsStore();
+  const {
+    portfolio,
+    fetchPortfolio,
+    isLoading: isPortfolioLoading,
+  } = useSavingsStore();
 
-  const { nairaWallet, fetchNairaWallet, isWalletLoading } = useWalletStore();
+  const {
+    nairaWallet,
+    fetchNairaWallet,
+    isLoading: isWalletLoading,
+  } = useWalletStore();
 
   // Calculate portfolio statistics using the custom hook
   const { chartData, isPositiveGrowth, growthPercentage, monthlyPercentage } =

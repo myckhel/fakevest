@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import {
-  TransactionOutlined,
-  SwapOutlined,
-  UploadOutlined,
   DownloadOutlined,
+  SwapOutlined,
+  TransactionOutlined,
+  UploadOutlined,
 } from '@ant-design/icons';
 import { Head } from '@inertiajs/react';
-import { Typography, Tabs, Card, DatePicker, Space, Select } from 'antd';
+import { Card, DatePicker, Select, Space, Tabs, Typography } from 'antd';
 
 import TransactionsList from '@/Components/Features/Transactions/TransactionsList';
 import MainLayout from '@/Layouts/MainLayout';
@@ -107,12 +107,7 @@ const Transactions = () => {
               }
               key="all"
             >
-              <TransactionsList
-                title="All Transactions"
-                type="all"
-                dateRange={dateRange}
-                transactionType={transactionType}
-              />
+              <TransactionsList title="All Transactions" type="all" />
             </TabPane>
 
             <TabPane
@@ -123,12 +118,7 @@ const Transactions = () => {
               }
               key="transfers"
             >
-              <TransactionsList
-                title="Transfers"
-                type="transfers"
-                dateRange={dateRange}
-                transactionType={transactionType}
-              />
+              <TransactionsList title="Transfers" type="transfers" />
             </TabPane>
 
             <TabPane
@@ -139,12 +129,7 @@ const Transactions = () => {
               }
               key="deposits"
             >
-              <TransactionsList
-                title="Deposits"
-                type="deposits"
-                dateRange={dateRange}
-                transactionType={transactionType}
-              />
+              <TransactionsList title="Deposits" type="deposits" />
             </TabPane>
 
             <TabPane
@@ -155,12 +140,7 @@ const Transactions = () => {
               }
               key="withdrawals"
             >
-              <TransactionsList
-                title="Withdrawals"
-                type="withdrawals"
-                dateRange={dateRange}
-                transactionType={transactionType}
-              />
+              <TransactionsList title="Withdrawals" type="withdrawals" />
             </TabPane>
           </Tabs>
         </Card>

@@ -1,4 +1,4 @@
-import { AxiosPromise } from 'axios';
+import { PaginatedData } from '../utils/interfaces';
 import Http from './Http';
 
 export type Wallet = {
@@ -64,56 +64,56 @@ const WalletAPI = {
   /**
    * Get naira wallet
    */
-  getNairaWallet: (): AxiosPromise<Wallet> => {
+  getNairaWallet: (): Promise<Wallet> => {
     return Http.get('/wallets/naira');
   },
 
   /**
    * Get dollar wallet
    */
-  getDollarWallet: (): AxiosPromise<Wallet> => {
+  getDollarWallet: (): Promise<Wallet> => {
     return Http.get('/wallets/dollar');
   },
 
   /**
    * Get all wallets
    */
-  getAllWallets: (): AxiosPromise<Wallet[]> => {
+  getAllWallets: (): Promise<PaginatedData<Wallet>> => {
     return Http.get('/wallets');
   },
 
   /**
    * Get wallet by ID
    */
-  getWalletById: (walletId: number): AxiosPromise<Wallet> => {
+  getWalletById: (walletId: number): Promise<Wallet> => {
     return Http.get(`/wallets/${walletId}`);
   },
 
   /**
    * Withdraw funds from wallet
    */
-  withdrawFunds: (data: WithdrawData): AxiosPromise<any> => {
+  withdrawFunds: (data: WithdrawData): Promise<any> => {
     return Http.post(`/wallets/${data.wallet_name}/withdraw`, data);
   },
 
   /**
    * Deposit funds to wallet
    */
-  depositFunds: (data: DepositData): AxiosPromise<any> => {
+  depositFunds: (data: DepositData): Promise<any> => {
     return Http.post(`/wallets/${data.wallet_name}/deposit`, data);
   },
 
   /**
    * Get wallet interests
    */
-  getInterests: (): AxiosPromise<any[]> => {
+  getInterests: (): Promise<any[]> => {
     return Http.get('/wallets/interests');
   },
 
   /**
    * Accept an interest
    */
-  acceptInterest: (interestId: number): AxiosPromise<void> => {
+  acceptInterest: (interestId: number): Promise<void> => {
     return Http.post(`/wallets/interests/${interestId}/accept`);
   },
 
@@ -124,7 +124,7 @@ const WalletAPI = {
     walletId: number,
     page = 1,
     perPage = 15,
-  ): AxiosPromise<any> => {
+  ): Promise<any> => {
     return Http.get(
       `/wallets/${walletId}/transactions?page=${page}&per_page=${perPage}`,
     );
@@ -133,14 +133,14 @@ const WalletAPI = {
   /**
    * Get wallet statistics
    */
-  getWalletStatistics: (): AxiosPromise<WalletStatistics> => {
+  getWalletStatistics: (): Promise<WalletStatistics> => {
     return Http.get('/wallets/statistics');
   },
 
   /**
    * Get bank accounts
    */
-  getBankAccounts: (): AxiosPromise<BankAccount[]> => {
+  getBankAccounts: (): Promise<BankAccount[]> => {
     return Http.get('/bank-accounts');
   },
 
@@ -152,28 +152,28 @@ const WalletAPI = {
       BankAccount,
       'id' | 'user_id' | 'created_at' | 'updated_at'
     >,
-  ): AxiosPromise<BankAccount> => {
+  ): Promise<BankAccount> => {
     return Http.post('/bank-accounts', bankAccount);
   },
 
   /**
    * Delete bank account
    */
-  deleteBankAccount: (accountId: number): AxiosPromise<void> => {
+  deleteBankAccount: (accountId: number): Promise<void> => {
     return Http.delete(`/bank-accounts/${accountId}`);
   },
 
   /**
    * Set default bank account
    */
-  setDefaultBankAccount: (accountId: number): AxiosPromise<void> => {
+  setDefaultBankAccount: (accountId: number): Promise<void> => {
     return Http.put(`/bank-accounts/${accountId}/default`);
   },
 
   /**
    * Transfer between wallets
    */
-  transferBetweenWallets: (data: WalletTransferData): AxiosPromise<any> => {
+  transferBetweenWallets: (data: WalletTransferData): Promise<any> => {
     return Http.post('/transfers', data);
   },
 };

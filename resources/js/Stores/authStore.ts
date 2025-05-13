@@ -1,6 +1,7 @@
 import { router } from '@inertiajs/react';
 import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
 
 import { inertiaApi } from '@/utils/inertiaApi';
 
@@ -51,247 +52,254 @@ interface AuthState {
 
 // Create the store with persistence and devtools
 const useAuthStore = create<AuthState>()(
-  devtools(
-    persist(
-      (set, get) => ({
-        // Initial state
-        user: null,
-        isAuthenticated: false,
-        isLoading: false,
+  immer(
+    devtools(
+      persist(
+        (set, get) => ({
+          // Initial state
+          user: null,
+          isAuthenticated: false,
+          isLoading: false,
 
-        // Direct state setter for external updates
-        set: (partial) => set(partial),
+          // Direct state setter for external updates
+          set: (partial) => set(partial),
 
-        // Actions
-        login: async (credentials) => {
-          set({ isLoading: true });
-          try {
-            const response = await API.auth.login(credentials);
-            const { user } = response;
-
-            set({
-              user,
-              isAuthenticated: true,
-              isLoading: false,
+          // Actions
+          login: async (credentials) => {
+            set((state) => {
+              state.isLoading = true;
             });
+            try {
+              const response = await API.auth.login(credentials);
+              const { user } = response;
 
-            // Use Inertia to navigate to dashboard after login
-            router.visit('/dashboard');
-          } catch (error) {
-            set({ isLoading: false });
-            throw error;
-          }
-        },
+              set((state) => {
+                state.user = user;
+                state.isAuthenticated = true;
+                state.isLoading = false;
+              });
 
-        register: async (userData, avatar) => {
-          set({ isLoading: true });
-          try {
-            const response = await API.auth.register(userData, avatar);
-            const { user } = response;
+              // Use Inertia to navigate to dashboard after login
+              router.visit('/dashboard');
+            } catch (error) {
+              set({ isLoading: false });
+              throw error;
+            }
+          },
 
-            set({
-              user,
-              isAuthenticated: true,
-              isLoading: false,
+          register: async (userData, avatar) => {
+            set({ isLoading: true });
+            try {
+              const response = await API.auth.register(userData, avatar);
+              const { user } = response;
+
+              set({
+                user,
+                isAuthenticated: true,
+                isLoading: false,
+              });
+
+              // Use Inertia to navigate to dashboard or email verification page
+              router.visit('/dashboard');
+            } catch (error) {
+              set({ isLoading: false });
+              throw error;
+            }
+          },
+
+          logout: () => {
+            set({ isLoading: true });
+
+            // Use direct Inertia navigation to the logout route
+            router.visit('/logout', {
+              method: 'get',
+              onFinish: () => {
+                set({
+                  user: null,
+                  isAuthenticated: false,
+                  isLoading: false,
+                });
+              },
+              preserveState: false,
+              preserveScroll: false,
             });
+          },
 
-            // Use Inertia to navigate to dashboard or email verification page
-            router.visit('/dashboard');
-          } catch (error) {
-            set({ isLoading: false });
-            throw error;
-          }
-        },
-
-        logout: () => {
-          set({ isLoading: true });
-
-          // Use direct Inertia navigation to the logout route
-          router.visit('/logout', {
-            method: 'get',
-            onFinish: () => {
+          checkAuth: async () => {
+            set({ isLoading: true });
+            try {
+              const user = await API.auth.whoami();
+              set({
+                user,
+                isAuthenticated: !!user,
+                isLoading: false,
+              });
+            } catch (_error) {
               set({
                 user: null,
                 isAuthenticated: false,
                 isLoading: false,
               });
-            },
-            preserveState: false,
-            preserveScroll: false,
-          });
-        },
+            }
+          },
 
-        checkAuth: async () => {
-          set({ isLoading: true });
-          try {
-            const user = await API.auth.whoami();
-            set({
-              user,
-              isAuthenticated: !!user,
-              isLoading: false,
-            });
-          } catch (_error) {
-            set({
-              user: null,
-              isAuthenticated: false,
-              isLoading: false,
-            });
-          }
-        },
+          // Added for PIN management - refresh user data without full page reload
+          refreshUser: async () => {
+            try {
+              const user = await API.auth.whoami();
+              set({ user });
+              return user;
+            } catch (error) {
+              console.error('Failed to refresh user data:', error);
+              return null;
+            }
+          },
 
-        // Added for PIN management - refresh user data without full page reload
-        refreshUser: async () => {
-          try {
-            const user = await API.auth.whoami();
-            set({ user });
-            return user;
-          } catch (error) {
-            console.error('Failed to refresh user data:', error);
-            return null;
-          }
-        },
+          updateProfile: async (data) => {
+            const user = get().user;
+            if (!user) throw new Error('User not authenticated');
 
-        updateProfile: async (data) => {
-          const user = get().user;
-          if (!user) throw new Error('User not authenticated');
+            set({ isLoading: true });
+            try {
+              const updatedUser = await API.user.updateProfile(user.id, data);
+              set({
+                user: updatedUser,
+                isLoading: false,
+              });
+            } catch (error) {
+              set({ isLoading: false });
+              throw error;
+            }
+          },
 
-          set({ isLoading: true });
-          try {
-            const updatedUser = await API.user.updateProfile(user.id, data);
-            set({
-              user: updatedUser,
-              isLoading: false,
-            });
-          } catch (error) {
-            set({ isLoading: false });
-            throw error;
-          }
-        },
+          updateAvatar: async (file) => {
+            const user = get().user;
+            if (!user) throw new Error('User not authenticated');
 
-        updateAvatar: async (file) => {
-          const user = get().user;
-          if (!user) throw new Error('User not authenticated');
+            set({ isLoading: true });
+            try {
+              const updatedUser = await API.user.updateAvatar(user.id, file);
+              set({
+                user: updatedUser,
+                isLoading: false,
+              });
+            } catch (error) {
+              set({ isLoading: false });
+              throw error;
+            }
+          },
 
-          set({ isLoading: true });
-          try {
-            const updatedUser = await API.user.updateAvatar(user.id, file);
-            set({
-              user: updatedUser,
-              isLoading: false,
-            });
-          } catch (error) {
-            set({ isLoading: false });
-            throw error;
-          }
-        },
+          getSocialLoginUrl: async (provider) => {
+            const response = await API.auth.getSocialLoginUrl(provider);
+            return response.url;
+          },
 
-        getSocialLoginUrl: async (provider) => {
-          const response = await API.auth.getSocialLoginUrl(provider);
-          return response.url;
-        },
+          handleSocialLogin: async (provider, code) => {
+            set({ isLoading: true });
+            try {
+              const response = await API.auth.socialLoginCallback(
+                provider,
+                code,
+              );
+              const { user } = response;
 
-        handleSocialLogin: async (provider, code) => {
-          set({ isLoading: true });
-          try {
-            const response = await API.auth.socialLoginCallback(provider, code);
-            const { user } = response;
+              set({
+                user,
+                isAuthenticated: true,
+                isLoading: false,
+              });
 
-            set({
-              user,
-              isAuthenticated: true,
-              isLoading: false,
-            });
+              // Use Inertia to navigate to dashboard after successful social login
+              router.visit('/dashboard');
+            } catch (error) {
+              set({ isLoading: false });
+              throw error;
+            }
+          },
 
-            // Use Inertia to navigate to dashboard after successful social login
-            router.visit('/dashboard');
-          } catch (error) {
-            set({ isLoading: false });
-            throw error;
-          }
-        },
+          forgotPassword: async (email) => {
+            set({ isLoading: true });
+            try {
+              const response = await API.auth.forgotPassword(email);
+              set({ isLoading: false });
+              return response;
+            } catch (error) {
+              set({ isLoading: false });
+              throw error;
+            }
+          },
 
-        forgotPassword: async (email) => {
-          set({ isLoading: true });
-          try {
-            const response = await API.auth.forgotPassword(email);
-            set({ isLoading: false });
-            return response;
-          } catch (error) {
-            set({ isLoading: false });
-            throw error;
-          }
-        },
+          resetPassword: async (data) => {
+            set({ isLoading: true });
+            try {
+              const response = await API.auth.resetPassword(data);
+              set({ isLoading: false });
+              return response;
+            } catch (error) {
+              set({ isLoading: false });
+              throw error;
+            }
+          },
 
-        resetPassword: async (data) => {
-          set({ isLoading: true });
-          try {
-            const response = await API.auth.resetPassword(data);
-            set({ isLoading: false });
-            return response;
-          } catch (error) {
-            set({ isLoading: false });
-            throw error;
-          }
-        },
+          changePassword: async (data) => {
+            set({ isLoading: true });
+            try {
+              const response = await API.auth.changePassword(data);
+              set({ isLoading: false });
+              return response;
+            } catch (error) {
+              set({ isLoading: false });
+              throw error;
+            }
+          },
 
-        changePassword: async (data) => {
-          set({ isLoading: true });
-          try {
-            const response = await API.auth.changePassword(data);
-            set({ isLoading: false });
-            return response;
-          } catch (error) {
-            set({ isLoading: false });
-            throw error;
-          }
-        },
-
-        resendEmailVerification: async () => {
-          set({ isLoading: true });
-          try {
-            // Use inertiaApi to ensure proper API base path
-            inertiaApi.post(
-              'auth/email/verification-notification',
-              {},
-              {
-                onFinish: () => {
-                  set({ isLoading: false });
+          resendEmailVerification: async () => {
+            set({ isLoading: true });
+            try {
+              // Use inertiaApi to ensure proper API base path
+              inertiaApi.post(
+                'auth/email/verification-notification',
+                {},
+                {
+                  onFinish: () => {
+                    set({ isLoading: false });
+                  },
                 },
-              },
-            );
-            return { status: 'Verification link sent!' };
-          } catch (error) {
-            set({ isLoading: false });
-            throw error;
-          }
-        },
+              );
+              return { status: 'Verification link sent!' };
+            } catch (error) {
+              set({ isLoading: false });
+              throw error;
+            }
+          },
 
-        verifyEmail: async (id, hash) => {
-          set({ isLoading: true });
-          try {
-            const response = await API.auth.verifyEmail(id, hash);
+          verifyEmail: async (id, hash) => {
+            set({ isLoading: true });
+            try {
+              const response = await API.auth.verifyEmail(id, hash);
 
-            // If verification is successful, refresh user data
-            await get().checkAuth();
+              // If verification is successful, refresh user data
+              await get().checkAuth();
 
-            set({ isLoading: false });
-            return response;
-          } catch (error) {
-            set({ isLoading: false });
-            throw error;
-          }
-        },
-      }),
-      {
-        name: 'auth-storage', // localStorage key
-        storage: createJSONStorage(() => localStorage),
-        partialize: (state) => ({
-          user: state.user,
-          isAuthenticated: state.isAuthenticated,
+              set({ isLoading: false });
+              return response;
+            } catch (error) {
+              set({ isLoading: false });
+              throw error;
+            }
+          },
         }),
-      },
+        {
+          name: 'auth-storage', // localStorage key
+          storage: createJSONStorage(() => localStorage),
+          partialize: (state) => ({
+            user: state.user,
+            isAuthenticated: state.isAuthenticated,
+          }),
+        },
+      ),
+      { name: 'AuthStore' },
     ),
-    { name: 'AuthStore' },
   ),
 );
 
