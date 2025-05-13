@@ -40,6 +40,7 @@ class TransferController extends Controller
         $query->where('from_id', $user->id)
           ->orWhere('to_id', $user->id);
       })
+      ->with('deposit')
       ->paginate($pageSize);
   }
 
@@ -74,10 +75,10 @@ class TransferController extends Controller
     }
 
     $fromWallet = $wallets->first(fn($w) => $w->id == $wallet_id);
-    $toWallet   = $username ? null : $wallets->first(fn($w) => $w->id == $to_wallet_id);
+    $toWallet   = $wallets->first(fn($w) => $w->id == $to_wallet_id);
 
     try {
-      return $fromWallet->transfer($otherUser ?? $toWallet, $request->amount, ['desc' => $otherUser ? "Transfer from $user->username to $otherUser->username" : "Transfer between wallets"]);
+      return $fromWallet->transfer($toWallet ?? $otherUser, $request->amount, ['desc' => $otherUser ? "Transfer from $user->username to $otherUser->username" : "Transfer between wallets"]);
     } catch (\Throwable $e) {
       if (get_class($e) == BalanceIsEmpty::class) {
         abort(400, $e->getMessage());

@@ -36,7 +36,7 @@ Route::middleware('auth:web')->group(function () {
   // Email verification
   Route::get('/email/verify', fn() => Inertia::render('Auth/EmailVerification'))->name('verification.notice');
   Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])->middleware(['signed'])->name('verification.verify');
-  Route::post('/email/verification-notification', [AuthController::class, 'resend'])->middleware(['throttle:6,1'])->name('verification.send');
+  // Route::post('/email/verification-notification', [AuthController::class, 'resend'])->middleware(['throttle:6,1'])->name('verification.send');
 
   // Standard pages requiring only authentication
   Route::middleware('verified')->group(function () {

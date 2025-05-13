@@ -46,7 +46,7 @@ Route::prefix('v1')->group(function () {
   Route::get('/login/{provider}/callback', [AuthController::class, 'handleProviderCallback']);
 
   // Email verification
-  Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])->name('verification.verify');
+  // Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])->name('verification.verify');
 
   // Payment webhook
   Route::post('/hooks/paystack', [PaymentController::class, 'hooks']);

@@ -1,16 +1,14 @@
 import React from 'react';
 
 import {
-  SendOutlined,
-  PlusOutlined,
   CreditCardOutlined,
-  SwapOutlined,
   HistoryOutlined,
+  PlusOutlined,
+  SendOutlined,
+  SwapOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { Row, Col, Card } from 'antd';
-
-import { _useDarkMode } from '@/Stores/uiStore';
+import { Card, Col, Row } from 'antd';
 
 type QuickActionsProps = {
   onTransfer: () => void;

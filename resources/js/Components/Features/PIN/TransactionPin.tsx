@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 
-import { Form, Input, Button, Typography, Alert, Space } from 'antd';
+import { Alert, Button, Form, Input, Space, Typography } from 'antd';
 import axios from 'axios';
 
 import useAuthStore from '@/Stores/authStore';
 import useUIStore from '@/Stores/uiStore';
 
-const { Title, _Text } = Typography;
+const { Title } = Typography;
 
 interface TransactionPinProps {
   onSuccess?: (pin: string) => void;
