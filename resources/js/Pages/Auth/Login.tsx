@@ -13,7 +13,7 @@ import axios from 'axios';
 
 import AuthLayout from '@/Layouts/AuthLayout';
 import useAuthStore from '@/Stores/authStore';
-import { inertiaApi } from '@/prev/inertiaApi';
+import { inertiaApi } from '@/Utils/inertiaApi';
 
 interface PageProps {
   errors: Record<string, string>;

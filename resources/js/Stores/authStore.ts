@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
-import { inertiaApi } from '@/prev/inertiaApi';
+import { inertiaApi } from '@/Utils/inertiaApi';
 
 import API from '../Apis';
 import { LoginCredentials, RegisterData, User } from '../Apis/auth';
