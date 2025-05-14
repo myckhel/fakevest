@@ -9,7 +9,7 @@ import {
   formatDate,
   getDaysRemaining,
   getSavingStatus,
-} from '@/Utils/formatters';
+} from '@/prev/formatters';
 
 type SavingsTableProps = {
   limit?: number;

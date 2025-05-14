@@ -15,7 +15,7 @@ import { Button, Divider, Form, Input, message, Upload } from 'antd';
 
 import AuthLayout from '@/Layouts/AuthLayout';
 import useAuthStore from '@/Stores/authStore';
-import { inertiaApi } from '@/Utils/inertiaApi';
+import { inertiaApi } from '@/prev/inertiaApi';
 
 import type { RcFile, UploadFile } from 'antd/es/upload/interface';
 

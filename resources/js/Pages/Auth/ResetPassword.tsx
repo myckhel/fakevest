@@ -5,7 +5,7 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Alert, Button, Form, Input, message } from 'antd';
 
 import AuthLayout from '@/Layouts/AuthLayout';
-import { inertiaApi } from '@/Utils/inertiaApi';
+import { inertiaApi } from '@/prev/inertiaApi';
 
 interface Props {
   token: string;

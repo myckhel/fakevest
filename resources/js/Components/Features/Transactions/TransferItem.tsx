@@ -7,7 +7,7 @@ import { Avatar, List, Tooltip } from 'antd';
 import React from 'react';
 import { Transfer } from '../../../Apis/transactions';
 import { useAuthUser } from '../../../Stores/authStore';
-import { formatCurrency, formatDateTime } from '../../../Utils/formatters';
+import { formatCurrency, formatDateTime } from '../../../prev/formatters';
 
 type TransferItemProps = {
   transfer: Transfer;
