@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Button, Form, Input, Alert, message } from 'antd';
+import { Alert, Button, Form, Input, message } from 'antd';
 
 import AuthLayout from '@/Layouts/AuthLayout';
-import { inertiaApi } from '@/utils/inertiaApi';
+import { inertiaApi } from '@/Utils/inertiaApi';
 
 interface Props {
   token: string;

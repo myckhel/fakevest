@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
-  LockOutlined,
-  MailOutlined,
+  FacebookOutlined,
   GithubOutlined,
   GoogleOutlined,
-  FacebookOutlined,
+  LockOutlined,
+  MailOutlined,
 } from '@ant-design/icons';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Button, Form, Input, Divider, message } from 'antd';
+import { Button, Divider, Form, Input, message } from 'antd';
 import axios from 'axios';
 
 import AuthLayout from '@/Layouts/AuthLayout';
 import useAuthStore from '@/Stores/authStore';
-import { inertiaApi } from '@/utils/inertiaApi';
+import { inertiaApi } from '@/Utils/inertiaApi';
 
 interface PageProps {
   errors: Record<string, string>;

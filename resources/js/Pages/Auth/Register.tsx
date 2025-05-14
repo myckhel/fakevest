@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
-  UserOutlined,
+  FacebookOutlined,
+  GithubOutlined,
+  GoogleOutlined,
   LockOutlined,
   MailOutlined,
   PhoneOutlined,
   UploadOutlined,
-  GithubOutlined,
-  GoogleOutlined,
-  FacebookOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Button, Form, Input, Upload, Divider, message } from 'antd';
+import { Button, Divider, Form, Input, message, Upload } from 'antd';
 
 import AuthLayout from '@/Layouts/AuthLayout';
 import useAuthStore from '@/Stores/authStore';
-import { inertiaApi } from '@/utils/inertiaApi';
+import { inertiaApi } from '@/Utils/inertiaApi';
 
 import type { RcFile, UploadFile } from 'antd/es/upload/interface';
 
