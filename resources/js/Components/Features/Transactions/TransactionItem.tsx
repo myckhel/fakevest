@@ -1,8 +1,8 @@
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { Avatar, List } from 'antd';
 import React from 'react';
+import { formatCurrency, formatDateTime } from '../../../../Utils/formatters';
 import { Transaction } from '../../../Apis/transactions';
-import { formatCurrency, formatDateTime } from '../../../prev/formatters';
 
 type TransactionItemProps = {
   transaction: Transaction;
