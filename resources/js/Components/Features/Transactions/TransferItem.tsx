@@ -5,9 +5,9 @@ import {
 } from '@ant-design/icons';
 import { Avatar, List, Tooltip } from 'antd';
 import React from 'react';
-import { formatCurrency, formatDateTime } from '../../../../Utils/formatters';
 import { Transfer } from '../../../Apis/transactions';
 import { useAuthUser } from '../../../Stores/authStore';
+import { formatCurrency, formatDateTime } from '../../../Utils/formatters';
 
 type TransferItemProps = {
   transfer: Transfer;

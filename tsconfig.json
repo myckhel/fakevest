@@ -14,11 +14,6 @@
       "ziggy-js": ["./vendor/tightenco/ziggy"]
     }
   },
-  "include": [
-    "resources/js/**/*",
-    "resources/Utils/formatters.ts",
-    "resources/Utils/inertiaApi.ts",
-    "resources/Utils/interfaces.ts"
-  ],
+  "include": ["resources/js/**/*"],
   "exclude": ["node_modules", "public"]
 }

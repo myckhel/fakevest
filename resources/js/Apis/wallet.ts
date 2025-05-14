@@ -1,4 +1,4 @@
-import { PaginatedData } from '../../Utils/interfaces';
+import { PaginatedData } from '../Utils/interfaces';
 import Http from './Http';
 
 export type Wallet = {
