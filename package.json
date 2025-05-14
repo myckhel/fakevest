@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && vite build --ssr",
+    "build": "vite build && vite build --ssr",
     "preview": "vite preview",
     "lint": "eslint resources/js/",
     "lint:fix": "eslint resources/js/ --fix",
@@ -24,6 +24,7 @@
     "immer": "^10.1.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "ziggy-js": "^2.5.2",
     "zustand": "^5.0.3"
   },
   "packageManager": "yarn@4.9.1",

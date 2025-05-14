@@ -52,8 +52,3 @@ Route::middleware('auth:web')->group(function () {
   // Logout route
   Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 });
-
-// UI Theme Showcase (Dev only)
-Route::get('/ui/theme-showcase', function () {
-  return inertia('Demo/ThemeShowcasePage');
-});
