@@ -23,6 +23,7 @@
 ## 🧱 Backend (Laravel)
 
 ### Architecture & Best Practices
+
 - Keep **Controllers slim** – delegate logic to **Service classes**
 - Validate with **Form Requests**
 - Format API output with **API Resources**
@@ -40,6 +41,7 @@
 ## ⚛️ Frontend (Inertia + React + Zustand)
 
 ### Directory Structure
+
 ```
 resources/js/
 ├── Pages/
@@ -57,6 +59,7 @@ resources/js/
 ---
 
 ### Routing
+
 - Use Laravel routes + `@inertiajs/react`'s `<Link>` or `router.visit`
 - **Avoid** React Router and `react-router-dom`
 
@@ -65,12 +68,14 @@ resources/js/
 ### Props & State Management
 
 #### General
+
 - Use `usePage<T>()` for typed Inertia props
 - Use **Zustand only** for **shared global UI state** (e.g., auth, modals, sidebar)
 - Prefer **local component state** for isolated feature behavior
 - Scope API calls or data fetching, form states, and side effects within feature components
 
 #### Feature Component Encapsulation
+
 - Abstract full workflows in domain-based components:
   - `Features/Savings/CreateForm.tsx`
   - `Features/Withdrawals/RequestModal.tsx`
@@ -92,6 +97,7 @@ resources/js/
 ---
 
 ### Performance
+
 - Use `useCallback`, `useMemo`, and `React.memo` to reduce re-renders
 - Use Zustand **selectors** to limit subscriptions
 - Virtualize long lists with `react-virtual`
@@ -102,12 +108,14 @@ resources/js/
 ### Abstractions
 
 #### Utility Functions
+
 - Extract reusable logic to `/Utils`
   - e.g., `formatCurrency`, `parseDate`, `generateUUID`, `copyToClipboard`
 - Keep functions **pure** and **well-tested**
 - Avoid inline helpers inside components
 
 #### API & Services
+
 - Centralize external API logic inside `/Apis/` or custom hooks (`/Hooks`)
 
 ---
@@ -115,11 +123,13 @@ resources/js/
 ## 🎨 UI (TailwindCSS + AntD)
 
 ### UI Guidelines
+
 - Use **AntD** for inputs, forms, modals, tables
 - Use **Tailwind** for layout, spacing, color utility
 - Combine styles using `clsx` or `classnames`
 
 ### Theming
+
 - Set AntD **primary color** to `#3b8cb7`
 - Use AntD's `ConfigProvider` at root level for consistent theming
 - Use tailwindcss dark mode features without manually accesing dark mode variable
@@ -151,4 +161,5 @@ resolve: {
   - Keep feature logic self-contained
   - Use `/Utils/` for reusable utility functions
   - Use `/Apis/` and `/Hooks/` for consistent API and async logic
-- Prioritize **clarity**, **cohesion**, and **maintainability**
+  - read the postman api doc if needed at path `docs/postman/FakeVest.postman_collection.json`
+- Prioritize **clarity**, **consistency**, **cohesion**, and **maintainability**
