@@ -238,7 +238,7 @@ class AuthController extends Controller
   {
     $request->validate([
       'username'            => "unique:users",
-      'phone'               => [Rule::requiredIf(!$request->email), "digits_between:10,20"],
+      'phone'               => [Rule::requiredIf(!$request->email), "digits_between:10,20", 'unique:users,phone'],
       'email'               => [Rule::requiredIf(!$request->phone), "email", "unique:users,email"],
       'password'            => 'required|min:6|confirmed',
       'fullname'            => 'required|min:6',
