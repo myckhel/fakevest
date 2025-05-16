@@ -1,28 +1,19 @@
+import '@ant-design/v5-patch-for-react-19';
 import '../css/app.css';
 import './bootstrap';
-import '@ant-design/v5-patch-for-react-19';
 
 import React from 'react';
 
 import { StyleProvider } from '@ant-design/cssinjs';
 import { createInertiaApp } from '@inertiajs/react';
-import { ConfigProvider } from 'antd';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 
 import DarkModeManager from './Components/Features/DarkMode/DarkModeManager';
+import FullScreenLoader from './Components/Shared/FullScreenLoader';
 import Toast from './Components/Toast';
-import { ThemeProvider } from './theme';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
-
-// Apply AntD theming
-const theme = {
-  token: {
-    colorPrimary: '#3b8cb7',
-    borderRadius: 4,
-  },
-};
 
 createInertiaApp({
   title: (title) => `${title} - ${appName}`,
@@ -43,12 +34,21 @@ createInertiaApp({
     }
 
     // Import the new GitHub-style theme provider
-    const GithubThemeProvider = React.lazy(() => import('./theme/GithubThemeProvider'));
+    const GithubThemeProvider = React.lazy(
+      () => import('./theme/GithubThemeProvider'),
+    );
 
     // Wrap with StyleProvider for better styles rendering in React 19
     const AppWithTheme = () => (
       <StyleProvider hashPriority="high">
-        <React.Suspense fallback={<div>Loading theme...</div>}>
+        <React.Suspense
+          fallback={
+            <FullScreenLoader
+              message="Loading Fakevest"
+              subMessage="Setting up your financial environment..."
+            />
+          }
+        >
           <GithubThemeProvider>
             <DarkModeManager />
             <App {...props} />
