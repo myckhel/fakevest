@@ -1,24 +1,24 @@
 import { generate } from '@ant-design/colors';
 import { theme } from 'antd';
 
-// Fakevest primary brand color as specified in the coding instructions
-const primaryColor = '#3b8cb7';
+// Github-like primary color
+const primaryColor = '#0969da';
 
 // Generate color palette based on the primary color
 const primaryColors = generate(primaryColor);
 
-// Theme configuration optimized for React 19
+// Theme configuration optimized for React 19 with GitHub-like UI
 export const themeConfig = {
   token: {
     colorPrimary: primaryColor,
     colorLink: primaryColor,
     colorInfo: primaryColor,
-    colorSuccess: '#52c41a',
-    colorWarning: '#faad14',
-    colorError: '#f5222d',
-    colorTextBase: '#1f2937', // TailwindCSS gray-800
+    colorSuccess: '#2da44e', // GitHub success color
+    colorWarning: '#bf8700', // GitHub warning color
+    colorError: '#d73a49',   // GitHub error color
+    colorTextBase: '#24292f', // GitHub text color
     fontFamily:
-      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif',
     borderRadius: 6,
     wireframe: false,
   },

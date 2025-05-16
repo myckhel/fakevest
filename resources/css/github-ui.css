@@ -1,0 +1,83 @@
+/* 
+ * GitHub-like UI Pattern Styles
+ * This adds subtle texture patterns for the glassy design background 
+ */
+
+/* Light pattern */
+.bg-pattern-light {
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Dark pattern */
+.bg-pattern-dark {
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Glass styling */
+.glass {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-sm {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.glass-lg {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Add a thin border to floating elements */
+.glass-border-light {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-border-dark {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Additional GitHub-like hover effects for glass components */
+.github-hoverable {
+  transition: all 0.2s ease-in-out;
+}
+
+.github-hoverable:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom GitHub-like scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(140, 149, 159, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(140, 149, 159, 0.5);
+}
+
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(80, 89, 99, 0.4);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(80, 89, 99, 0.6);
+}

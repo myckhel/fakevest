@@ -1,8 +1,7 @@
-export { default as ThemeProvider } from './ThemeProvider';
-export { themeConfig, darkThemeConfig, themeColors } from './themeConfig';
+export { darkThemeConfig, themeColors, themeConfig } from './themeConfig';
 export {
-  useThemeToken,
   cn,
-  useIsDarkMode,
   getTailwindColorForAntd,
+  useIsDarkMode,
+  useThemeToken,
 } from './utils';

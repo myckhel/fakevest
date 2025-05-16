@@ -42,16 +42,19 @@ createInertiaApp({
       document.documentElement.classList.add('dark');
     }
 
+    // Import the new GitHub-style theme provider
+    const GithubThemeProvider = React.lazy(() => import('./theme/GithubThemeProvider'));
+
     // Wrap with StyleProvider for better styles rendering in React 19
     const AppWithTheme = () => (
       <StyleProvider hashPriority="high">
-        <ThemeProvider>
-          <ConfigProvider theme={theme}>
+        <React.Suspense fallback={<div>Loading theme...</div>}>
+          <GithubThemeProvider>
             <DarkModeManager />
             <App {...props} />
             <Toast />
-          </ConfigProvider>
-        </ThemeProvider>
+          </GithubThemeProvider>
+        </React.Suspense>
       </StyleProvider>
     );
 

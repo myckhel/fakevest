@@ -1,9 +1,9 @@
 import React, { ReactNode } from 'react';
 
-import { ConfigProvider, App } from 'antd';
+import { App, ConfigProvider } from 'antd';
 
-import { themeConfig, darkThemeConfig } from './themeConfig';
 import { useDarkMode } from '../Stores/uiStore';
+import { darkThemeConfig, themeConfig } from './themeConfig';
 
 interface AntDesignProviderProps {
   children: ReactNode;
