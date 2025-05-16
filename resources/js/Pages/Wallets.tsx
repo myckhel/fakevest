@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   BankOutlined,
@@ -20,11 +20,13 @@ import {
   Typography,
 } from 'antd';
 
+import AddCardModal from '@/Components/Features/Cards/AddCardModal';
 import ManagePinModal from '@/Components/Features/PIN/ManagePinModal';
 import TransferMoneyModal from '@/Components/Features/Transfers/TransferMoneyModal';
 import WithdrawFundsModal from '@/Components/Features/Withdrawals/WithdrawFundsModal';
 import MainLayout from '@/Layouts/MainLayout';
 import useAuthStore from '@/Stores/authStore';
+import usePaymentOptionsStore from '@/Stores/paymentOptionsStore';
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -33,19 +35,32 @@ const { TabPane } = Tabs;
  * Wallets page that shows user's wallets and financial accounts
  */
 const Wallets = () => {
-  // Use auth store to get user
+  // Use stores
   const { user } = useAuthStore();
+  const { cards, fetchCards, deleteCard, setDefaultCard } =
+    usePaymentOptionsStore();
   const hasPin = user?.has_pin;
 
   // Local state for UI management
   const [isTransferModalVisible, setIsTransferModalVisible] = useState(false);
   const [isWithdrawModalVisible, setIsWithdrawModalVisible] = useState(false);
-  const [, setIsAddCardModalVisible] = useState(false);
-  const [, setIsAddBankAccountModalVisible] = useState(false);
+  const [isAddCardModalVisible, setIsAddCardModalVisible] = useState(false);
   const [isManagePinModalVisible, setIsManagePinModalVisible] = useState(false);
   const [pinManagementMode, setPinManagementMode] = useState<
     'create' | 'update'
   >('create');
+
+  // Use underscore prefix for unused state variables or handlers
+  const [_isAddBankAccountModalVisible, setIsAddBankAccountModalVisible] =
+    useState(false);
+  const _handleCloseAddBankAccountModal = () =>
+    setIsAddBankAccountModalVisible(false);
+
+  // Fetch cards on component mount
+  useEffect(() => {
+    fetchCards();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Handle modal visibility
   const handleOpenTransferModal = () => setIsTransferModalVisible(true);
@@ -53,11 +68,33 @@ const Wallets = () => {
   const handleOpenWithdrawModal = () => setIsWithdrawModalVisible(true);
   const handleCloseWithdrawModal = () => setIsWithdrawModalVisible(false);
   const handleOpenAddCardModal = () => setIsAddCardModalVisible(true);
-  const _handleCloseAddCardModal = () => setIsAddCardModalVisible(false);
+  const handleCloseAddCardModal = () => setIsAddCardModalVisible(false);
   const handleOpenAddBankAccountModal = () =>
     setIsAddBankAccountModalVisible(true);
-  const _handleCloseAddBankAccountModal = () =>
-    setIsAddBankAccountModalVisible(false);
+
+  const handleCardAdded = () => {
+    // Refresh cards list and close modal
+    fetchCards();
+    handleCloseAddCardModal();
+  };
+
+  // Handle deleting a card
+  const handleDeleteCard = async (id: number) => {
+    try {
+      await deleteCard(id);
+    } catch (err) {
+      console.error('Failed to delete card:', err);
+    }
+  };
+
+  // Handle setting a card as default
+  const handleSetDefaultCard = async (id: number) => {
+    try {
+      await setDefaultCard(id);
+    } catch (err) {
+      console.error('Failed to set default card:', err);
+    }
+  };
 
   const handleOpenCreatePinModal = () => {
     setPinManagementMode('create');
@@ -84,22 +121,28 @@ const Wallets = () => {
     { id: 2, name: 'UBA', accountNumber: '****5678', isDefault: false },
   ];
 
-  const cards = [
-    {
-      id: 1,
-      type: 'Visa',
-      cardNumber: '****4321',
-      expiryDate: '06/27',
-      isDefault: true,
-    },
-    {
-      id: 2,
-      type: 'Mastercard',
-      cardNumber: '****8765',
-      expiryDate: '12/26',
-      isDefault: false,
-    },
-  ];
+  // Format payment option cards for display
+  const formatCards = () => {
+    if (!cards || cards.length === 0) {
+      return [];
+    }
+
+    return cards.map((card) => {
+      return {
+        id: card.id,
+        type: card.card_type || card.brand || 'Card',
+        cardNumber: card.last4 ? `****${card.last4}` : '****',
+        expiryDate:
+          card.exp_month && card.exp_year
+            ? `${card.exp_month}/${card.exp_year}`
+            : 'XX/XX',
+        isDefault: card.id === 1, // Placeholder logic - replace with actual default logic
+        bank: card.bank || '',
+      };
+    });
+  };
+
+  const displayCards = formatCards();
 
   return (
     <MainLayout>
@@ -286,9 +329,9 @@ const Wallets = () => {
               }
               key="cards"
             >
-              {cards.length > 0 ? (
+              {displayCards.length > 0 ? (
                 <div className="space-y-4">
-                  {cards.map((card) => (
+                  {displayCards.map((card) => (
                     <Card key={card.id} className="bg-gray-50 dark:bg-gray-700">
                       <div className="flex justify-between items-center">
                         <div>
@@ -304,13 +347,27 @@ const Wallets = () => {
                           <Text type="secondary">
                             {card.cardNumber} • Expires {card.expiryDate}
                           </Text>
+                          {card.bank && (
+                            <Text type="secondary" className="block">
+                              Bank: {card.bank}
+                            </Text>
+                          )}
                         </div>
                         <Space>
                           {!card.isDefault && (
-                            <Button size="small">Set Default</Button>
+                            <Button
+                              size="small"
+                              onClick={() => handleSetDefaultCard(card.id)}
+                            >
+                              Set Default
+                            </Button>
                           )}
                           {!card.isDefault && (
-                            <Button size="small" danger>
+                            <Button
+                              size="small"
+                              danger
+                              onClick={() => handleDeleteCard(card.id)}
+                            >
                               Remove
                             </Button>
                           )}
@@ -334,7 +391,7 @@ const Wallets = () => {
                 </div>
               )}
 
-              {cards.length > 0 && (
+              {displayCards.length > 0 && (
                 <div className="mt-4">
                   <Button
                     type="primary"
@@ -366,7 +423,13 @@ const Wallets = () => {
           mode={pinManagementMode}
         />
 
-        {/* TODO: Implement AddCardModal and AddBankAccountModal components */}
+        <AddCardModal
+          visible={isAddCardModalVisible}
+          onClose={handleCloseAddCardModal}
+          onSuccess={handleCardAdded}
+        />
+
+        {/* TODO: Implement AddBankAccountModal component */}
       </div>
     </MainLayout>
   );

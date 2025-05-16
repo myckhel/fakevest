@@ -74,7 +74,8 @@ Route::prefix('v1')->group(function () {
     // User accounts, payments, and financial operations
     Route::apiResource('/user-accounts', UserAccountController::class);
     Route::post('/payments/verify', [PaymentController::class, 'verify']);
-    Route::apiResource('/payments', PaymentController::class)->only(['index', 'show']);
+    Route::apiResource('/payments', PaymentController::class)->only(['index', 'show', 'store']);
+    Route::apiResource('/payment-options', PaymentOptionController::class)->only(['index', 'show', 'destroy', 'store']);
     Route::apiResource('/plans', PlanController::class);
     Route::apiResource('/savings', SavingController::class);
     Route::apiResource('/transactions', TransactionController::class)->only(['index', 'show']);

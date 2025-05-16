@@ -1,5 +1,6 @@
 import AuthAPI from './auth';
 import Http from './Http';
+import PaymentOptionsAPI from './paymentOptions';
 import SavingsAPI from './savings';
 import TransactionsAPI from './transactions';
 import UserAPI from './user';
@@ -13,6 +14,7 @@ const API = {
   savings: SavingsAPI,
   transactions: TransactionsAPI,
   wallet: WalletAPI,
+  paymentOptions: PaymentOptionsAPI,
 };
 
 export default API;
