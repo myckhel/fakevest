@@ -48,8 +48,18 @@ export type WithdrawData = {
 export type DepositData = {
   amount: number;
   wallet_name: string;
-  payment_method: string;
-  reference?: string;
+};
+
+export type PaymentInitiationResponse = {
+  id: number;
+  amount: number;
+  access_code: string;
+  reference: string;
+  wallet_id: number;
+  user_id: number;
+  updated_at: string;
+  created_at: string;
+  authorization_url: string;
 };
 
 export type WalletTransferData = {
@@ -97,10 +107,10 @@ const WalletAPI = {
   },
 
   /**
-   * Deposit funds to wallet
+   * Initiate a deposit to wallet
    */
-  depositFunds: (data: DepositData): Promise<any> => {
-    return Http.post(`/wallets/${data.wallet_name}/deposit`, data);
+  initiateDeposit: (data: DepositData): Promise<PaymentInitiationResponse> => {
+    return Http.post('/payments', data);
   },
 
   /**
