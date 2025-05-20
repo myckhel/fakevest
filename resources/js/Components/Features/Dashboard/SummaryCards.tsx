@@ -20,6 +20,7 @@ import useWalletStore from '@/Stores/walletStore';
 type SummaryCardsProps = {
   onTransfer: () => void;
   onWithdraw: () => void;
+  onDeposit: () => void;
 };
 
 /**
@@ -29,6 +30,7 @@ type SummaryCardsProps = {
 const SummaryCards: React.FC<SummaryCardsProps> = ({
   onTransfer,
   onWithdraw,
+  onDeposit,
 }) => {
   // Get dark mode from global store
   const darkMode = useDarkMode();
@@ -111,6 +113,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
               icon={<SendOutlined />}
               onClick={onTransfer}
               size="small"
+              key="transfer"
             >
               Transfer
             </Button>,
@@ -119,8 +122,18 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
               icon={<SwapOutlined />}
               onClick={onWithdraw}
               size="small"
+              key="withdraw"
             >
               Withdraw
+            </Button>,
+            <Button
+              type="text"
+              icon={<BankOutlined />}
+              onClick={onDeposit}
+              size="small"
+              key="deposit"
+            >
+              Deposit
             </Button>,
           ]}
         >
@@ -200,7 +213,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
           />
 
           <div className="mt-4 flex justify-between items-end h-10">
-            {chartData.map((value, index) => (
+            {chartData.map((value: number, index: number) => (
               <div
                 key={index}
                 className="rounded-t"

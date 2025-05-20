@@ -13,6 +13,7 @@ import { Card, Col, Row } from 'antd';
 type QuickActionsProps = {
   onTransfer: () => void;
   onWithdraw: () => void;
+  onDeposit: () => void;
 };
 
 /**
@@ -21,6 +22,7 @@ type QuickActionsProps = {
 const QuickActions: React.FC<QuickActionsProps> = ({
   onTransfer,
   onWithdraw,
+  onDeposit,
 }) => {
   const actions = [
     {
@@ -36,7 +38,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({
     {
       icon: <CreditCardOutlined style={{ fontSize: 24, color: '#722ed1' }} />,
       title: 'Add Funds',
-      href: '/deposit',
+      onClick: onDeposit,
     },
     {
       icon: <SwapOutlined style={{ fontSize: 24, color: '#fa8c16' }} />,
