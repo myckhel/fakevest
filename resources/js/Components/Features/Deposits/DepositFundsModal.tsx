@@ -1,3 +1,4 @@
+import Paystack from '@paystack/inline-js';
 import React, { useEffect, useState } from 'react';
 
 import { LoadingOutlined } from '@ant-design/icons';
@@ -27,10 +28,15 @@ interface DepositFundsModalProps {
   defaultWallet?: string;
 }
 
+interface PaystackTransaction {
+  reference: string;
+  [key: string]: unknown;
+}
+
 /**
- * Modal component for depositing funds to wallet using the enhanced flow:
+ * Modal component for depositing funds to wallet using the enhanced flow with Paystack InlineJS:
  * 1. Initiate payment with POST /payments
- * 2. User completes payment in Paystack window
+ * 2. User completes payment in Paystack inline popup
  * 3. Verify payment with POST /payments/verify
  */
 const DepositFundsModal: React.FC<DepositFundsModalProps> = ({
@@ -45,51 +51,90 @@ const DepositFundsModal: React.FC<DepositFundsModalProps> = ({
   const [success, setSuccess] = useState(false);
 
   // Payment flow states
-  const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
   const [reference, setReference] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
+  const [paystackPublicKey, setPaystackPublicKey] = useState<string>('');
 
   const { showToast } = useUIStore();
 
-  // Reset form when modal becomes visible
+  // Reset form when modal becomes visible and fetch Paystack public key
   useEffect(() => {
     if (visible) {
       form.setFieldsValue({
         wallet_name: defaultWallet,
       });
+
+      // Fetch Paystack public key when modal opens
+      const fetchPaystackConfig = async () => {
+        try {
+          const config = await API.paystack.getConfig();
+          setPaystackPublicKey(config.publicKey);
+        } catch (error) {
+          console.error('Failed to fetch Paystack configuration:', error);
+          setError('Failed to load payment configuration. Please try again.');
+        }
+      };
+
+      fetchPaystackConfig();
     }
   }, [visible, defaultWallet, form]);
 
   // Handle form submission
-  const handleSubmit = async (values: Record<string, any>) => {
+  const handleSubmit = async (values: Record<string, unknown>) => {
     try {
       setLoading(true);
       setError(null);
 
-      // Step 1: Initiate the deposit to get authorization URL
+      // Step 1: Initiate the deposit to get reference
       const depositData: DepositData = {
-        amount: values.amount,
-        wallet_name: values.wallet_name,
+        amount: values.amount as number,
+        wallet_name: values.wallet_name as string,
       };
 
       const response = await API.wallet.initiateDeposit(depositData);
 
-      // Store the payment URL and reference for verification later
-      setPaymentUrl(response.authorization_url);
+      // Store the reference for verification later
       setReference(response.reference);
 
-      // Open the Paystack checkout in a new window
-      const paymentWindow = window.open(response.authorization_url, '_blank');
+      // Initialize Paystack inline payment
+      const popup = new Paystack();
+      popup.newTransaction({
+        key: paystackPublicKey,
+        email: response.email || '',
+        amount: depositData.amount * 100, // Convert to kobo/cents
+        ref: response.reference,
+        currency: response.currency || 'NGN',
+        onSuccess: (transaction: PaystackTransaction) => {
+          // Verify the payment once completed
+          handleVerifyPayment(transaction.reference);
+        },
+        onCancel: () => {
+          setError('Payment was cancelled. Please try again.');
+          setLoading(false);
+        },
+        channels: [
+          'card',
+          'bank',
+          'ussd',
+          'qr',
+          'mobile_money',
+          'bank_transfer',
+        ],
+      });
+    } catch (error: unknown) {
+      let errorMessage = 'Failed to initiate payment. Please try again.';
 
-      if (!paymentWindow) {
-        setError('Please enable popups to complete the payment process.');
+      if (error && typeof error === 'object' && 'response' in error) {
+        const response = error.response as Record<string, unknown>;
+        if (response.data && typeof response.data === 'object') {
+          const data = response.data as Record<string, unknown>;
+          if (data.message && typeof data.message === 'string') {
+            errorMessage = data.message;
+          }
+        }
       }
-    } catch (error: any) {
-      setError(
-        error.response?.data?.message ||
-          'Failed to initiate payment. Please try again.',
-      );
-    } finally {
+
+      setError(errorMessage);
       setLoading(false);
     }
   };
@@ -98,20 +143,20 @@ const DepositFundsModal: React.FC<DepositFundsModalProps> = ({
     form.resetFields();
     setError(null);
     setSuccess(false);
-    setPaymentUrl(null);
     setReference(null);
     onClose();
   };
 
   // Verify payment after user completes the Paystack checkout
-  const handleVerifyPayment = async () => {
-    if (!reference) return;
+  const handleVerifyPayment = async (paymentReference?: string) => {
+    const ref = paymentReference || reference;
+    if (!ref) return;
 
     try {
       setVerifying(true);
       setError(null);
 
-      const result = await API.paymentOptions.verifyPayment(reference);
+      const result = await API.paymentOptions.verifyPayment(ref);
 
       if (result.status) {
         setSuccess(true);
@@ -125,11 +170,20 @@ const DepositFundsModal: React.FC<DepositFundsModalProps> = ({
       } else {
         setError('Payment verification failed. Please try again.');
       }
-    } catch (error: any) {
-      setError(
-        error.response?.data?.message ||
-          'Failed to verify payment. Please try again.',
-      );
+    } catch (error: unknown) {
+      let errorMessage = 'Failed to verify payment. Please try again.';
+
+      if (error && typeof error === 'object' && 'response' in error) {
+        const response = error.response as Record<string, unknown>;
+        if (response.data && typeof response.data === 'object') {
+          const data = response.data as Record<string, unknown>;
+          if (data.message && typeof data.message === 'string') {
+            errorMessage = data.message;
+          }
+        }
+      }
+
+      setError(errorMessage);
     } finally {
       setVerifying(false);
     }
@@ -152,59 +206,16 @@ const DepositFundsModal: React.FC<DepositFundsModalProps> = ({
       );
     }
 
-    if (paymentUrl && reference) {
+    if (verifying) {
       return (
-        <div className="text-center">
-          <Alert
-            message="Payment in Progress"
-            description="Complete the payment process in the opened window to deposit funds."
-            type="info"
-            showIcon
-            className="mb-4"
-          />
-
-          {error && (
-            <Alert
-              message="Error"
-              description={error}
-              type="error"
-              showIcon
-              className="mb-4"
-            />
-          )}
-
-          <div className="mb-4">
-            <Typography.Paragraph>
-              {verifying ? (
-                <Spin
-                  indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}
-                />
-              ) : (
-                'Click the button below when you have completed the payment process'
-              )}
-            </Typography.Paragraph>
-          </div>
-
-          <Space>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button
-              type="primary"
-              onClick={handleVerifyPayment}
-              loading={verifying}
-              disabled={verifying}
-            >
-              {verifying ? 'Verifying...' : "I've Completed Payment"}
-            </Button>
-          </Space>
-
-          <div className="mt-4">
-            <Typography.Text type="secondary">
-              If you accidentally closed the payment window,{' '}
-              <Button type="link" href={paymentUrl} target="_blank">
-                click here to reopen it
-              </Button>
-            </Typography.Text>
-          </div>
+        <div className="text-center p-8">
+          <Spin indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />} />
+          <Typography.Title level={4} className="mt-4">
+            Verifying Payment
+          </Typography.Title>
+          <Typography.Paragraph>
+            Please wait while we confirm your payment...
+          </Typography.Paragraph>
         </div>
       );
     }
@@ -287,13 +298,7 @@ const DepositFundsModal: React.FC<DepositFundsModalProps> = ({
       onCancel={handleClose}
       footer={null}
       destroyOnClose
-      title={
-        success
-          ? null
-          : paymentUrl && reference
-            ? 'Complete Payment'
-            : 'Deposit Funds'
-      }
+      title={success ? null : verifying ? 'Verifying Payment' : 'Deposit Funds'}
       width={500}
     >
       {renderContent()}

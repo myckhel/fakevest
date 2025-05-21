@@ -109,6 +109,8 @@ class PaymentController extends Controller
     ]);
 
     $payment->authorization_url = $responseData->authorization_url;
+    $payment->email = $user->email;
+    $payment->currency = 'NGN';
 
     return $payment;
   }

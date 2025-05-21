@@ -6,6 +6,7 @@ use App\Http\Controllers\JobController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PaymentOptionController;
+use App\Http\Controllers\PaystackController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\SavingController;
 use App\Http\Controllers\TransactionController;
@@ -50,6 +51,9 @@ Route::prefix('v1')->group(function () {
 
   // Payment webhook
   Route::post('/hooks/paystack', [PaymentController::class, 'hooks']);
+
+  // Paystack config
+  Route::get('/paystack/config', [PaystackController::class, 'getConfig']);
 
   // Protected routes
   Route::middleware(['auth:sanctum'])->group(function () {

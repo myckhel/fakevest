@@ -1,6 +1,7 @@
 import AuthAPI from './auth';
 import Http from './Http';
 import PaymentOptionsAPI from './paymentOptions';
+import PaystackAPI from './paystack';
 import SavingsAPI from './savings';
 import TransactionsAPI from './transactions';
 import UserAPI from './user';
@@ -15,6 +16,7 @@ const API = {
   transactions: TransactionsAPI,
   wallet: WalletAPI,
   paymentOptions: PaymentOptionsAPI,
+  paystack: PaystackAPI,
 };
 
 export default API;

@@ -60,6 +60,8 @@ export type PaymentInitiationResponse = {
   updated_at: string;
   created_at: string;
   authorization_url: string;
+  email?: string;
+  currency?: string;
 };
 
 export type WalletTransferData = {
