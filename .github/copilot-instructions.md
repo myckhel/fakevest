@@ -4,7 +4,38 @@
 
 **Fakevest** is a modern piggybank app inspired by PiggyVest. It empowers users to **manage and grow their finances** with automated savings, fixed goals, flexible withdrawal options, and investment opportunities. Designed for real-life financial enhancement, Fakevest encourages financial discipline through intuitive design and strong backend architecture.
 
----
+## 🏦 Savings Plans
+
+- **PiggyBank:** Flexible savings on your terms. Save manually or automatically, no rules. Save daily, weekly, monthly or yearly with no limits. Interests up to 17.5% p.a.
+
+  - `interest`: 17.5
+  - `minDays`: 0
+  - `breakable`: true
+  - `icon`: `/assets/img/plans/piggy.png`
+  - `colors`: `['#CDE6F2', '#61A7C7']`
+
+- **Vault:** Lock funds for a period of time with no access to it. Terms: minimum of 1 month and maximum 1 year. Returns up to 30% p.a.
+
+  - `interest`: 30
+  - `minDays`: 5
+  - `breakable`: false
+  - `icon`: `/assets/img/plans/vault.png`
+  - `colors`: `['#D1D1D1', '#B5B5B5', '#696969']`
+
+- **Goals:** Create, explore and smash your goals. Returns up to 12.5% p.a.
+
+  - `interest`: 12.5
+  - `minDays`: 0
+  - `breakable`: true
+  - `icon`: `/assets/img/plans/goals.png`
+  - `colors`: `['#C9DECC', '#CDEFD1']`
+
+- **Challenge:** Create or join a saving Challenge, and see yourself perform better.
+  - `interest`: 0
+  - `minDays`: 0
+  - `breakable`: true
+  - `icon`: `/assets/img/plans/challenge.png`
+  - `colors`: `['#D4D2E7', '#CDC9F7']`
 
 ## 🛠 Stack
 
@@ -17,8 +48,6 @@
 - **Vite**
 - **Yarn**
 - **Artisan CLI**
-
----
 
 ## 🧱 Backend (Laravel)
 
@@ -35,8 +64,6 @@
 - Version APIs (e.g., `/api/v1/...`)
 - Support **token expiration** and **password reset** via Laravel Auth features
 - Schedule tasks using **Custom Artisan Commands**
-
----
 
 ## ⚛️ Frontend (Inertia + React + Zustand)
 
@@ -56,14 +83,10 @@ resources/js/
 └── App.tsx
 ```
 
----
-
 ### Routing
 
 - Use Laravel routes + `@inertiajs/react`'s `<Link>` or `router.visit`
 - **Avoid** React Router and `react-router-dom`
-
----
 
 ### Props & State Management
 
@@ -94,16 +117,12 @@ resources/js/
 <Savings.CreateForm form={form} loading={loading} onSubmit={handleSubmit} />
 ```
 
----
-
 ### Performance
 
 - Use `useCallback`, `useMemo`, and `React.memo` to reduce re-renders
 - Use Zustand **selectors** to limit subscriptions
 - Virtualize long lists with `react-virtual`
 - Avoid prop drilling and anonymous functions in JSX
-
----
 
 ### Abstractions
 
@@ -117,8 +136,6 @@ resources/js/
 #### API & Services
 
 - Centralize external API logic inside `/Apis/` or custom hooks (`/Hooks`)
-
----
 
 ## 🎨 UI (TailwindCSS + AntD)
 
@@ -134,8 +151,6 @@ resources/js/
 - Use AntD's `ConfigProvider` at root level for consistent theming
 - Use tailwindcss dark mode features without manually accesing dark mode variable
 
----
-
 ## ⚡ Vite
 
 ```ts
@@ -146,8 +161,6 @@ resolve: {
   },
 }
 ```
-
----
 
 ## 🧠 Copilot Smart Notes
 
