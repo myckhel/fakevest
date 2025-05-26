@@ -1,3 +1,4 @@
+import { PaginatedData } from '../Utils/interfaces';
 import Http from './Http';
 
 export interface SavingPlan {
@@ -92,7 +93,7 @@ const SavingsAPI = {
   /**
    * Get all available saving plans
    */
-  getPlans: (): Promise<SavingPlan[]> => {
+  getPlans: (): Promise<PaginatedData<SavingPlan>> => {
     return Http.get('/plans');
   },
 

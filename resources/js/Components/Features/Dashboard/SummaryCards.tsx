@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 import {
   ArrowDownOutlined,
@@ -52,11 +52,20 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
   const { chartData, isPositiveGrowth, growthPercentage, monthlyPercentage } =
     usePortfolioStats(portfolio);
 
+  // Create memoized functions to prevent infinite re-renders
+  const loadPortfolio = useCallback(() => {
+    fetchPortfolio();
+  }, [fetchPortfolio]);
+
+  const loadNairaWallet = useCallback(() => {
+    fetchNairaWallet();
+  }, [fetchNairaWallet]);
+
   // Fetch data when component mounts
   useEffect(() => {
-    fetchPortfolio();
-    fetchNairaWallet();
-  }, []);
+    loadPortfolio();
+    loadNairaWallet();
+  }, [loadPortfolio, loadNairaWallet]);
 
   if (isPortfolioLoading || isWalletLoading) {
     return (

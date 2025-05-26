@@ -1,14 +1,16 @@
 import { useState } from 'react';
 
-import { DollarOutlined, PieChartOutlined } from '@ant-design/icons';
+import { PieChartOutlined } from '@ant-design/icons';
 import { Head, Link } from '@inertiajs/react';
-import { Button, Card, Col, Row, Space, Typography } from 'antd';
+import { Button, Col, Row, Space, Typography } from 'antd';
 
 // Import feature components
 import QuickActions from '@/Components/Features/Dashboard/QuickActions';
 import SummaryCards from '@/Components/Features/Dashboard/SummaryCards';
 import DepositFundsModal from '@/Components/Features/Deposits/DepositFundsModal';
-import SavingsTable from '@/Components/Features/Savings/SavingsTable';
+import ActivePlansSection from '@/Components/Features/Savings/ActivePlansSection';
+import SavingsChallengeSection from '@/Components/Features/Savings/SavingsChallengeSection';
+import SavingsPlansGrid from '@/Components/Features/Savings/SavingsPlansGrid';
 import TransactionsList from '@/Components/Features/Transactions/TransactionsList';
 import TransferMoneyModal from '@/Components/Features/Transfers/TransferMoneyModal';
 import WithdrawFundsModal from '@/Components/Features/Withdrawals/WithdrawFundsModal';
@@ -46,30 +48,36 @@ const Dashboard = () => {
         <div className="flex justify-between items-center mb-6">
           <div>
             <Title level={3} style={{ margin: 0 }}>
-              Financial Overview
+              Welcome back, {user?.fullname || 'User'}!
             </Title>
             <Text type="secondary" className="mt-1">
-              Welcome back, {user?.fullname || 'User'}
+              Track your savings progress and grow your wealth with Fakevest
             </Text>
           </div>
 
           <Space>
             <Link href="/savings/new">
               <Button type="primary" icon={<PieChartOutlined />}>
-                New Savings Goal
+                Start Saving
               </Button>
             </Link>
           </Space>
         </div>
 
         {/* Main Dashboard Content */}
-        <div>
+        <div className="space-y-8">
           {/* Summary Cards - now fetches its own data */}
           <SummaryCards
             onTransfer={handleOpenTransferModal}
             onWithdraw={handleOpenWithdrawModal}
             onDeposit={handleOpenDepositModal}
           />
+
+          {/* Active Plans Section */}
+          <ActivePlansSection />
+
+          {/* Savings Plans Grid - Start Saving Section */}
+          <SavingsPlansGrid />
 
           {/* Quick Actions */}
           <QuickActions
@@ -78,8 +86,8 @@ const Dashboard = () => {
             onDeposit={handleOpenDepositModal}
           />
 
-          {/* Recent Activity - now fetches its own data */}
-          <Row gutter={[16, 16]} className="mb-6">
+          {/* Recent Activity */}
+          <Row gutter={[16, 16]} className="mb-8">
             <Col xs={24} md={12}>
               <TransactionsList
                 title="Recent Transactions"
@@ -97,26 +105,8 @@ const Dashboard = () => {
             </Col>
           </Row>
 
-          {/* Savings Table - now fetches its own data */}
-          <Card
-            title={
-              <div className="flex items-center gap-2">
-                <DollarOutlined className="text-blue-600" />
-                <span>Your Savings Plans</span>
-              </div>
-            }
-            className="shadow bg-white dark:bg-gray-800"
-            bordered={false}
-            extra={
-              <Link href="/savings/new">
-                <Button type="primary" size="small">
-                  New Plan
-                </Button>
-              </Link>
-            }
-          >
-            <SavingsTable limit={5} />
-          </Card>
+          {/* Savings Challenge Section */}
+          <SavingsChallengeSection />
         </div>
 
         {/* Money Transfer Modal */}

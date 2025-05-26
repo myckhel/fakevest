@@ -2,7 +2,7 @@
 
 ## 🔍 Overview
 
-**Fakevest** is a modern piggybank app inspired by PiggyVest. It empowers users to **manage and grow their finances** with automated savings, fixed goals, flexible withdrawal options, and investment opportunities. Designed for real-life financial enhancement, Fakevest encourages financial discipline through intuitive design and strong backend architecture.
+**Fakevest** is a modern piggybank app inspired by PiggyVest. It empowers individuals with bank accounts to **save money automatically or one-time**, manage and grow their finances, and build better financial habits. Users can create flexible savings plans, set and track saving goals, or join saving challenges to encourage discipline and reach their targets faster. Designed for real-life financial enhancement, Fakevest encourages financial discipline through intuitive design and strong backend architecture.
 
 ## 🏦 Savings Plans
 
